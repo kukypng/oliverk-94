@@ -101,10 +101,105 @@ export const useShopProfile = () => {
     },
   });
 
+  const uploadLogoMutation = useMutation({
+    mutationFn: async (file: File) => {
+      if (!user?.id) throw new Error('User not authenticated');
+
+      // Verificar tamanho do arquivo (3MB = 3145728 bytes)
+      if (file.size > 3145728) {
+        throw new Error('O arquivo deve ter no máximo 3MB');
+      }
+
+      // Verificar tipo do arquivo
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+      if (!allowedTypes.includes(file.type)) {
+        throw new Error('Apenas imagens PNG, JPEG, WebP e GIF são permitidas');
+      }
+
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}/logo.${fileExt}`;
+
+      // Upload do arquivo
+      const { data, error } = await supabase.storage
+        .from('company-logos')
+        .upload(fileName, file, {
+          upsert: true
+        });
+
+      if (error) throw error;
+
+      // Obter URL pública
+      const { data: { publicUrl } } = supabase.storage
+        .from('company-logos')
+        .getPublicUrl(fileName);
+
+      return publicUrl;
+    },
+    onSuccess: async (logoUrl) => {
+      // Atualizar o perfil com a nova URL da logo
+      await createOrUpdateMutation.mutateAsync({ 
+        ...shopProfile,
+        logo_url: logoUrl 
+      });
+      
+      showSuccess({
+        title: 'Logo enviada com sucesso',
+        description: 'A logo da empresa foi atualizada.',
+      });
+    },
+    onError: (error) => {
+      console.error('Error uploading logo:', error);
+      showError({
+        title: 'Erro ao enviar logo',
+        description: error.message || 'Ocorreu um erro ao enviar a logo.',
+      });
+    },
+  });
+
+  const removeLogoMutation = useMutation({
+    mutationFn: async () => {
+      if (!user?.id || !shopProfile?.logo_url) throw new Error('No logo to remove');
+
+      // Extrair o caminho do arquivo da URL
+      const urlParts = shopProfile.logo_url.split('/');
+      const fileName = `${user.id}/${urlParts[urlParts.length - 1]}`;
+
+      // Remover do storage
+      const { error } = await supabase.storage
+        .from('company-logos')
+        .remove([fileName]);
+
+      if (error) throw error;
+
+      // Atualizar o perfil removendo a URL da logo
+      await createOrUpdateMutation.mutateAsync({ 
+        ...shopProfile,
+        logo_url: null 
+      });
+    },
+    onSuccess: () => {
+      showSuccess({
+        title: 'Logo removida',
+        description: 'A logo da empresa foi removida com sucesso.',
+      });
+    },
+    onError: (error) => {
+      console.error('Error removing logo:', error);
+      showError({
+        title: 'Erro ao remover logo',
+        description: 'Ocorreu um erro ao remover a logo.',
+      });
+    },
+  });
+
   return {
     shopProfile,
     isLoading,
     saveProfile: createOrUpdateMutation.mutate,
     isSaving: createOrUpdateMutation.isPending,
+    uploadLogo: uploadLogoMutation.mutate,
+    isUploadingLogo: uploadLogoMutation.isPending,
+    removeLogo: removeLogoMutation.mutate,
+    isRemovingLogo: removeLogoMutation.isPending,
   };
 };

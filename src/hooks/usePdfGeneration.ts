@@ -55,6 +55,7 @@ export const usePdfGeneration = () => {
         shop_address: shopProfile.address,
         shop_phone: shopProfile.contact_phone,
         shop_cnpj: shopProfile.cnpj,
+        shop_logo_url: shopProfile.logo_url,
       };
 
       // Gerar PDF usando o template
@@ -146,6 +147,7 @@ Clique no link para baixar o PDF: ${window.location.origin}
         shop_address: shopProfile.address,
         shop_phone: shopProfile.contact_phone,
         shop_cnpj: shopProfile.cnpj,
+        shop_logo_url: shopProfile.logo_url,
       };
 
       const pdfBlob = await generateBudgetPDF(pdfData);
