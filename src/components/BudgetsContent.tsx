@@ -41,32 +41,6 @@ export const BudgetsContent = () => {
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'pending':
-        return 'bg-yellow-50 text-yellow-700 border-yellow-200';
-      case 'approved':
-        return 'bg-green-50 text-green-700 border-green-200';
-      case 'rejected':
-        return 'bg-red-50 text-red-700 border-red-200';
-      default:
-        return 'bg-gray-50 text-gray-700 border-gray-200';
-    }
-  };
-
-  const getStatusLabel = (status: string) => {
-    switch (status) {
-      case 'pending':
-        return 'Pendente';
-      case 'approved':
-        return 'Aprovado';
-      case 'rejected':
-        return 'Rejeitado';
-      default:
-        return status;
-    }
-  };
-
   const handleShareWhatsApp = (budget: any) => {
     try {
       const message = generateWhatsAppMessage(budget);
@@ -163,8 +137,6 @@ export const BudgetsContent = () => {
                     <TableHead className="font-semibold">Dispositivo</TableHead>
                     <TableHead className="font-semibold">Problema</TableHead>
                     <TableHead className="font-semibold">Valor</TableHead>
-                    <TableHead className="font-semibold">Status</TableHead>
-                    <TableHead className="font-semibold">Validade</TableHead>
                     <TableHead className="font-semibold">Data</TableHead>
                     <TableHead className="font-semibold text-center">Ações</TableHead>
                   </TableRow>
@@ -201,18 +173,6 @@ export const BudgetsContent = () => {
                             </p>
                           )}
                         </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge className={getStatusColor(budget.status)}>
-                          {getStatusLabel(budget.status)}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        {budget.valid_until && (
-                          <span className="text-sm text-muted-foreground">
-                            {new Date(budget.valid_until).toLocaleDateString('pt-BR')}
-                          </span>
-                        )}
                       </TableCell>
                       <TableCell>
                         <span className="text-sm text-muted-foreground">

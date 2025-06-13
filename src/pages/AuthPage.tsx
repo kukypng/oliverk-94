@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -10,7 +9,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { Loader2, Smartphone, Wrench } from 'lucide-react';
 
 export const AuthPage = () => {
-  const { signIn, signUp } = useAuth();
+  const { signIn, signUp, user, loading: authLoading } = useAuth();
   const [loading, setLoading] = useState(false);
 
   const [loginForm, setLoginForm] = useState({
@@ -24,6 +23,22 @@ export const AuthPage = () => {
     confirmPassword: '',
     name: ''
   });
+
+  // Redirecionar usuários já logados
+  useEffect(() => {
+    if (!authLoading && user) {
+      window.location.href = '/dashboard';
+    }
+  }, [user, authLoading]);
+
+  // Mostrar loading se usuário já está logado
+  if (authLoading || user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-primary/5 to-primary/10">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -1,9 +1,9 @@
-
 import { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 
 export type UserRole = 'admin' | 'manager' | 'user';
 
@@ -130,6 +130,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         });
       } else {
         toast.success('Login realizado com sucesso!');
+        // Redirecionar para o dashboard após login bem-sucedido
+        setTimeout(() => {
+          window.location.href = '/dashboard';
+        }, 500);
       }
       
       return { error };
