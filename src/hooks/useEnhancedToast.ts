@@ -29,7 +29,7 @@ export const useEnhancedToast = () => {
     console.error('Toast Error:', options.title, options.description);
     toast.error(options.title, {
       description: options.description,
-      duration: options.duration || 6000, // Longer duration for errors
+      duration: options.duration || 6000,
       action: options.action ? {
         label: options.action.label,
         onClick: options.action.onClick,

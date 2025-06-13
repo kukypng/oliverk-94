@@ -146,7 +146,6 @@ export type Database = {
           status: string
           total_price: number
           updated_at: string
-          user_id: string | null
           valid_until: string | null
           warranty_months: number | null
         }
@@ -173,7 +172,6 @@ export type Database = {
           status?: string
           total_price: number
           updated_at?: string
-          user_id?: string | null
           valid_until?: string | null
           warranty_months?: number | null
         }
@@ -200,7 +198,6 @@ export type Database = {
           status?: string
           total_price?: number
           updated_at?: string
-          user_id?: string | null
           valid_until?: string | null
           warranty_months?: number | null
         }

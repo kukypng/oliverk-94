@@ -8,25 +8,35 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Eye, Edit, Trash2, MessageCircle, Search, Filter, Download } from 'lucide-react';
 import { generateWhatsAppMessage, shareViaWhatsApp } from '@/utils/whatsappUtils';
-import { useToast } from '@/hooks/use-toast';
+import { useEnhancedToast } from '@/hooks/useEnhancedToast';
 import { EditBudgetModal } from '@/components/EditBudgetModal';
 import { DeleteBudgetConfirm } from '@/components/DeleteBudgetConfirm';
 import { BudgetsSkeleton } from '@/components/ui/loading-skeleton';
 import { EmptyState } from '@/components/EmptyState';
 import { Input } from '@/components/ui/input';
+import { useAuth } from '@/hooks/useAuth';
 
 export const BudgetsContent = () => {
-  const { toast } = useToast();
+  const { showSuccess, showError } = useEnhancedToast();
+  const { user } = useAuth();
   const [editingBudget, setEditingBudget] = useState<any>(null);
   const [deletingBudget, setDeletingBudget] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState('');
   
   const { data: budgets, isLoading, error, refetch } = useQuery({
-    queryKey: ['budgets', searchTerm],
+    queryKey: ['budgets', searchTerm, user?.id],
     queryFn: async () => {
+      if (!user) {
+        console.log('No user found, returning empty array');
+        return [];
+      }
+
+      console.log('Fetching budgets for user:', user.id);
+      
       let query = supabase
         .from('budgets')
         .select('*')
+        .eq('owner_id', user.id) // Garantir que só busca orçamentos do usuário atual
         .order('created_at', { ascending: false });
 
       if (searchTerm) {
@@ -34,9 +44,15 @@ export const BudgetsContent = () => {
       }
 
       const { data, error } = await query;
-      if (error) throw error;
-      return data;
+      if (error) {
+        console.error('Error fetching budgets:', error);
+        throw error;
+      }
+      
+      console.log('Fetched budgets:', data?.length || 0);
+      return data || [];
     },
+    enabled: !!user, // Só executar a query se houver usuário logado
     retry: 3,
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
@@ -45,24 +61,36 @@ export const BudgetsContent = () => {
     try {
       const message = generateWhatsAppMessage(budget);
       shareViaWhatsApp(message);
-      toast({
+      showSuccess({
         title: "Compartilhando via WhatsApp",
         description: "O orçamento será compartilhado via WhatsApp.",
       });
     } catch (error) {
-      toast({
+      showError({
         title: "Erro ao compartilhar",
         description: "Ocorreu um erro ao preparar o compartilhamento.",
-        variant: "destructive",
       });
     }
   };
+
+  if (!user) {
+    return (
+      <div className="p-4 lg:p-8">
+        <EmptyState
+          icon={MessageCircle}
+          title="Faça login para continuar"
+          description="Você precisa estar logado para ver seus orçamentos."
+        />
+      </div>
+    );
+  }
 
   if (isLoading) {
     return <BudgetsSkeleton />;
   }
 
   if (error) {
+    console.error('Budget loading error:', error);
     return (
       <div className="p-4 lg:p-8">
         <EmptyState
@@ -84,7 +112,7 @@ export const BudgetsContent = () => {
     <div className="p-4 lg:p-8 space-y-6 lg:space-y-8 animate-fade-in">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl lg:text-3xl font-bold text-foreground">Orçamentos</h1>
+          <h1 className="text-2xl lg:text-3xl font-bold text-foreground">Meus Orçamentos</h1>
           <p className="text-muted-foreground mt-1">
             Gerencie todos os seus orçamentos ({filteredBudgets.length})
           </p>
@@ -241,7 +269,6 @@ export const BudgetsContent = () => {
                   : {
                       label: "Criar Primeiro Orçamento",
                       onClick: () => {
-                        // This would be handled by parent component
                         console.log('Navigate to new budget');
                       }
                     }

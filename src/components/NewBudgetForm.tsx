@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,8 +9,9 @@ import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { useEnhancedToast } from '@/hooks/useEnhancedToast';
 import { ArrowLeft } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 
 interface BudgetFormData {
   deviceModel: string;
@@ -32,7 +32,8 @@ interface NewBudgetFormProps {
 }
 
 export const NewBudgetForm = ({ onBack }: NewBudgetFormProps) => {
-  const { toast } = useToast();
+  const { showSuccess, showError } = useEnhancedToast();
+  const { user } = useAuth();
   const queryClient = useQueryClient();
   
   const [formData, setFormData] = useState<BudgetFormData>({
@@ -71,16 +72,23 @@ export const NewBudgetForm = ({ onBack }: NewBudgetFormProps) => {
 
   const createBudgetMutation = useMutation({
     mutationFn: async (data: BudgetFormData) => {
-      // Criar orçamento sem informações de cliente
+      if (!user) {
+        throw new Error('Usuário não está logado');
+      }
+
+      console.log('Creating budget for user:', user.id);
+      
+      // Criar orçamento com owner_id explícito (o trigger vai garantir que seja o usuário atual)
       const { data: budget, error: budgetError } = await supabase
         .from('budgets')
         .insert({
+          owner_id: user.id, // Explicitamente definir o owner_id
           device_model: data.deviceModel,
-          device_type: 'Smartphone', // Default baseado na imagem
+          device_type: 'Smartphone',
           issue: `Troca de ${data.partType}`,
           part_type: data.partType,
           warranty_months: data.warrantyMonths,
-          cash_price: Math.round(data.cashPrice * 100), // Converter para centavos
+          cash_price: Math.round(data.cashPrice * 100),
           installment_price: data.enableInstallmentPrice ? Math.round(data.installmentPrice * 100) : null,
           installments: data.enableInstallmentPrice ? data.installments : 1,
           total_price: Math.round(data.cashPrice * 100),
@@ -92,7 +100,12 @@ export const NewBudgetForm = ({ onBack }: NewBudgetFormProps) => {
         .select('id')
         .single();
 
-      if (budgetError) throw budgetError;
+      if (budgetError) {
+        console.error('Budget creation error:', budgetError);
+        throw budgetError;
+      }
+
+      console.log('Budget created:', budget.id);
 
       // Criar item do orçamento
       const { error: partError } = await supabase
@@ -101,7 +114,7 @@ export const NewBudgetForm = ({ onBack }: NewBudgetFormProps) => {
           budget_id: budget.id,
           name: `${data.partType} - ${data.deviceModel}`,
           part_type: data.partType,
-          brand_id: null, // Agora é texto livre
+          brand_id: null,
           quantity: 1,
           price: Math.round(data.cashPrice * 100),
           cash_price: Math.round(data.cashPrice * 100),
@@ -109,12 +122,16 @@ export const NewBudgetForm = ({ onBack }: NewBudgetFormProps) => {
           warranty_months: data.warrantyMonths
         });
 
-      if (partError) throw partError;
+      if (partError) {
+        console.error('Budget part creation error:', partError);
+        throw partError;
+      }
 
+      console.log('Budget part created successfully');
       return budget;
     },
     onSuccess: () => {
-      toast({
+      showSuccess({
         title: "Orçamento criado com sucesso!",
         description: "O orçamento foi criado e está válido por 15 dias.",
       });
@@ -122,28 +139,43 @@ export const NewBudgetForm = ({ onBack }: NewBudgetFormProps) => {
       queryClient.invalidateQueries({ queryKey: ['budgets'] });
       onBack();
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error('Erro ao criar orçamento:', error);
-      toast({
+      showError({
         title: "Erro ao criar orçamento",
-        description: "Ocorreu um erro ao salvar o orçamento. Tente novamente.",
-        variant: "destructive",
+        description: error.message || "Ocorreu um erro ao salvar o orçamento. Tente novamente.",
       });
     }
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user) {
+      showError({
+        title: "Usuário não autenticado",
+        description: "Você precisa estar logado para criar orçamentos.",
+      });
+      return;
+    }
+    
     if (!formData.deviceModel || !formData.partType) {
-      toast({
+      showError({
         title: "Preencha os campos obrigatórios",
         description: "Modelo do aparelho e tipo de peça são obrigatórios.",
-        variant: "destructive",
       });
       return;
     }
     createBudgetMutation.mutate(formData);
   };
+
+  if (!user) {
+    return (
+      <div className="p-8 text-center">
+        <h1 className="text-2xl font-bold text-gray-900 mb-4">Acesso Negado</h1>
+        <p className="text-gray-600">Você precisa estar logado para criar orçamentos.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="p-8">

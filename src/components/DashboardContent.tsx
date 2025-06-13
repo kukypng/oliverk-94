@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useQuery } from '@tanstack/react-query';
@@ -9,22 +8,42 @@ import { DashboardSkeleton } from '@/components/ui/loading-states';
 import { EmptyState } from '@/components/EmptyState';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
-import { useToast } from '@/hooks/useToast';
+import { useEnhancedToast } from '@/hooks/useEnhancedToast';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 export const DashboardContent = () => {
-  const { profile, hasPermission } = useAuth();
-  const { showError } = useToast();
+  const { profile, hasPermission, user } = useAuth();
+  const { showError } = useEnhancedToast();
 
   const { data: stats, isLoading, error } = useQuery({
-    queryKey: ['dashboard-stats'],
+    queryKey: ['dashboard-stats', user?.id],
     queryFn: async () => {
+      if (!user) {
+        console.log('No user found for dashboard stats');
+        return {
+          totalBudgets: 0,
+          monthlyRevenue: 0,
+          averageTicket: 0,
+          monthlyGrowth: 0,
+          topDevice: 'N/A',
+          recentBudgets: []
+        };
+      }
+
       try {
+        console.log('Fetching dashboard stats for user:', user.id);
+        
         const { data: budgets, error } = await supabase
           .from('budgets')
-          .select('id, total_price, device_model, created_at, client_name, status');
+          .select('id, total_price, device_model, created_at, client_name, status')
+          .eq('owner_id', user.id); // Garantir que só busca orçamentos do usuário atual
 
-        if (error) throw error;
+        if (error) {
+          console.error('Error fetching budgets for dashboard:', error);
+          throw error;
+        }
+
+        console.log('Dashboard budgets fetched:', budgets?.length || 0);
 
         const total = budgets?.length || 0;
         const totalRevenue = budgets?.reduce((sum, budget) => sum + Number(budget.total_price), 0) || 0;
@@ -56,6 +75,7 @@ export const DashboardContent = () => {
           recentBudgets: budgets?.slice(-5).reverse() || []
         };
       } catch (error: any) {
+        console.error('Dashboard stats error:', error);
         showError({
           title: 'Erro ao carregar dados',
           description: error.message || 'Ocorreu um erro inesperado'
@@ -63,15 +83,29 @@ export const DashboardContent = () => {
         throw error;
       }
     },
+    enabled: !!user, // Só executar se houver usuário logado
     retry: 3,
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
+
+  if (!user) {
+    return (
+      <div className="p-4 lg:p-8">
+        <EmptyState
+          icon={FileText}
+          title="Faça login para continuar"
+          description="Você precisa estar logado para ver seu dashboard."
+        />
+      </div>
+    );
+  }
 
   if (isLoading) {
     return <DashboardSkeleton />;
   }
 
   if (error) {
+    console.error('Dashboard error:', error);
     return (
       <div className="p-4 lg:p-8">
         <EmptyState
@@ -131,7 +165,7 @@ export const DashboardContent = () => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl lg:text-3xl font-bold text-foreground">Dashboard</h1>
+            <h1 className="text-2xl lg:text-3xl font-bold text-foreground">Meu Dashboard</h1>
             <p className="text-muted-foreground mt-1">
               Visão geral dos seus orçamentos
               {profile && (
