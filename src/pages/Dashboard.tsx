@@ -31,10 +31,17 @@ export const Dashboard = () => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
+    <div className="flex h-screen bg-background">
+      <div className="hidden lg:block">
+        <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
+      </div>
+      
+      {/* Mobile sidebar overlay would go here */}
+      
       <main className="flex-1 overflow-auto">
-        {renderContent()}
+        <div className="animate-fade-in">
+          {renderContent()}
+        </div>
       </main>
     </div>
   );
