@@ -53,30 +53,52 @@ export type Database = {
       }
       budget_parts: {
         Row: {
+          brand_id: string | null
           budget_id: string
+          cash_price: number | null
           created_at: string
           id: string
+          installment_price: number | null
           name: string
+          part_type: string | null
           price: number
           quantity: number
+          warranty_months: number | null
         }
         Insert: {
+          brand_id?: string | null
           budget_id: string
+          cash_price?: number | null
           created_at?: string
           id?: string
+          installment_price?: number | null
           name: string
+          part_type?: string | null
           price: number
           quantity?: number
+          warranty_months?: number | null
         }
         Update: {
+          brand_id?: string | null
           budget_id?: string
+          cash_price?: number | null
           created_at?: string
           id?: string
+          installment_price?: number | null
           name?: string
+          part_type?: string | null
           price?: number
           quantity?: number
+          warranty_months?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "budget_parts_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "budget_parts_budget_id_fkey"
             columns: ["budget_id"]
@@ -95,52 +117,82 @@ export type Database = {
       }
       budgets: {
         Row: {
+          cash_price: number | null
           client_name: string
           client_phone: string
           created_at: string
+          delivery_date: string | null
+          device_brand: string | null
           device_model: string
           device_type: string
           id: string
+          includes_delivery: boolean | null
+          includes_screen_protector: boolean | null
+          installment_price: number | null
+          installments: number | null
           issue: string
           notes: string | null
           owner_id: string | null
+          part_type: string | null
+          payment_condition: string | null
           search_vector: unknown | null
           status: string
           total_price: number
           updated_at: string
           user_id: string | null
+          warranty_months: number | null
         }
         Insert: {
+          cash_price?: number | null
           client_name: string
           client_phone: string
           created_at?: string
+          delivery_date?: string | null
+          device_brand?: string | null
           device_model: string
           device_type: string
           id?: string
+          includes_delivery?: boolean | null
+          includes_screen_protector?: boolean | null
+          installment_price?: number | null
+          installments?: number | null
           issue: string
           notes?: string | null
           owner_id?: string | null
+          part_type?: string | null
+          payment_condition?: string | null
           search_vector?: unknown | null
           status?: string
           total_price: number
           updated_at?: string
           user_id?: string | null
+          warranty_months?: number | null
         }
         Update: {
+          cash_price?: number | null
           client_name?: string
           client_phone?: string
           created_at?: string
+          delivery_date?: string | null
+          device_brand?: string | null
           device_model?: string
           device_type?: string
           id?: string
+          includes_delivery?: boolean | null
+          includes_screen_protector?: boolean | null
+          installment_price?: number | null
+          installments?: number | null
           issue?: string
           notes?: string | null
           owner_id?: string | null
+          part_type?: string | null
+          payment_condition?: string | null
           search_vector?: unknown | null
           status?: string
           total_price?: number
           updated_at?: string
           user_id?: string | null
+          warranty_months?: number | null
         }
         Relationships: []
       }
@@ -192,6 +244,45 @@ export type Database = {
           label?: string
           user_id?: string | null
           value?: string
+        }
+        Relationships: []
+      }
+      device_types: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      payment_conditions: {
+        Row: {
+          created_at: string
+          id: string
+          installments: number
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          installments?: number
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          installments?: number
+          name?: string
         }
         Relationships: []
       }
@@ -282,6 +373,27 @@ export type Database = {
           role?: string | null
           updated_at?: string
           username?: string | null
+        }
+        Relationships: []
+      }
+      warranty_periods: {
+        Row: {
+          created_at: string
+          id: string
+          label: string
+          months: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          label: string
+          months: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          label?: string
+          months?: number
         }
         Relationships: []
       }

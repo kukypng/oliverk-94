@@ -1,9 +1,13 @@
 
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useState } from 'react';
+import { NewBudgetForm } from './NewBudgetForm';
 
 export const NewBudgetContent = () => {
-  return (
+  const [showForm, setShowForm] = useState(true);
+
+  return showForm ? (
+    <NewBudgetForm onBack={() => setShowForm(false)} />
+  ) : (
     <div className="p-8">
       <div className="flex items-center justify-between mb-8">
         <div>
@@ -11,17 +15,6 @@ export const NewBudgetContent = () => {
           <p className="text-gray-600 mt-2">Crie um novo orçamento para seu cliente</p>
         </div>
       </div>
-      
-      <Card className="border-0 shadow-sm">
-        <CardHeader>
-          <CardTitle>Formulário de Orçamento</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center py-8 text-gray-500">
-            <p>Formulário em desenvolvimento</p>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 };
