@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -24,6 +25,7 @@ interface BudgetFormData {
   installments: number;
   includesDelivery: boolean;
   includesScreenProtector: boolean;
+  enableInstallmentPrice: boolean;
   notes: string;
 }
 
@@ -47,6 +49,7 @@ export const NewBudgetForm = ({ onBack }: NewBudgetFormProps) => {
     installments: 1,
     includesDelivery: false,
     includesScreenProtector: false,
+    enableInstallmentPrice: true,
     notes: ''
   });
 
@@ -118,8 +121,8 @@ export const NewBudgetForm = ({ onBack }: NewBudgetFormProps) => {
           part_type: data.partType,
           warranty_months: data.warrantyMonths,
           cash_price: Math.round(data.cashPrice * 100), // Converter para centavos
-          installment_price: Math.round(data.installmentPrice * 100),
-          installments: data.installments,
+          installment_price: data.enableInstallmentPrice ? Math.round(data.installmentPrice * 100) : null,
+          installments: data.enableInstallmentPrice ? data.installments : 1,
           total_price: Math.round(data.cashPrice * 100),
           includes_delivery: data.includesDelivery,
           includes_screen_protector: data.includesScreenProtector,
@@ -138,11 +141,11 @@ export const NewBudgetForm = ({ onBack }: NewBudgetFormProps) => {
           budget_id: budget.id,
           name: `${data.partType} - ${data.deviceModel}`,
           part_type: data.partType,
-          brand_id: data.brand,
+          brand_id: null, // Agora é texto livre
           quantity: 1,
           price: Math.round(data.cashPrice * 100),
           cash_price: Math.round(data.cashPrice * 100),
-          installment_price: Math.round(data.installmentPrice * 100),
+          installment_price: data.enableInstallmentPrice ? Math.round(data.installmentPrice * 100) : null,
           warranty_months: data.warrantyMonths
         });
 
@@ -180,8 +183,6 @@ export const NewBudgetForm = ({ onBack }: NewBudgetFormProps) => {
     }
     createBudgetMutation.mutate(formData);
   };
-
-  const partTypes = ['Tela', 'Bateria', 'Câmera', 'Conector'];
 
   return (
     <div className="p-8">
@@ -246,36 +247,24 @@ export const NewBudgetForm = ({ onBack }: NewBudgetFormProps) => {
             </div>
 
             <div>
-              <Label>Tipo de Peça *</Label>
-              <div className="grid grid-cols-2 gap-2 mt-2">
-                {partTypes.map((type) => (
-                  <Button
-                    key={type}
-                    type="button"
-                    variant={formData.partType === type ? "default" : "outline"}
-                    onClick={() => setFormData({...formData, partType: type})}
-                    className="justify-start"
-                  >
-                    {type}
-                  </Button>
-                ))}
-              </div>
+              <Label htmlFor="partType">Qual peça vai ser trocada? / Serviço a ser realizado *</Label>
+              <Input
+                id="partType"
+                value={formData.partType}
+                onChange={(e) => setFormData({...formData, partType: e.target.value})}
+                placeholder="Ex: Tela, Bateria, Troca de conector, Limpeza..."
+                required
+              />
             </div>
 
             <div>
-              <Label htmlFor="brand">Marca da Peça *</Label>
-              <Select onValueChange={(value) => setFormData({...formData, brand: value})}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione a marca" />
-                </SelectTrigger>
-                <SelectContent>
-                  {brands?.map((brand) => (
-                    <SelectItem key={brand.id} value={brand.id}>
-                      {brand.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Label htmlFor="brand">Marca da Peça</Label>
+              <Input
+                id="brand"
+                value={formData.brand}
+                onChange={(e) => setFormData({...formData, brand: e.target.value})}
+                placeholder="Ex: Original, Incell, OLED, Compatível..."
+              />
             </div>
 
             <div>
@@ -317,36 +306,49 @@ export const NewBudgetForm = ({ onBack }: NewBudgetFormProps) => {
               />
             </div>
 
-            <div>
-              <Label htmlFor="installmentPrice">Valor Parcelado (R$)</Label>
-              <Input
-                id="installmentPrice"
-                type="number"
-                step="0.01"
-                value={formData.installmentPrice}
-                onChange={(e) => setFormData({...formData, installmentPrice: parseFloat(e.target.value) || 0})}
-                placeholder="0,00"
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="enableInstallmentPrice"
+                checked={formData.enableInstallmentPrice}
+                onCheckedChange={(checked) => setFormData({...formData, enableInstallmentPrice: checked})}
               />
+              <Label htmlFor="enableInstallmentPrice">Ativar valor parcelado</Label>
             </div>
 
-            <div>
-              <Label htmlFor="installments">Número de Parcelas</Label>
-              <Select 
-                value={formData.installments.toString()} 
-                onValueChange={(value) => setFormData({...formData, installments: parseInt(value)})}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {paymentConditions?.map((condition) => (
-                    <SelectItem key={condition.id} value={condition.installments.toString()}>
-                      {condition.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            {formData.enableInstallmentPrice && (
+              <>
+                <div>
+                  <Label htmlFor="installmentPrice">Valor Parcelado (R$)</Label>
+                  <Input
+                    id="installmentPrice"
+                    type="number"
+                    step="0.01"
+                    value={formData.installmentPrice}
+                    onChange={(e) => setFormData({...formData, installmentPrice: parseFloat(e.target.value) || 0})}
+                    placeholder="0,00"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="installments">Número de Parcelas</Label>
+                  <Select 
+                    value={formData.installments.toString()} 
+                    onValueChange={(value) => setFormData({...formData, installments: parseInt(value)})}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {paymentConditions?.map((condition) => (
+                        <SelectItem key={condition.id} value={condition.installments.toString()}>
+                          {condition.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </>
+            )}
           </CardContent>
         </Card>
 
