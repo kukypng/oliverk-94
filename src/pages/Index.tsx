@@ -23,46 +23,42 @@ const Index = () => {
   return <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50">
       {/* Header */}
       <header className="bg-white/80 backdrop-blur-sm border-b shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4 bg-zinc-950">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 bg-black">
+          <div className="flex justify-between items-center py-4 bg-black">
             <div className="flex items-center space-x-2">
               <Calculator className="h-8 w-8 text-amber-600" />
-              <h1 className="text-2xl font-bold text-white">OLiver</h1>
+              <h1 className="text-2xl font-bold text-white">Oliver</h1>
             </div>
-            <Button onClick={() => window.location.href = '/auth'} className="bg-amber-600 hover:bg-amber-700">
-              Entrar
-            </Button>
+            <Button onClick={() => window.location.href = '/auth'} className="bg-[#fec832]">Login</Button>
           </div>
         </div>
       </header>
 
       {/* Hero Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-black">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl lg:text-6xl font-bold text-gray-900 mb-6">
-            Gerencie seus <span className="text-amber-600">Orçamentos</span>
+          <h2 className="text-4xl lg:text-6xl font-bold mb-6 text-white">
+            Gerencie seus <span className="text-[#fec832]">Orçamentos</span>
             <br />
             de forma profissional
           </h2>
-          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+          <p className="text-xl mb-8 max-w-2xl mx-auto text-white">
             Sistema completo para assistências técnicas gerenciarem orçamentos, 
             clientes e relatórios de forma eficiente e organizada.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" onClick={() => window.location.href = '/auth'} className="bg-amber-600 hover:bg-amber-700 text-lg px-8 py-3">
+            <Button size="lg" onClick={() => window.location.href = '/auth'} className="text-lg px-8 py-3 bg-[#fec832]">
               Começar Agora
             </Button>
-            <Button size="lg" variant="outline" className="text-lg px-8 py-3 border-amber-600 text-amber-600 hover:bg-amber-50">
-              Ver Demo
-            </Button>
+            <Button size="lg" variant="outline" className="text-lg px-8 py-3 border-amber-600 text-white -bottom-0 ">Entre em contato</Button>
           </div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8">
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-black">
         <div className="max-w-6xl mx-auto">
-          <h3 className="text-3xl font-bold text-center text-gray-900 mb-12">
+          <h3 className="text-3xl font-bold text-center mb-12 text-white">
             Funcionalidades Principais
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -94,13 +90,13 @@ const Index = () => {
             const Icon = feature.icon;
             return <Card key={index} className="hover:shadow-lg transition-shadow duration-200">
                   <CardHeader>
-                    <div className="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center mb-4">
+                    <div className="w-12 h-12 rounded-lg flex items-center justify-center mb-4 bg-[#fec832] py-0">
                       <Icon className="h-6 w-6 text-amber-600" />
                     </div>
-                    <CardTitle className="text-xl text-gray-900">{feature.title}</CardTitle>
+                    <CardTitle className="text-xl text-white">{feature.title}</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-gray-600">{feature.description}</p>
+                    <p className="text-white">{feature.description}</p>
                   </CardContent>
                 </Card>;
           })}
@@ -109,31 +105,29 @@ const Index = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white/50">
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-black">
         <div className="max-w-4xl mx-auto text-center">
-          <h3 className="text-3xl font-bold text-gray-900 mb-6">
+          <h3 className="text-3xl font-bold mb-6 text-white">
             Pronto para otimizar sua assistência técnica?
           </h3>
-          <p className="text-xl text-gray-600 mb-8">
+          <p className="text-xl mb-8 text-white">
             Junte-se a centenas de profissionais que já utilizam o BudgetFlow 
             para gerenciar seus negócios de forma mais eficiente.
           </p>
-          <Button size="lg" onClick={() => window.location.href = '/auth'} className="bg-amber-600 hover:bg-amber-700 text-lg px-8 py-3">
+          <Button size="lg" onClick={() => window.location.href = '/auth'} className="text-lg px-8 py-3 bg-[#fec832] text-black ">
             Criar Conta Gratuita
           </Button>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-8 px-4 sm:px-6 lg:px-8">
+      <footer className="text-white py-8 px-4 sm:px-6 lg:px-8 bg-black">
         <div className="max-w-6xl mx-auto text-center">
           <div className="flex items-center justify-center space-x-2 mb-4">
             <Calculator className="h-6 w-6 text-amber-500" />
-            <span className="text-xl font-bold">BudgetFlow</span>
+            <span className="text-xl font-bold">Oliver</span>
           </div>
-          <p className="text-gray-400">
-            © 2024 BudgetFlow. Sistema profissional para gestão de orçamentos.
-          </p>
+          <p className="text-gray-400">© 2025 Oliver. Sistema profissional para gestão de orçamentos.</p>
         </div>
       </footer>
     </div>;
