@@ -1,5 +1,5 @@
 
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/hooks/useAuth';
 import { AuthPage } from '@/pages/AuthPage';
 
 interface AuthGuardProps {

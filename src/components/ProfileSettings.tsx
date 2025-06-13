@@ -4,13 +4,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
+import { toast } from 'sonner';
 import { User, Save } from 'lucide-react';
 
 export const ProfileSettings = () => {
   const { user } = useAuth();
-  const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: user?.user_metadata?.name || '',
@@ -21,15 +20,12 @@ export const ProfileSettings = () => {
     setIsLoading(true);
     try {
       // Aqui você implementaria a lógica para salvar os dados do perfil no Supabase
-      toast({
-        title: "Perfil atualizado",
+      toast.success("Perfil atualizado", {
         description: "Suas informações foram salvas com sucesso.",
       });
     } catch (error) {
-      toast({
-        title: "Erro ao salvar",
+      toast.error("Erro ao salvar", {
         description: "Ocorreu um erro ao salvar suas informações.",
-        variant: "destructive",
       });
     } finally {
       setIsLoading(false);
