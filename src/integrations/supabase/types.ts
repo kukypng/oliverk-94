@@ -118,8 +118,8 @@ export type Database = {
       budgets: {
         Row: {
           cash_price: number | null
-          client_name: string
-          client_phone: string
+          client_name: string | null
+          client_phone: string | null
           created_at: string
           delivery_date: string | null
           device_brand: string | null
@@ -140,12 +140,13 @@ export type Database = {
           total_price: number
           updated_at: string
           user_id: string | null
+          valid_until: string | null
           warranty_months: number | null
         }
         Insert: {
           cash_price?: number | null
-          client_name: string
-          client_phone: string
+          client_name?: string | null
+          client_phone?: string | null
           created_at?: string
           delivery_date?: string | null
           device_brand?: string | null
@@ -166,12 +167,13 @@ export type Database = {
           total_price: number
           updated_at?: string
           user_id?: string | null
+          valid_until?: string | null
           warranty_months?: number | null
         }
         Update: {
           cash_price?: number | null
-          client_name?: string
-          client_phone?: string
+          client_name?: string | null
+          client_phone?: string | null
           created_at?: string
           delivery_date?: string | null
           device_brand?: string | null
@@ -192,6 +194,7 @@ export type Database = {
           total_price?: number
           updated_at?: string
           user_id?: string | null
+          valid_until?: string | null
           warranty_months?: number | null
         }
         Relationships: []

@@ -4,7 +4,6 @@ import { Sidebar } from '@/components/Sidebar';
 import { DashboardContent } from '@/components/DashboardContent';
 import { BudgetsContent } from '@/components/BudgetsContent';
 import { NewBudgetContent } from '@/components/NewBudgetContent';
-import { ClientsContent } from '@/components/ClientsContent';
 import { ReportsContent } from '@/components/ReportsContent';
 import { SettingsContent } from '@/components/SettingsContent';
 
@@ -19,8 +18,6 @@ export const Dashboard = () => {
         return <BudgetsContent />;
       case 'new-budget':
         return <NewBudgetContent />;
-      case 'clients':
-        return <ClientsContent />;
       case 'reports':
         return <ReportsContent />;
       case 'settings':

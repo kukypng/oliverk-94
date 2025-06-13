@@ -11,11 +11,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Plus } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 
 interface BudgetFormData {
-  clientName: string;
-  clientPhone: string;
   deviceModel: string;
   partType: string;
   brand: string;
@@ -38,8 +36,6 @@ export const NewBudgetForm = ({ onBack }: NewBudgetFormProps) => {
   const queryClient = useQueryClient();
   
   const [formData, setFormData] = useState<BudgetFormData>({
-    clientName: '',
-    clientPhone: '',
     deviceModel: '',
     partType: '',
     brand: '',
@@ -51,16 +47,6 @@ export const NewBudgetForm = ({ onBack }: NewBudgetFormProps) => {
     includesScreenProtector: false,
     enableInstallmentPrice: true,
     notes: ''
-  });
-
-  // Buscar marcas disponíveis
-  const { data: brands } = useQuery({
-    queryKey: ['brands'],
-    queryFn: async () => {
-      const { data, error } = await supabase.from('brands').select('*');
-      if (error) throw error;
-      return data;
-    }
   });
 
   // Buscar períodos de garantia
@@ -85,36 +71,10 @@ export const NewBudgetForm = ({ onBack }: NewBudgetFormProps) => {
 
   const createBudgetMutation = useMutation({
     mutationFn: async (data: BudgetFormData) => {
-      // Primeiro, verificar/criar cliente
-      let clientId;
-      const { data: existingClient } = await supabase
-        .from('clients')
-        .select('id')
-        .eq('phone', data.clientPhone)
-        .single();
-
-      if (existingClient) {
-        clientId = existingClient.id;
-      } else {
-        const { data: newClient, error: clientError } = await supabase
-          .from('clients')
-          .insert({
-            name: data.clientName,
-            phone: data.clientPhone
-          })
-          .select('id')
-          .single();
-
-        if (clientError) throw clientError;
-        clientId = newClient.id;
-      }
-
-      // Criar orçamento
+      // Criar orçamento sem informações de cliente
       const { data: budget, error: budgetError } = await supabase
         .from('budgets')
         .insert({
-          client_name: data.clientName,
-          client_phone: data.clientPhone,
           device_model: data.deviceModel,
           device_type: 'Smartphone', // Default baseado na imagem
           issue: `Troca de ${data.partType}`,
@@ -156,9 +116,10 @@ export const NewBudgetForm = ({ onBack }: NewBudgetFormProps) => {
     onSuccess: () => {
       toast({
         title: "Orçamento criado com sucesso!",
-        description: "O orçamento foi criado e salvo na base de dados.",
+        description: "O orçamento foi criado e está válido por 15 dias.",
       });
       queryClient.invalidateQueries({ queryKey: ['dashboard-stats'] });
+      queryClient.invalidateQueries({ queryKey: ['budgets'] });
       onBack();
     },
     onError: (error) => {
@@ -173,10 +134,10 @@ export const NewBudgetForm = ({ onBack }: NewBudgetFormProps) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.clientName || !formData.clientPhone || !formData.deviceModel || !formData.partType) {
+    if (!formData.deviceModel || !formData.partType) {
       toast({
         title: "Preencha os campos obrigatórios",
-        description: "Nome, telefone, modelo do aparelho e tipo de peça são obrigatórios.",
+        description: "Modelo do aparelho e tipo de peça são obrigatórios.",
         variant: "destructive",
       });
       return;
@@ -197,39 +158,11 @@ export const NewBudgetForm = ({ onBack }: NewBudgetFormProps) => {
         </Button>
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Novo Orçamento</h1>
-          <p className="text-gray-600 mt-2">Crie um novo orçamento para seu cliente</p>
+          <p className="text-gray-600 mt-2">Crie um novo orçamento válido por 15 dias</p>
         </div>
       </div>
 
       <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Informações do Cliente</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label htmlFor="clientName">Nome do Cliente *</Label>
-              <Input
-                id="clientName"
-                value={formData.clientName}
-                onChange={(e) => setFormData({...formData, clientName: e.target.value})}
-                placeholder="Digite o nome completo"
-                required
-              />
-            </div>
-            <div>
-              <Label htmlFor="clientPhone">Telefone *</Label>
-              <Input
-                id="clientPhone"
-                value={formData.clientPhone}
-                onChange={(e) => setFormData({...formData, clientPhone: e.target.value})}
-                placeholder="(11) 99999-9999"
-                required
-              />
-            </div>
-          </CardContent>
-        </Card>
-
         <Card>
           <CardHeader>
             <CardTitle>Informações do Dispositivo</CardTitle>

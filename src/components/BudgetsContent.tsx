@@ -6,9 +6,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Eye, Edit, Trash2 } from 'lucide-react';
+import { Eye, Edit, Trash2, Share, MessageCircle } from 'lucide-react';
+import { generateWhatsAppMessage, shareViaWhatsApp } from '@/utils/whatsappUtils';
+import { useToast } from '@/hooks/use-toast';
 
 export const BudgetsContent = () => {
+  const { toast } = useToast();
+  
   const { data: budgets, isLoading } = useQuery({
     queryKey: ['budgets'],
     queryFn: async () => {
@@ -48,6 +52,29 @@ export const BudgetsContent = () => {
     }
   };
 
+  const isValidBudget = (validUntil: string) => {
+    const today = new Date();
+    const validDate = new Date(validUntil);
+    return validDate >= today;
+  };
+
+  const handleShareWhatsApp = (budget: any) => {
+    try {
+      const message = generateWhatsAppMessage(budget);
+      shareViaWhatsApp(message);
+      toast({
+        title: "Compartilhando via WhatsApp",
+        description: "O orçamento será compartilhado via WhatsApp.",
+      });
+    } catch (error) {
+      toast({
+        title: "Erro ao compartilhar",
+        description: "Ocorreu um erro ao preparar o compartilhamento.",
+        variant: "destructive",
+      });
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="p-8">
@@ -77,11 +104,11 @@ export const BudgetsContent = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Cliente</TableHead>
                   <TableHead>Dispositivo</TableHead>
                   <TableHead>Problema</TableHead>
                   <TableHead>Valor</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead>Validade</TableHead>
                   <TableHead>Data</TableHead>
                   <TableHead>Ações</TableHead>
                 </TableRow>
@@ -91,13 +118,9 @@ export const BudgetsContent = () => {
                   <TableRow key={budget.id}>
                     <TableCell>
                       <div>
-                        <p className="font-medium">{budget.client_name}</p>
-                        <p className="text-sm text-gray-500">{budget.client_phone}</p>
+                        <p className="font-medium">{budget.device_model}</p>
+                        <p className="text-sm text-gray-500">{budget.device_type}</p>
                       </div>
-                    </TableCell>
-                    <TableCell>
-                      <p>{budget.device_model}</p>
-                      <p className="text-sm text-gray-500">{budget.device_type}</p>
                     </TableCell>
                     <TableCell>{budget.issue}</TableCell>
                     <TableCell>
@@ -111,10 +134,30 @@ export const BudgetsContent = () => {
                       </Badge>
                     </TableCell>
                     <TableCell>
+                      {budget.valid_until && (
+                        <div className="flex items-center space-x-2">
+                          <span className={`text-sm ${isValidBudget(budget.valid_until) ? 'text-green-600' : 'text-red-600'}`}>
+                            {new Date(budget.valid_until).toLocaleDateString('pt-BR')}
+                          </span>
+                          {!isValidBudget(budget.valid_until) && (
+                            <Badge variant="destructive" className="text-xs">Expirado</Badge>
+                          )}
+                        </div>
+                      )}
+                    </TableCell>
+                    <TableCell>
                       {new Date(budget.created_at).toLocaleDateString('pt-BR')}
                     </TableCell>
                     <TableCell>
                       <div className="flex space-x-2">
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => handleShareWhatsApp(budget)}
+                          className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                        >
+                          <MessageCircle className="h-4 w-4" />
+                        </Button>
                         <Button variant="ghost" size="sm">
                           <Eye className="h-4 w-4" />
                         </Button>

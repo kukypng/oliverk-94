@@ -6,7 +6,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { 
   Home, 
   FileText, 
-  Users, 
   Settings, 
   LogOut, 
   Smartphone,
@@ -28,7 +27,6 @@ export const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
     { id: 'dashboard', label: 'Dashboard', icon: Home },
     { id: 'budgets', label: 'Orçamentos', icon: FileText },
     { id: 'new-budget', label: 'Novo Orçamento', icon: Plus },
-    { id: 'clients', label: 'Clientes', icon: Users },
     { id: 'reports', label: 'Relatórios', icon: BarChart3 },
     { id: 'settings', label: 'Configurações', icon: Settings },
   ];
