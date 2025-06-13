@@ -107,6 +107,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "fk_budget_parts_brand_id"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "fk_budget_parts_budget_id"
             columns: ["budget_id"]
             isOneToOne: false
@@ -132,7 +139,7 @@ export type Database = {
           installments: number | null
           issue: string
           notes: string | null
-          owner_id: string | null
+          owner_id: string
           part_type: string | null
           payment_condition: string | null
           search_vector: unknown | null
@@ -159,7 +166,7 @@ export type Database = {
           installments?: number | null
           issue: string
           notes?: string | null
-          owner_id?: string | null
+          owner_id?: string
           part_type?: string | null
           payment_condition?: string | null
           search_vector?: unknown | null
@@ -186,7 +193,7 @@ export type Database = {
           installments?: number | null
           issue?: string
           notes?: string | null
-          owner_id?: string | null
+          owner_id?: string
           part_type?: string | null
           payment_condition?: string | null
           search_vector?: unknown | null
