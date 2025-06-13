@@ -10,7 +10,6 @@ import {
   LogOut, 
   Smartphone,
   Wrench,
-  BarChart3,
   Plus
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -27,7 +26,6 @@ export const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
     { id: 'dashboard', label: 'Dashboard', icon: Home },
     { id: 'budgets', label: 'Orçamentos', icon: FileText },
     { id: 'new-budget', label: 'Novo Orçamento', icon: Plus },
-    { id: 'reports', label: 'Relatórios', icon: BarChart3 },
     { id: 'settings', label: 'Configurações', icon: Settings },
   ];
 

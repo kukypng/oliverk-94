@@ -48,7 +48,7 @@ export const generateWhatsAppMessage = (budget: BudgetData): string => {
     }
   }
 
-  const message = `*Data: ${createdDate} Válido até: ${validUntil}*
+  const message = `*Criado em: ${createdDate} | Válido até: ${validUntil}*
 
 *ORÇAMENTO*
 Aparelho: *${budget.device_model}*

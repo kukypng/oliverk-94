@@ -1,17 +1,21 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Eye, Edit, Trash2, Share, MessageCircle } from 'lucide-react';
+import { Eye, Edit, Trash2, MessageCircle } from 'lucide-react';
 import { generateWhatsAppMessage, shareViaWhatsApp } from '@/utils/whatsappUtils';
 import { useToast } from '@/hooks/use-toast';
+import { EditBudgetModal } from '@/components/EditBudgetModal';
+import { DeleteBudgetConfirm } from '@/components/DeleteBudgetConfirm';
 
 export const BudgetsContent = () => {
   const { toast } = useToast();
+  const [editingBudget, setEditingBudget] = useState<any>(null);
+  const [deletingBudget, setDeletingBudget] = useState<any>(null);
   
   const { data: budgets, isLoading } = useQuery({
     queryKey: ['budgets'],
@@ -50,12 +54,6 @@ export const BudgetsContent = () => {
       default:
         return status;
     }
-  };
-
-  const isValidBudget = (validUntil: string) => {
-    const today = new Date();
-    const validDate = new Date(validUntil);
-    return validDate >= today;
   };
 
   const handleShareWhatsApp = (budget: any) => {
@@ -135,14 +133,9 @@ export const BudgetsContent = () => {
                     </TableCell>
                     <TableCell>
                       {budget.valid_until && (
-                        <div className="flex items-center space-x-2">
-                          <span className={`text-sm ${isValidBudget(budget.valid_until) ? 'text-green-600' : 'text-red-600'}`}>
-                            {new Date(budget.valid_until).toLocaleDateString('pt-BR')}
-                          </span>
-                          {!isValidBudget(budget.valid_until) && (
-                            <Badge variant="destructive" className="text-xs">Expirado</Badge>
-                          )}
-                        </div>
+                        <span className="text-sm text-gray-600">
+                          {new Date(budget.valid_until).toLocaleDateString('pt-BR')}
+                        </span>
                       )}
                     </TableCell>
                     <TableCell>
@@ -161,10 +154,19 @@ export const BudgetsContent = () => {
                         <Button variant="ghost" size="sm">
                           <Eye className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="sm">
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => setEditingBudget(budget)}
+                        >
                           <Edit className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="sm">
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => setDeletingBudget(budget)}
+                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                        >
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
@@ -181,6 +183,18 @@ export const BudgetsContent = () => {
           )}
         </CardContent>
       </Card>
+
+      <EditBudgetModal
+        budget={editingBudget}
+        open={!!editingBudget}
+        onOpenChange={(open) => !open && setEditingBudget(null)}
+      />
+
+      <DeleteBudgetConfirm
+        budget={deletingBudget}
+        open={!!deletingBudget}
+        onOpenChange={(open) => !open && setDeletingBudget(null)}
+      />
     </div>
   );
 };
