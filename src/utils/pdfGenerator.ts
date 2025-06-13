@@ -1,4 +1,3 @@
-
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
@@ -26,129 +25,360 @@ interface BudgetPDFData {
 
 export const generateBudgetPDF = async (data: BudgetPDFData): Promise<Blob> => {
   try {
-    // Criar um documento PDF do zero baseado no layout do template
-    const doc = new jsPDF('p', 'mm', 'a4');
+    // Carregar o template PDF existente
+    const templateResponse = await fetch('/pdf1/exemplo.pdf');
+    const templateArrayBuffer = await templateResponse.arrayBuffer();
     
-    // Configurar fonte
-    doc.setFont('helvetica');
+    // Carregar o documento PDF
+    const pdfDoc = await PDFDocument.load(templateArrayBuffer);
+    const pages = pdfDoc.getPages();
+    const firstPage = pages[0];
     
-    // Header - Dados da loja
-    doc.setFontSize(16);
-    doc.setTextColor(0, 0, 0);
-    doc.text(data.shop_name || 'Nome da Loja', 20, 30);
+    // Obter fonte padrão
+    const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+    const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
     
-    doc.setFontSize(12);
-    doc.text(`Endereço: ${data.shop_address || 'Não informado'}`, 20, 40);
-    doc.text(`Telefone: ${data.shop_phone || 'Não informado'}`, 20, 50);
+    // Cor amarela para destacar os dados
+    const yellowColor = rgb(1, 0.757, 0.027); // #FFC107
+    const blackColor = rgb(0, 0, 0);
+    
+    // Dados da empresa (parte superior do PDF)
+    firstPage.drawText(data.shop_name, {
+      x: 50,
+      y: 750,
+      size: 16,
+      font: boldFont,
+      color: yellowColor,
+    });
+    
+    firstPage.drawText(`Endereço: ${data.shop_address}`, {
+      x: 50,
+      y: 720,
+      size: 12,
+      font: font,
+      color: blackColor,
+    });
+    
+    firstPage.drawText(`Telefone: ${data.shop_phone}`, {
+      x: 50,
+      y: 700,
+      size: 12,
+      font: font,
+      color: blackColor,
+    });
+    
     if (data.shop_cnpj) {
-      doc.text(`CNPJ: ${data.shop_cnpj}`, 20, 60);
+      firstPage.drawText(`CNPJ: ${data.shop_cnpj}`, {
+        x: 50,
+        y: 680,
+        size: 12,
+        font: font,
+        color: blackColor,
+      });
     }
     
-    // Título do orçamento
-    doc.setFontSize(18);
-    doc.setTextColor(255, 193, 7); // Amarelo
-    doc.text('ORÇAMENTO', 20, 80);
+    // Título ORÇAMENTO
+    firstPage.drawText('ORÇAMENTO', {
+      x: 50,
+      y: 640,
+      size: 20,
+      font: boldFont,
+      color: yellowColor,
+    });
     
-    // Reset cor para preto
-    doc.setTextColor(0, 0, 0);
-    doc.setFontSize(12);
-    
-    // Dados do cliente
-    let yPos = 100;
+    // Dados do cliente (se houver)
+    let yPosition = 600;
     if (data.client_name) {
-      doc.text(`Cliente: ${data.client_name}`, 20, yPos);
-      yPos += 10;
+      firstPage.drawText(`Cliente: ${data.client_name}`, {
+        x: 50,
+        y: yPosition,
+        size: 12,
+        font: font,
+        color: yellowColor,
+      });
+      yPosition -= 20;
     }
+    
     if (data.client_phone) {
-      doc.text(`Telefone: ${data.client_phone}`, 20, yPos);
-      yPos += 10;
+      firstPage.drawText(`Telefone: ${data.client_phone}`, {
+        x: 50,
+        y: yPosition,
+        size: 12,
+        font: font,
+        color: yellowColor,
+      });
+      yPosition -= 30;
     }
     
     // Dados do dispositivo
-    yPos += 10;
-    doc.setFontSize(14);
-    doc.setTextColor(255, 193, 7); // Amarelo
-    doc.text('DISPOSITIVO', 20, yPos);
+    firstPage.drawText('DISPOSITIVO', {
+      x: 50,
+      y: yPosition,
+      size: 14,
+      font: boldFont,
+      color: yellowColor,
+    });
+    yPosition -= 25;
     
-    doc.setTextColor(0, 0, 0);
-    doc.setFontSize(12);
-    yPos += 15;
-    doc.text(`Modelo: ${data.device_model}`, 20, yPos);
-    yPos += 10;
-    doc.text(`Tipo: ${data.device_type}`, 20, yPos);
-    yPos += 10;
-    doc.text(`Problema: ${data.issue}`, 20, yPos);
+    firstPage.drawText(`Modelo: ${data.device_model}`, {
+      x: 50,
+      y: yPosition,
+      size: 12,
+      font: font,
+      color: blackColor,
+    });
+    yPosition -= 20;
     
-    // Preços
-    yPos += 20;
-    doc.setFontSize(14);
-    doc.setTextColor(255, 193, 7); // Amarelo
-    doc.text('VALORES', 20, yPos);
+    firstPage.drawText(`Tipo: ${data.device_type}`, {
+      x: 50,
+      y: yPosition,
+      size: 12,
+      font: font,
+      color: blackColor,
+    });
+    yPosition -= 20;
     
-    doc.setTextColor(0, 0, 0);
-    doc.setFontSize(12);
-    yPos += 15;
+    firstPage.drawText(`Problema: ${data.issue}`, {
+      x: 50,
+      y: yPosition,
+      size: 12,
+      font: font,
+      color: blackColor,
+    });
+    yPosition -= 40;
+    
+    // Valores
+    firstPage.drawText('VALORES', {
+      x: 50,
+      y: yPosition,
+      size: 14,
+      font: boldFont,
+      color: yellowColor,
+    });
+    yPosition -= 25;
     
     const cashPrice = (data.cash_price / 100).toLocaleString('pt-BR', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
+      style: 'currency',
+      currency: 'BRL'
     });
-    doc.text(`À vista: R$ ${cashPrice}`, 20, yPos);
+    
+    firstPage.drawText(`À vista: ${cashPrice}`, {
+      x: 50,
+      y: yPosition,
+      size: 12,
+      font: boldFont,
+      color: yellowColor,
+    });
+    yPosition -= 20;
     
     if (data.installment_price && data.installments && data.installments > 1) {
-      yPos += 10;
       const installmentPrice = (data.installment_price / 100).toLocaleString('pt-BR', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
+        style: 'currency',
+        currency: 'BRL'
       });
-      doc.text(`Parcelado: R$ ${installmentPrice} em ${data.installments}x`, 20, yPos);
+      
+      firstPage.drawText(`Parcelado: ${installmentPrice} em ${data.installments}x`, {
+        x: 50,
+        y: yPosition,
+        size: 12,
+        font: boldFont,
+        color: yellowColor,
+      });
+      yPosition -= 30;
     }
     
     // Garantia
-    yPos += 20;
-    doc.setFontSize(14);
-    doc.setTextColor(255, 193, 7); // Amarelo
-    doc.text('GARANTIA', 20, yPos);
+    firstPage.drawText('GARANTIA', {
+      x: 50,
+      y: yPosition,
+      size: 14,
+      font: boldFont,
+      color: yellowColor,
+    });
+    yPosition -= 25;
     
-    doc.setTextColor(0, 0, 0);
-    doc.setFontSize(12);
-    yPos += 15;
     const warrantyText = data.warranty_months === 1 
       ? `${data.warranty_months} mês` 
       : `${data.warranty_months} meses`;
-    doc.text(`Garantia: ${warrantyText}`, 20, yPos);
+      
+    firstPage.drawText(`Período: ${warrantyText}`, {
+      x: 50,
+      y: yPosition,
+      size: 12,
+      font: font,
+      color: blackColor,
+    });
+    yPosition -= 30;
     
-    // Datas
-    yPos += 20;
-    doc.setFontSize(14);
-    doc.setTextColor(255, 193, 7); // Amarelo
-    doc.text('INFORMAÇÕES', 20, yPos);
-    
-    doc.setTextColor(0, 0, 0);
-    doc.setFontSize(12);
-    yPos += 15;
+    // Informações
+    firstPage.drawText('INFORMAÇÕES', {
+      x: 50,
+      y: yPosition,
+      size: 14,
+      font: boldFont,
+      color: yellowColor,
+    });
+    yPosition -= 25;
     
     const createdDate = new Date(data.created_at).toLocaleDateString('pt-BR');
     const validDate = new Date(data.valid_until).toLocaleDateString('pt-BR');
     
-    doc.text(`Data de criação: ${createdDate}`, 20, yPos);
-    yPos += 10;
-    doc.text(`Válido até: ${validDate}`, 20, yPos);
+    firstPage.drawText(`Data: ${createdDate}`, {
+      x: 50,
+      y: yPosition,
+      size: 12,
+      font: font,
+      color: blackColor,
+    });
+    yPosition -= 20;
     
-    // Observações
-    yPos += 20;
-    doc.setFontSize(10);
-    doc.setTextColor(100, 100, 100);
-    doc.text('* Garantia não cobre danos por quebra ou líquidos', 20, yPos);
+    firstPage.drawText(`Válido até: ${validDate}`, {
+      x: 50,
+      y: yPosition,
+      size: 12,
+      font: font,
+      color: blackColor,
+    });
     
-    // Converter para blob
-    const pdfBlob = doc.output('blob');
-    return pdfBlob;
+    // Observações no rodapé
+    firstPage.drawText('* Garantia não cobre danos por quebra ou líquidos', {
+      x: 50,
+      y: 100,
+      size: 10,
+      font: font,
+      color: rgb(0.5, 0.5, 0.5),
+    });
+    
+    // Retornar o PDF como blob
+    const pdfBytes = await pdfDoc.save();
+    return new Blob([pdfBytes], { type: 'application/pdf' });
     
   } catch (error) {
-    console.error('Erro ao gerar PDF:', error);
-    throw new Error('Falha ao gerar o PDF do orçamento');
+    console.error('Erro ao gerar PDF do template:', error);
+    // Fallback para geração sem template
+    return generateFallbackPDF(data);
   }
+};
+
+const generateFallbackPDF = async (data: BudgetPDFData): Promise<Blob> => {
+  // ... keep existing code (fallback PDF generation)
+  const doc = new jsPDF('p', 'mm', 'a4');
+  
+  // Configurar fonte
+  doc.setFont('helvetica');
+  
+  // Header - Dados da loja
+  doc.setFontSize(16);
+  doc.setTextColor(0, 0, 0);
+  doc.text(data.shop_name || 'Nome da Loja', 20, 30);
+  
+  doc.setFontSize(12);
+  doc.text(`Endereço: ${data.shop_address || 'Não informado'}`, 20, 40);
+  doc.text(`Telefone: ${data.shop_phone || 'Não informado'}`, 20, 50);
+  if (data.shop_cnpj) {
+    doc.text(`CNPJ: ${data.shop_cnpj}`, 20, 60);
+  }
+  
+  // Título do orçamento
+  doc.setFontSize(18);
+  doc.setTextColor(255, 193, 7); // Amarelo
+  doc.text('ORÇAMENTO', 20, 80);
+  
+  // Reset cor para preto
+  doc.setTextColor(0, 0, 0);
+  doc.setFontSize(12);
+  
+  // Dados do cliente
+  let yPos = 100;
+  if (data.client_name) {
+    doc.text(`Cliente: ${data.client_name}`, 20, yPos);
+    yPos += 10;
+  }
+  if (data.client_phone) {
+    doc.text(`Telefone: ${data.client_phone}`, 20, yPos);
+    yPos += 10;
+  }
+  
+  // Dados do dispositivo
+  yPos += 10;
+  doc.setFontSize(14);
+  doc.setTextColor(255, 193, 7); // Amarelo
+  doc.text('DISPOSITIVO', 20, yPos);
+  
+  doc.setTextColor(0, 0, 0);
+  doc.setFontSize(12);
+  yPos += 15;
+  doc.text(`Modelo: ${data.device_model}`, 20, yPos);
+  yPos += 10;
+  doc.text(`Tipo: ${data.device_type}`, 20, yPos);
+  yPos += 10;
+  doc.text(`Problema: ${data.issue}`, 20, yPos);
+  
+  // Preços
+  yPos += 20;
+  doc.setFontSize(14);
+  doc.setTextColor(255, 193, 7); // Amarelo
+  doc.text('VALORES', 20, yPos);
+  
+  doc.setTextColor(0, 0, 0);
+  doc.setFontSize(12);
+  yPos += 15;
+  
+  const cashPrice = (data.cash_price / 100).toLocaleString('pt-BR', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
+  doc.text(`À vista: R$ ${cashPrice}`, 20, yPos);
+  
+  if (data.installment_price && data.installments && data.installments > 1) {
+    yPos += 10;
+    const installmentPrice = (data.installment_price / 100).toLocaleString('pt-BR', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+    doc.text(`Parcelado: R$ ${installmentPrice} em ${data.installments}x`, 20, yPos);
+  }
+  
+  // Garantia
+  yPos += 20;
+  doc.setFontSize(14);
+  doc.setTextColor(255, 193, 7); // Amarelo
+  doc.text('GARANTIA', 20, yPos);
+  
+  doc.setTextColor(0, 0, 0);
+  doc.setFontSize(12);
+  yPos += 15;
+  const warrantyText = data.warranty_months === 1 
+    ? `${data.warranty_months} mês` 
+    : `${data.warranty_months} meses`;
+  doc.text(`Garantia: ${warrantyText}`, 20, yPos);
+  
+  // Datas
+  yPos += 20;
+  doc.setFontSize(14);
+  doc.setTextColor(255, 193, 7); // Amarelo
+  doc.text('INFORMAÇÕES', 20, yPos);
+  
+  doc.setTextColor(0, 0, 0);
+  doc.setFontSize(12);
+  yPos += 15;
+  
+  const createdDate = new Date(data.created_at).toLocaleDateString('pt-BR');
+  const validDate = new Date(data.valid_until).toLocaleDateString('pt-BR');
+  
+  doc.text(`Data de criação: ${createdDate}`, 20, yPos);
+  yPos += 10;
+  doc.text(`Válido até: ${validDate}`, 20, yPos);
+  
+  // Observações
+  yPos += 20;
+  doc.setFontSize(10);
+  doc.setTextColor(100, 100, 100);
+  doc.text('* Garantia não cobre danos por quebra ou líquidos', 20, yPos);
+  
+  // Converter para blob
+  const pdfBlob = doc.output('blob');
+  return pdfBlob;
 };
 
 export const generatePDFImage = async (data: BudgetPDFData): Promise<string> => {

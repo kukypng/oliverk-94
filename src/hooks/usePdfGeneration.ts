@@ -57,28 +57,11 @@ export const usePdfGeneration = () => {
         shop_cnpj: shopProfile.cnpj,
       };
 
-      // Gerar imagem para compartilhar no WhatsApp (mais compatível)
-      const imageDataUrl = await generatePDFImage(pdfData);
+      // Gerar PDF usando o template
+      const pdfBlob = await generateBudgetPDF(pdfData);
       
-      // Converter data URL para blob
-      const response = await fetch(imageDataUrl);
-      const blob = await response.blob();
-      
-      // Criar URL temporária para o arquivo
-      const url = URL.createObjectURL(blob);
-      
-      // Criar link temporário para download
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `orcamento-${budget.device_model.replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.png`;
-      
-      // Fazer download automaticamente
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      
-      // Limpar URL temporária
-      URL.revokeObjectURL(url);
+      // Criar URL temporária para o PDF
+      const pdfUrl = URL.createObjectURL(pdfBlob);
       
       // Preparar mensagem para WhatsApp
       const message = `Segue o orçamento para ${budget.device_model}. 
@@ -87,16 +70,38 @@ Valor à vista: R$ ${(budget.cash_price / 100).toLocaleString('pt-BR', { minimum
 ${budget.installment_price && budget.installments ? 
   `Parcelado: R$ ${(budget.installment_price / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })} em ${budget.installments}x` : ''}
 
-O PDF foi baixado em seu dispositivo para envio.`;
+Clique no link para baixar o PDF: ${window.location.origin}
+
+*Para enviar o PDF pelo WhatsApp:*
+1. Baixe o PDF clicando no botão abaixo
+2. Escolha o contato no WhatsApp
+3. Anexe o PDF baixado`;
       
-      // Abrir WhatsApp com a mensagem
-      const encodedMessage = encodeURIComponent(message);
-      const whatsappUrl = `https://wa.me/?text=${encodedMessage}`;
-      window.open(whatsappUrl, '_blank');
+      // Criar link de download do PDF
+      const downloadLink = document.createElement('a');
+      downloadLink.href = pdfUrl;
+      downloadLink.download = `orcamento-${budget.device_model.replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.pdf`;
+      downloadLink.style.display = 'none';
+      document.body.appendChild(downloadLink);
+      
+      // Fazer download do PDF
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+      
+      // Aguardar um pouco para o download iniciar
+      setTimeout(() => {
+        // Abrir WhatsApp Web para seleção de contato
+        const encodedMessage = encodeURIComponent(message);
+        const whatsappUrl = `https://web.whatsapp.com/send?text=${encodedMessage}`;
+        window.open(whatsappUrl, '_blank');
+        
+        // Limpar URL temporária
+        URL.revokeObjectURL(pdfUrl);
+      }, 1000);
       
       showSuccess({
         title: 'PDF gerado com sucesso!',
-        description: 'O arquivo foi baixado e o WhatsApp foi aberto para compartilhamento.',
+        description: 'O PDF foi baixado. Agora selecione o contato no WhatsApp para enviar.',
       });
       
     } catch (error) {
