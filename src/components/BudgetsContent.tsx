@@ -6,51 +6,40 @@ import { supabase } from '@/integrations/supabase/client';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Eye, Edit, Trash2, MessageCircle, Search, Filter, Download } from 'lucide-react';
+import { Eye, Edit, Trash2, MessageCircle } from 'lucide-react';
 import { generateWhatsAppMessage, shareViaWhatsApp } from '@/utils/whatsappUtils';
 import { useToast } from '@/hooks/use-toast';
 import { EditBudgetModal } from '@/components/EditBudgetModal';
 import { DeleteBudgetConfirm } from '@/components/DeleteBudgetConfirm';
-import { BudgetsSkeleton } from '@/components/ui/loading-skeleton';
-import { EmptyState } from '@/components/EmptyState';
-import { Input } from '@/components/ui/input';
 
 export const BudgetsContent = () => {
   const { toast } = useToast();
   const [editingBudget, setEditingBudget] = useState<any>(null);
   const [deletingBudget, setDeletingBudget] = useState<any>(null);
-  const [searchTerm, setSearchTerm] = useState('');
   
-  const { data: budgets, isLoading, error, refetch } = useQuery({
-    queryKey: ['budgets', searchTerm],
+  const { data: budgets, isLoading } = useQuery({
+    queryKey: ['budgets'],
     queryFn: async () => {
-      let query = supabase
+      const { data, error } = await supabase
         .from('budgets')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (searchTerm) {
-        query = query.or(`client_name.ilike.%${searchTerm}%,device_model.ilike.%${searchTerm}%,issue.ilike.%${searchTerm}%`);
-      }
-
-      const { data, error } = await query;
       if (error) throw error;
       return data;
-    },
-    retry: 3,
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+    }
   });
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'pending':
-        return 'bg-yellow-50 text-yellow-700 border-yellow-200';
+        return 'bg-yellow-100 text-yellow-800';
       case 'approved':
-        return 'bg-green-50 text-green-700 border-green-200';
+        return 'bg-green-100 text-green-800';
       case 'rejected':
-        return 'bg-red-50 text-red-700 border-red-200';
+        return 'bg-red-100 text-red-800';
       default:
-        return 'bg-gray-50 text-gray-700 border-gray-200';
+        return 'bg-gray-100 text-gray-800';
     }
   };
 
@@ -85,209 +74,112 @@ export const BudgetsContent = () => {
   };
 
   if (isLoading) {
-    return <BudgetsSkeleton />;
-  }
-
-  if (error) {
     return (
-      <div className="p-4 lg:p-8">
-        <EmptyState
-          icon={MessageCircle}
-          title="Erro ao carregar orçamentos"
-          description="Não foi possível carregar os orçamentos. Verifique sua conexão e tente novamente."
-          action={{
-            label: "Tentar Novamente",
-            onClick: () => refetch()
-          }}
-        />
+      <div className="p-8">
+        <div className="animate-pulse space-y-6">
+          <div className="h-8 bg-gray-200 rounded w-1/4"></div>
+          <div className="h-64 bg-gray-200 rounded-lg"></div>
+        </div>
       </div>
     );
   }
 
-  const filteredBudgets = budgets || [];
-
   return (
-    <div className="p-4 lg:p-8 space-y-6 lg:space-y-8 animate-fade-in">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="p-8">
+      <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl lg:text-3xl font-bold text-foreground">Orçamentos</h1>
-          <p className="text-muted-foreground mt-1">
-            Gerencie todos os seus orçamentos ({filteredBudgets.length})
-          </p>
-        </div>
-        
-        <div className="flex items-center space-x-3">
-          <Button variant="outline" size="sm">
-            <Download className="mr-2 h-4 w-4" />
-            Exportar
-          </Button>
-          <Button variant="outline" size="sm">
-            <Filter className="mr-2 h-4 w-4" />
-            Filtros
-          </Button>
+          <h1 className="text-3xl font-bold text-gray-900">Orçamentos</h1>
+          <p className="text-gray-600 mt-2">Gerencie todos os seus orçamentos</p>
         </div>
       </div>
-
-      {/* Search Bar */}
-      <Card className="glass-card border-0">
-        <CardContent className="p-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Buscar por cliente, dispositivo ou problema..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 h-10"
-            />
-          </div>
-        </CardContent>
-      </Card>
       
-      <Card className="glass-card border-0 shadow-sm animate-scale-in">
+      <Card className="border-0 shadow-sm">
         <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-            <span>Lista de Orçamentos</span>
-            {filteredBudgets.length > 0 && (
-              <Badge variant="secondary" className="ml-2">
-                {filteredBudgets.length}
-              </Badge>
-            )}
-          </CardTitle>
+          <CardTitle>Lista de Orçamentos</CardTitle>
         </CardHeader>
         <CardContent>
-          {filteredBudgets.length > 0 ? (
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow className="hover:bg-transparent border-border/50">
-                    <TableHead className="font-semibold">Dispositivo</TableHead>
-                    <TableHead className="font-semibold">Problema</TableHead>
-                    <TableHead className="font-semibold">Valor</TableHead>
-                    <TableHead className="font-semibold">Status</TableHead>
-                    <TableHead className="font-semibold">Validade</TableHead>
-                    <TableHead className="font-semibold">Data</TableHead>
-                    <TableHead className="font-semibold text-center">Ações</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredBudgets.map((budget, index) => (
-                    <TableRow 
-                      key={budget.id} 
-                      className="hover:bg-muted/30 transition-colors border-border/30 animate-fade-in"
-                      style={{ animationDelay: `${index * 50}ms` }}
-                    >
-                      <TableCell>
-                        <div className="space-y-1">
-                          <p className="font-medium text-foreground">{budget.device_model}</p>
-                          <p className="text-sm text-muted-foreground">{budget.device_type}</p>
-                          {budget.client_name && (
-                            <p className="text-xs text-muted-foreground">
-                              {budget.client_name}
-                            </p>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <span className="text-sm">{budget.issue}</span>
-                      </TableCell>
-                      <TableCell>
-                        <div className="space-y-1">
-                          <p className="font-semibold text-foreground">
-                            R$ {((budget.total_price || 0) / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                          </p>
-                          {budget.installments > 1 && (
-                            <p className="text-xs text-muted-foreground">
-                              {budget.installments}x
-                            </p>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge className={getStatusColor(budget.status)}>
-                          {getStatusLabel(budget.status)}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        {budget.valid_until && (
-                          <span className="text-sm text-muted-foreground">
-                            {new Date(budget.valid_until).toLocaleDateString('pt-BR')}
-                          </span>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <span className="text-sm text-muted-foreground">
-                          {new Date(budget.created_at).toLocaleDateString('pt-BR')}
+          {budgets && budgets.length > 0 ? (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Dispositivo</TableHead>
+                  <TableHead>Problema</TableHead>
+                  <TableHead>Valor</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Validade</TableHead>
+                  <TableHead>Data</TableHead>
+                  <TableHead>Ações</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {budgets.map((budget) => (
+                  <TableRow key={budget.id}>
+                    <TableCell>
+                      <div>
+                        <p className="font-medium">{budget.device_model}</p>
+                        <p className="text-sm text-gray-500">{budget.device_type}</p>
+                      </div>
+                    </TableCell>
+                    <TableCell>{budget.issue}</TableCell>
+                    <TableCell>
+                      <p className="font-semibold">
+                        R$ {((budget.total_price || 0) / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                      </p>
+                    </TableCell>
+                    <TableCell>
+                      <Badge className={getStatusColor(budget.status)}>
+                        {getStatusLabel(budget.status)}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      {budget.valid_until && (
+                        <span className="text-sm text-gray-600">
+                          {new Date(budget.valid_until).toLocaleDateString('pt-BR')}
                         </span>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center justify-center space-x-1">
-                          <Button 
-                            variant="ghost" 
-                            size="sm"
-                            onClick={() => handleShareWhatsApp(budget)}
-                            className="h-8 w-8 p-0 text-green-600 hover:text-green-700 hover:bg-green-50"
-                            title="Compartilhar no WhatsApp"
-                          >
-                            <MessageCircle className="h-4 w-4" />
-                          </Button>
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            className="h-8 w-8 p-0"
-                            title="Visualizar"
-                          >
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                          <Button 
-                            variant="ghost" 
-                            size="sm"
-                            onClick={() => setEditingBudget(budget)}
-                            className="h-8 w-8 p-0 hover:bg-blue-50 hover:text-blue-600"
-                            title="Editar"
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button 
-                            variant="ghost" 
-                            size="sm"
-                            onClick={() => setDeletingBudget(budget)}
-                            className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
-                            title="Excluir"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {new Date(budget.created_at).toLocaleDateString('pt-BR')}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex space-x-2">
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => handleShareWhatsApp(budget)}
+                          className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                        >
+                          <MessageCircle className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="sm">
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => setEditingBudget(budget)}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => setDeletingBudget(budget)}
+                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           ) : (
-            <EmptyState
-              icon={MessageCircle}
-              title={searchTerm ? "Nenhum resultado encontrado" : "Nenhum orçamento encontrado"}
-              description={
-                searchTerm 
-                  ? `Não encontramos orçamentos com "${searchTerm}". Tente uma busca diferente.`
-                  : "Você ainda não criou nenhum orçamento. Comece criando seu primeiro orçamento para começar a gerenciar suas vendas."
-              }
-              action={
-                searchTerm 
-                  ? {
-                      label: "Limpar busca",
-                      onClick: () => setSearchTerm('')
-                    }
-                  : {
-                      label: "Criar Primeiro Orçamento",
-                      onClick: () => {
-                        // This would be handled by parent component
-                        console.log('Navigate to new budget');
-                      }
-                    }
-              }
-              className="border-0 shadow-none"
-            />
+            <div className="text-center py-8 text-gray-500">
+              <p>Nenhum orçamento encontrado</p>
+              <p className="text-sm">Crie seu primeiro orçamento para começar</p>
+            </div>
           )}
         </CardContent>
       </Card>
