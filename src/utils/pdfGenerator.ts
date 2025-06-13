@@ -1,4 +1,3 @@
-
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
@@ -38,146 +37,142 @@ const generateProfessionalPDF = async (data: BudgetPDFData): Promise<Blob> => {
   const lightGray = [245, 245, 245];
   const mediumGray = [128, 128, 128];
   
-  // Header - Nome da empresa
+  // Header - Nome da empresa (reduzido)
   doc.setFillColor(lightGray[0], lightGray[1], lightGray[2]);
-  doc.rect(0, 0, 210, 40, 'F');
+  doc.rect(0, 0, 210, 30, 'F');
   
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(20);
-  doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-  doc.text(data.shop_name || 'Nome da Empresa', 105, 15, { align: 'center' });
-  
-  // Informações da empresa
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(10);
-  doc.setTextColor(mediumGray[0], mediumGray[1], mediumGray[2]);
-  
-  if (data.shop_cnpj) {
-    doc.text(`CNPJ: ${data.shop_cnpj}`, 105, 22, { align: 'center' });
-  }
-  doc.text(`Endereço: ${data.shop_address}`, 105, 28, { align: 'center' });
-  doc.text(`Contato: ${data.shop_phone}`, 105, 34, { align: 'center' });
-  
-  // Título do orçamento
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(18);
   doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-  doc.text('ORÇAMENTO DE SERVIÇO', 105, 55, { align: 'center' });
+  doc.text(data.shop_name || 'Nome da Empresa', 105, 12, { align: 'center' });
   
-  // Seção de datas
-  let yPos = 75;
-  
-  // Data do Orçamento
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(11);
-  doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-  doc.text('Data do Orçamento:', 20, yPos);
-  
+  // Informações da empresa (compactadas)
   doc.setFont('helvetica', 'normal');
-  doc.setTextColor(textColor[0], textColor[1], textColor[2]);
-  const createdDate = new Date(data.created_at).toLocaleDateString('pt-BR');
-  doc.text(createdDate, 20, yPos + 6);
+  doc.setFontSize(9);
+  doc.setTextColor(mediumGray[0], mediumGray[1], mediumGray[2]);
   
-  // Válido Até - aumentei o espaçamento
-  yPos += 20;
-  doc.setFont('helvetica', 'bold');
-  doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-  doc.text('Válido Até:', 20, yPos);
-  
-  doc.setFont('helvetica', 'normal');
-  doc.setTextColor(textColor[0], textColor[1], textColor[2]);
-  const validDate = new Date(data.valid_until).toLocaleDateString('pt-BR');
-  doc.text(validDate, 20, yPos + 6);
-  
-  // Cliente (se houver) - aumentei o espaçamento
-  if (data.client_name || data.client_phone) {
-    yPos += 30;
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(11);
-    doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-    doc.text('Cliente:', 20, yPos);
-    
-    if (data.client_name) {
-      doc.setFont('helvetica', 'normal');
-      doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-      doc.text(data.client_name, 20, yPos + 6);
-    }
-    
-    if (data.client_phone) {
-      doc.setFont('helvetica', 'normal');
-      doc.setTextColor(mediumGray[0], mediumGray[1], mediumGray[2]);
-      doc.text(`Tel: ${data.client_phone}`, 20, yPos + 12);
-    }
+  let headerY = 18;
+  if (data.shop_cnpj) {
+    doc.text(`CNPJ: ${data.shop_cnpj}`, 105, headerY, { align: 'center' });
+    headerY += 4;
   }
+  doc.text(`${data.shop_address} | ${data.shop_phone}`, 105, headerY, { align: 'center' });
   
-  // Detalhes do Aparelho e Serviço - aumentei mais o espaçamento
-  yPos += 35;
+  // Título do orçamento
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(14);
+  doc.setFontSize(16);
   doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-  doc.text('Detalhes do Aparelho e Serviço', 20, yPos);
+  doc.text('ORÇAMENTO DE SERVIÇO', 105, 40, { align: 'center' });
   
-  // Tabela de detalhes
-  yPos += 10;
-  
-  // Header da tabela
-  doc.setFillColor(lightGray[0], lightGray[1], lightGray[2]);
-  doc.rect(20, yPos, 170, 10, 'F');
+  // Seção de datas (lado a lado para economizar espaço)
+  let yPos = 50;
   
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(10);
   doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-  doc.text('Item', 25, yPos + 6);
-  doc.text('Descrição', 100, yPos + 6);
   
-  // Linha 1 - Aparelho
-  yPos += 10;
-  doc.setFillColor(255, 255, 255);
-  doc.rect(20, yPos, 170, 8, 'F');
-  doc.setDrawColor(mediumGray[0], mediumGray[1], mediumGray[2]);
-  doc.rect(20, yPos, 170, 8, 'S');
+  const createdDate = new Date(data.created_at).toLocaleDateString('pt-BR');
+  const validDate = new Date(data.valid_until).toLocaleDateString('pt-BR');
+  
+  doc.text('Data:', 20, yPos);
+  doc.text('Válido até:', 110, yPos);
   
   doc.setFont('helvetica', 'normal');
-  doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-  doc.text('Aparelho', 25, yPos + 5);
   doc.setTextColor(textColor[0], textColor[1], textColor[2]);
-  doc.text(data.device_model, 100, yPos + 5);
+  doc.text(createdDate, 20, yPos + 5);
+  doc.text(validDate, 110, yPos + 5);
+  
+  // Cliente (se houver) - compactado
+  yPos += 15;
+  if (data.client_name || data.client_phone) {
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+    doc.text('Cliente:', 20, yPos);
+    
+    let clientInfo = '';
+    if (data.client_name) {
+      clientInfo = data.client_name;
+    }
+    if (data.client_phone) {
+      clientInfo += data.client_name ? ` | Tel: ${data.client_phone}` : `Tel: ${data.client_phone}`;
+    }
+    
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(textColor[0], textColor[1], textColor[2]);
+    doc.text(clientInfo, 20, yPos + 5);
+    yPos += 12;
+  }
+  
+  // Detalhes do Aparelho e Serviço
+  yPos += 8;
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(12);
+  doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+  doc.text('Detalhes do Serviço', 20, yPos);
+  
+  // Tabela de detalhes (mais compacta)
+  yPos += 8;
+  
+  // Header da tabela
+  doc.setFillColor(lightGray[0], lightGray[1], lightGray[2]);
+  doc.rect(20, yPos, 170, 8, 'F');
+  
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(9);
+  doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+  doc.text('Item', 25, yPos + 5);
+  doc.text('Descrição', 100, yPos + 5);
+  
+  // Linha 1 - Aparelho
+  yPos += 8;
+  doc.setFillColor(255, 255, 255);
+  doc.rect(20, yPos, 170, 6, 'F');
+  doc.setDrawColor(mediumGray[0], mediumGray[1], mediumGray[2]);
+  doc.rect(20, yPos, 170, 6, 'S');
+  
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+  doc.text('Aparelho', 25, yPos + 4);
+  doc.setTextColor(textColor[0], textColor[1], textColor[2]);
+  doc.text(data.device_model, 100, yPos + 4);
   
   // Linha 2 - Serviço
-  yPos += 8;
+  yPos += 6;
   doc.setFillColor(255, 255, 255);
-  doc.rect(20, yPos, 170, 8, 'F');
-  doc.rect(20, yPos, 170, 8, 'S');
+  doc.rect(20, yPos, 170, 6, 'F');
+  doc.rect(20, yPos, 170, 6, 'S');
   
   doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-  doc.text('Serviço Solicitado', 25, yPos + 5);
+  doc.text('Serviço', 25, yPos + 4);
   doc.setTextColor(textColor[0], textColor[1], textColor[2]);
-  doc.text(data.issue, 100, yPos + 5);
+  doc.text(data.issue, 100, yPos + 4);
   
   // Linha 3 - Marca/Tipo
-  yPos += 8;
+  yPos += 6;
   doc.setFillColor(255, 255, 255);
-  doc.rect(20, yPos, 170, 8, 'F');
-  doc.rect(20, yPos, 170, 8, 'S');
+  doc.rect(20, yPos, 170, 6, 'F');
+  doc.rect(20, yPos, 170, 6, 'S');
   
   doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-  doc.text('Marca da Peça', 25, yPos + 5);
+  doc.text('Tipo de Peça', 25, yPos + 4);
   doc.setTextColor(textColor[0], textColor[1], textColor[2]);
-  doc.text(data.device_type || 'Original', 100, yPos + 5);
+  doc.text(data.device_type || 'Original', 100, yPos + 4);
   
   // Seção Valores
-  yPos += 25;
+  yPos += 15;
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(14);
+  doc.setFontSize(12);
   doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
   doc.text('Valores', 20, yPos);
   
-  yPos += 15;
+  yPos += 10;
   
   // Valor à Vista
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(11);
-  doc.text('Valor à Vista:', 20, yPos);
+  doc.setFontSize(10);
+  doc.text('À Vista:', 20, yPos);
   
   const cashPrice = (data.cash_price / 100).toLocaleString('pt-BR', {
     style: 'currency',
@@ -185,17 +180,16 @@ const generateProfessionalPDF = async (data: BudgetPDFData): Promise<Blob> => {
   });
   
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(12);
+  doc.setFontSize(11);
   doc.setTextColor(textColor[0], textColor[1], textColor[2]);
-  doc.text(cashPrice, 20, yPos + 8);
+  doc.text(cashPrice, 50, yPos);
   
-  // Valor Parcelado (se houver)
+  // Valor Parcelado (se houver) - na mesma linha
   if (data.installment_price && data.installments && data.installments > 1) {
-    yPos += 20;
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(11);
+    doc.setFontSize(10);
     doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-    doc.text('Valor Parcelado:', 20, yPos);
+    doc.text('Parcelado:', 110, yPos);
     
     const installmentPrice = (data.installment_price / 100).toLocaleString('pt-BR', {
       style: 'currency',
@@ -203,22 +197,22 @@ const generateProfessionalPDF = async (data: BudgetPDFData): Promise<Blob> => {
     });
     
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(12);
+    doc.setFontSize(11);
     doc.setTextColor(textColor[0], textColor[1], textColor[2]);
-    doc.text(`${installmentPrice} em até ${data.installments}x`, 20, yPos + 8);
+    doc.text(`${installmentPrice} em ${data.installments}x`, 150, yPos);
   }
   
   // Seção Garantia
-  yPos += 30;
+  yPos += 20;
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(14);
+  doc.setFontSize(12);
   doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
   doc.text('Garantia', 20, yPos);
   
-  yPos += 15;
+  yPos += 10;
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(11);
-  doc.text('Prazo da Garantia:', 20, yPos);
+  doc.setFontSize(10);
+  doc.text('Prazo:', 20, yPos);
   
   const warrantyText = data.warranty_months === 1 
     ? `${data.warranty_months} mês` 
@@ -226,40 +220,39 @@ const generateProfessionalPDF = async (data: BudgetPDFData): Promise<Blob> => {
   
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(textColor[0], textColor[1], textColor[2]);
-  doc.text(warrantyText, 20, yPos + 6);
+  doc.text(warrantyText, 50, yPos);
   
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(9);
+  doc.setFontSize(8);
   doc.setTextColor(mediumGray[0], mediumGray[1], mediumGray[2]);
-  doc.text('A garantia não cobre danos causados por quebra ou contato com líquidos.', 20, yPos + 15);
+  doc.text('* Não cobre danos por quebra ou líquidos', 20, yPos + 6);
   
   // Seção Observações
-  yPos += 30;
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(14);
-  doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-  doc.text('Observações', 20, yPos);
-  
-  // Caixa de observações
-  yPos += 10;
-  doc.setFillColor(240, 248, 255);
-  doc.rect(20, yPos, 170, 20, 'F');
-  doc.setDrawColor(70, 130, 180);
-  doc.setLineWidth(0.5);
-  doc.line(15, yPos, 15, yPos + 20);
-  
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(10);
-  doc.setTextColor(textColor[0], textColor[1], textColor[2]);
-  doc.text('- Inclui busca e entrega do aparelho', 25, yPos + 7);
-  doc.text('- Inclui película de proteção', 25, yPos + 14);
-  
-  // Rodapé
-  yPos = 280;
+  yPos += 20;
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(12);
   doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-  doc.text('Agradecemos a preferência!', 105, yPos, { align: 'center' });
+  doc.text('Incluso no Serviço', 20, yPos);
+  
+  // Lista de observações (mais compacta)
+  yPos += 8;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.setTextColor(textColor[0], textColor[1], textColor[2]);
+  doc.text('• Busca e entrega do aparelho', 25, yPos);
+  doc.text('• Película de proteção', 25, yPos + 5);
+  
+  // Rodapé
+  yPos += 20;
+  // Garantir que não ultrapasse a página (A4 tem ~297mm de altura)
+  if (yPos > 260) {
+    yPos = 260;
+  }
+  
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(11);
+  doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+  doc.text('Obrigado pela preferência!', 105, yPos, { align: 'center' });
   
   // Converter para blob
   const pdfBlob = doc.output('blob');
