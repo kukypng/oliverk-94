@@ -45,7 +45,7 @@ const generateSimplePDF = async (data: BudgetPDFData): Promise<Blob> => {
   doc.setFillColor(colors.veryLightGray[0], colors.veryLightGray[1], colors.veryLightGray[2]);
   doc.rect(0, 0, 210, 35, 'F');
   
-  // Logo ou placeholder
+  // Logo com fundo preto
   if (data.shop_logo_url) {
     try {
       // Tentar carregar a logo
@@ -58,27 +58,31 @@ const generateSimplePDF = async (data: BudgetPDFData): Promise<Blob> => {
         img.src = data.shop_logo_url!;
       });
       
+      // Fundo preto para a logo
+      doc.setFillColor(0, 0, 0);
+      doc.rect(15, 7, 20, 20, 'F');
+      
       // Adicionar logo ao PDF
       doc.addImage(img, 'JPEG', 15, 7, 20, 20);
     } catch (error) {
       console.warn('Não foi possível carregar a logo:', error);
-      // Fallback: placeholder para logo
-      doc.setFillColor(colors.white[0], colors.white[1], colors.white[2]);
+      // Fallback: placeholder para logo com fundo preto
+      doc.setFillColor(0, 0, 0);
       doc.rect(15, 7, 20, 20, 'F');
       doc.setDrawColor(colors.lightGray[0], colors.lightGray[1], colors.lightGray[2]);
       doc.rect(15, 7, 20, 20, 'S');
       doc.setFontSize(8);
-      doc.setTextColor(colors.lightGray[0], colors.lightGray[1], colors.lightGray[2]);
+      doc.setTextColor(colors.white[0], colors.white[1], colors.white[2]);
       doc.text('LOGO', 25, 18, { align: 'center' });
     }
   } else {
-    // Placeholder para logo
-    doc.setFillColor(colors.white[0], colors.white[1], colors.white[2]);
+    // Placeholder para logo com fundo preto
+    doc.setFillColor(0, 0, 0);
     doc.rect(15, 7, 20, 20, 'F');
     doc.setDrawColor(colors.lightGray[0], colors.lightGray[1], colors.lightGray[2]);
     doc.rect(15, 7, 20, 20, 'S');
     doc.setFontSize(8);
-    doc.setTextColor(colors.lightGray[0], colors.lightGray[1], colors.lightGray[2]);
+    doc.setTextColor(colors.white[0], colors.white[1], colors.white[2]);
     doc.text('LOGO', 25, 18, { align: 'center' });
   }
   
@@ -413,10 +417,12 @@ export const generatePDFImage = async (data: BudgetPDFData): Promise<string> => 
     const createdDate = new Date(data.created_at).toLocaleDateString('pt-BR');
     const validDate = new Date(data.valid_until).toLocaleDateString('pt-BR');
     
-    // Logo section
+    // Logo section com fundo preto
     const logoSection = data.shop_logo_url ? 
-      `<img src="${data.shop_logo_url}" alt="Logo da empresa" style="width: 50px; height: 50px; object-fit: contain; border-radius: 4px; margin-right: 20px;" />` :
-      `<div style="width: 50px; height: 50px; background: #f0f0f0; border: 2px dashed #ccc; border-radius: 4px; display: flex; align-items: center; justify-content: center; margin-right: 20px; font-weight: bold; color: #999; font-size: 10px;">LOGO</div>`;
+      `<div style="width: 50px; height: 50px; background: black; border-radius: 4px; display: flex; align-items: center; justify-content: center; margin-right: 20px; padding: 5px;">
+        <img src="${data.shop_logo_url}" alt="Logo da empresa" style="max-width: 100%; max-height: 100%; object-fit: contain;" />
+      </div>` :
+      `<div style="width: 50px; height: 50px; background: black; border: 2px dashed #ccc; border-radius: 4px; display: flex; align-items: center; justify-content: center; margin-right: 20px; font-weight: bold; color: white; font-size: 10px;">LOGO</div>`;
     
     tempDiv.innerHTML = `
       <!-- Header Principal -->

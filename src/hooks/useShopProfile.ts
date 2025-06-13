@@ -105,6 +105,9 @@ export const useShopProfile = () => {
     mutationFn: async (file: File) => {
       if (!user?.id) throw new Error('User not authenticated');
 
+      console.log('Starting logo upload for user:', user.id);
+      console.log('File details:', { name: file.name, size: file.size, type: file.type });
+
       // Verificar tamanho do arquivo (3MB = 3145728 bytes)
       if (file.size > 3145728) {
         throw new Error('O arquivo deve ter no máximo 3MB');
@@ -116,29 +119,55 @@ export const useShopProfile = () => {
         throw new Error('Apenas imagens PNG, JPEG, WebP e GIF são permitidas');
       }
 
+      // Remover logo anterior se existir
+      if (shopProfile?.logo_url) {
+        try {
+          const urlParts = shopProfile.logo_url.split('/');
+          const oldFileName = `${user.id}/${urlParts[urlParts.length - 1]}`;
+          console.log('Removing old logo:', oldFileName);
+          
+          await supabase.storage
+            .from('company-logos')
+            .remove([oldFileName]);
+        } catch (error) {
+          console.warn('Error removing old logo:', error);
+        }
+      }
+
       const fileExt = file.name.split('.').pop();
       const fileName = `${user.id}/logo.${fileExt}`;
+      console.log('Uploading to:', fileName);
 
       // Upload do arquivo
       const { data, error } = await supabase.storage
         .from('company-logos')
         .upload(fileName, file, {
-          upsert: true
+          upsert: true,
+          contentType: file.type
         });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Upload error:', error);
+        throw error;
+      }
+
+      console.log('Upload successful:', data);
 
       // Obter URL pública
       const { data: { publicUrl } } = supabase.storage
         .from('company-logos')
         .getPublicUrl(fileName);
 
+      console.log('Public URL:', publicUrl);
       return publicUrl;
     },
     onSuccess: async (logoUrl) => {
+      console.log('Logo uploaded successfully, updating profile with URL:', logoUrl);
+      
       // Atualizar o perfil com a nova URL da logo
+      const currentProfile = shopProfile || {};
       await createOrUpdateMutation.mutateAsync({ 
-        ...shopProfile,
+        ...currentProfile,
         logo_url: logoUrl 
       });
       
@@ -160,16 +189,22 @@ export const useShopProfile = () => {
     mutationFn: async () => {
       if (!user?.id || !shopProfile?.logo_url) throw new Error('No logo to remove');
 
+      console.log('Removing logo for user:', user.id);
+
       // Extrair o caminho do arquivo da URL
       const urlParts = shopProfile.logo_url.split('/');
       const fileName = `${user.id}/${urlParts[urlParts.length - 1]}`;
+      console.log('Removing file:', fileName);
 
       // Remover do storage
       const { error } = await supabase.storage
         .from('company-logos')
         .remove([fileName]);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error removing from storage:', error);
+        throw error;
+      }
 
       // Atualizar o perfil removendo a URL da logo
       await createOrUpdateMutation.mutateAsync({ 
