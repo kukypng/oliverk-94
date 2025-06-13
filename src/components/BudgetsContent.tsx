@@ -15,10 +15,12 @@ import { BudgetsSkeleton } from '@/components/ui/loading-skeleton';
 import { EmptyState } from '@/components/EmptyState';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/hooks/useAuth';
+import { usePdfGeneration } from '@/hooks/usePdfGeneration';
 
 export const BudgetsContent = () => {
   const { showSuccess, showError } = useEnhancedToast();
   const { user } = useAuth();
+  const { generateAndSharePDF, isGenerating } = usePdfGeneration();
   const [editingBudget, setEditingBudget] = useState<any>(null);
   const [deletingBudget, setDeletingBudget] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -70,6 +72,14 @@ export const BudgetsContent = () => {
         title: "Erro ao compartilhar",
         description: "Ocorreu um erro ao preparar o compartilhamento.",
       });
+    }
+  };
+
+  const handleViewPDF = async (budget: any) => {
+    try {
+      await generateAndSharePDF(budget);
+    } catch (error) {
+      console.error('Erro ao gerar PDF:', error);
     }
   };
 
@@ -221,8 +231,10 @@ export const BudgetsContent = () => {
                           <Button 
                             variant="ghost" 
                             size="sm" 
-                            className="h-8 w-8 p-0"
-                            title="Visualizar"
+                            onClick={() => handleViewPDF(budget)}
+                            disabled={isGenerating}
+                            className="h-8 w-8 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                            title="Gerar PDF e Compartilhar"
                           >
                             <Eye className="h-4 w-4" />
                           </Button>
