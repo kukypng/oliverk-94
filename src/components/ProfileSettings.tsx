@@ -5,31 +5,61 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/hooks/useAuth';
-import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
+import { useEnhancedToast } from '@/hooks/useEnhancedToast';
 import { User, Save } from 'lucide-react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 export const ProfileSettings = () => {
-  const { user } = useAuth();
-  const [isLoading, setIsLoading] = useState(false);
+  const { user, profile } = useAuth();
+  const { showSuccess, showError } = useEnhancedToast();
+  const queryClient = useQueryClient();
+  
   const [formData, setFormData] = useState({
-    name: user?.user_metadata?.name || '',
+    name: profile?.name || '',
     email: user?.email || '',
   });
 
+  const updateProfileMutation = useMutation({
+    mutationFn: async (name: string) => {
+      if (!user?.id) throw new Error('User not authenticated');
+      
+      const { data, error } = await supabase
+        .from('user_profiles')
+        .update({ name })
+        .eq('id', user.id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user-profile', user?.id] });
+      showSuccess({
+        title: 'Perfil atualizado',
+        description: 'Suas informações foram salvas com sucesso.',
+      });
+    },
+    onError: (error) => {
+      console.error('Error updating profile:', error);
+      showError({
+        title: 'Erro ao salvar',
+        description: 'Ocorreu um erro ao salvar suas informações.',
+      });
+    },
+  });
+
   const handleSave = async () => {
-    setIsLoading(true);
-    try {
-      // Aqui você implementaria a lógica para salvar os dados do perfil no Supabase
-      toast.success("Perfil atualizado", {
-        description: "Suas informações foram salvas com sucesso.",
+    if (!formData.name.trim()) {
+      showError({
+        title: 'Campo obrigatório',
+        description: 'O nome é obrigatório.',
       });
-    } catch (error) {
-      toast.error("Erro ao salvar", {
-        description: "Ocorreu um erro ao salvar suas informações.",
-      });
-    } finally {
-      setIsLoading(false);
+      return;
     }
+
+    updateProfileMutation.mutate(formData.name);
   };
 
   return (
@@ -37,7 +67,7 @@ export const ProfileSettings = () => {
       <CardHeader>
         <CardTitle className="flex items-center text-lg">
           <User className="h-5 w-5 mr-2 text-primary" />
-          Perfil
+          Perfil Pessoal
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -62,9 +92,13 @@ export const ProfileSettings = () => {
             O email não pode ser alterado
           </p>
         </div>
-        <Button onClick={handleSave} disabled={isLoading} className="w-full">
+        <Button 
+          onClick={handleSave} 
+          disabled={updateProfileMutation.isPending} 
+          className="w-full"
+        >
           <Save className="h-4 w-4 mr-2" />
-          {isLoading ? 'Salvando...' : 'Salvar Alterações'}
+          {updateProfileMutation.isPending ? 'Salvando...' : 'Salvar Alterações'}
         </Button>
       </CardContent>
     </Card>

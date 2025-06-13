@@ -317,6 +317,7 @@ export type Database = {
       shop_profiles: {
         Row: {
           address: string
+          cnpj: string | null
           contact_phone: string
           created_at: string
           id: string
@@ -327,6 +328,7 @@ export type Database = {
         }
         Insert: {
           address: string
+          cnpj?: string | null
           contact_phone: string
           created_at?: string
           id?: string
@@ -337,6 +339,7 @@ export type Database = {
         }
         Update: {
           address?: string
+          cnpj?: string | null
           contact_phone?: string
           created_at?: string
           id?: string

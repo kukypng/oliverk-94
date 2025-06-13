@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { ProfileSettings } from '@/components/ProfileSettings';
+import { CompanySettings } from '@/components/CompanySettings';
 import { SecuritySettings } from '@/components/SecuritySettings';
 
 export const SettingsContent = () => {
@@ -9,13 +10,18 @@ export const SettingsContent = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl lg:text-3xl font-bold text-foreground">Configurações</h1>
-          <p className="text-muted-foreground mt-2">Gerencie seu perfil e configurações de segurança</p>
+          <p className="text-muted-foreground mt-2">Gerencie seu perfil, empresa e configurações de segurança</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ProfileSettings />
-        <SecuritySettings />
+        <div className="space-y-6">
+          <ProfileSettings />
+          <SecuritySettings />
+        </div>
+        <div>
+          <CompanySettings />
+        </div>
       </div>
     </div>
   );
