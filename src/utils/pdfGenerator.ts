@@ -33,24 +33,24 @@ const generateProfessionalPDF = async (data: BudgetPDFData): Promise<Blob> => {
   const doc = new jsPDF('p', 'mm', 'a4');
   
   // Configurações de cores
-  const primaryColor = [64, 64, 64]; // Cinza escuro
-  const accentColor = [255, 193, 7]; // Amarelo
-  const lightGray = [245, 245, 245];
-  const mediumGray = [128, 128, 128];
+  const primaryColor = [64, 64, 64] as const; // Cinza escuro
+  const accentColor = [255, 193, 7] as const; // Amarelo
+  const lightGray = [245, 245, 245] as const;
+  const mediumGray = [128, 128, 128] as const;
   
   // Header - Nome da empresa
-  doc.setFillColor(...lightGray);
+  doc.setFillColor(lightGray[0], lightGray[1], lightGray[2]);
   doc.rect(0, 0, 210, 40, 'F');
   
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(20);
-  doc.setTextColor(...primaryColor);
+  doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
   doc.text(data.shop_name || 'Nome da Empresa', 105, 15, { align: 'center' });
   
   // Informações da empresa
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(10);
-  doc.setTextColor(...mediumGray);
+  doc.setTextColor(mediumGray[0], mediumGray[1], mediumGray[2]);
   
   if (data.shop_cnpj) {
     doc.text(`CNPJ: ${data.shop_cnpj}`, 105, 22, { align: 'center' });
@@ -61,7 +61,7 @@ const generateProfessionalPDF = async (data: BudgetPDFData): Promise<Blob> => {
   // Título do orçamento
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(18);
-  doc.setTextColor(...primaryColor);
+  doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
   doc.text('ORÇAMENTO DE SERVIÇO', 105, 55, { align: 'center' });
   
   // Seção de datas
@@ -70,21 +70,21 @@ const generateProfessionalPDF = async (data: BudgetPDFData): Promise<Blob> => {
   // Data do Orçamento
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(11);
-  doc.setTextColor(...primaryColor);
+  doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
   doc.text('Data do Orçamento:', 20, yPos);
   
   doc.setFont('helvetica', 'normal');
-  doc.setTextColor(...accentColor);
+  doc.setTextColor(accentColor[0], accentColor[1], accentColor[2]);
   const createdDate = new Date(data.created_at).toLocaleDateString('pt-BR');
   doc.text(createdDate, 20, yPos + 6);
   
   // Válido Até
   doc.setFont('helvetica', 'bold');
-  doc.setTextColor(...primaryColor);
+  doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
   doc.text('Válido Até:', 20, yPos + 20);
   
   doc.setFont('helvetica', 'normal');
-  doc.setTextColor(...accentColor);
+  doc.setTextColor(accentColor[0], accentColor[1], accentColor[2]);
   const validDate = new Date(data.valid_until).toLocaleDateString('pt-BR');
   doc.text(validDate, 20, yPos + 26);
   
@@ -93,18 +93,18 @@ const generateProfessionalPDF = async (data: BudgetPDFData): Promise<Blob> => {
     yPos += 45;
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(11);
-    doc.setTextColor(...primaryColor);
+    doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
     doc.text('Cliente:', 20, yPos);
     
     if (data.client_name) {
       doc.setFont('helvetica', 'normal');
-      doc.setTextColor(...primaryColor);
+      doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
       doc.text(data.client_name, 20, yPos + 6);
     }
     
     if (data.client_phone) {
       doc.setFont('helvetica', 'normal');
-      doc.setTextColor(...mediumGray);
+      doc.setTextColor(mediumGray[0], mediumGray[1], mediumGray[2]);
       doc.text(`Tel: ${data.client_phone}`, 20, yPos + 12);
     }
   }
@@ -113,19 +113,19 @@ const generateProfessionalPDF = async (data: BudgetPDFData): Promise<Blob> => {
   yPos += 25;
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(14);
-  doc.setTextColor(...primaryColor);
+  doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
   doc.text('Detalhes do Aparelho e Serviço', 20, yPos);
   
   // Tabela de detalhes
   yPos += 10;
   
   // Header da tabela
-  doc.setFillColor(...lightGray);
+  doc.setFillColor(lightGray[0], lightGray[1], lightGray[2]);
   doc.rect(20, yPos, 170, 10, 'F');
   
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(10);
-  doc.setTextColor(...primaryColor);
+  doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
   doc.text('Item', 25, yPos + 6);
   doc.text('Descrição', 100, yPos + 6);
   
@@ -133,13 +133,13 @@ const generateProfessionalPDF = async (data: BudgetPDFData): Promise<Blob> => {
   yPos += 10;
   doc.setFillColor(255, 255, 255);
   doc.rect(20, yPos, 170, 8, 'F');
-  doc.setDrawColor(...mediumGray);
+  doc.setDrawColor(mediumGray[0], mediumGray[1], mediumGray[2]);
   doc.rect(20, yPos, 170, 8, 'S');
   
   doc.setFont('helvetica', 'normal');
-  doc.setTextColor(...primaryColor);
+  doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
   doc.text('Aparelho', 25, yPos + 5);
-  doc.setTextColor(...accentColor);
+  doc.setTextColor(accentColor[0], accentColor[1], accentColor[2]);
   doc.text(data.device_model, 100, yPos + 5);
   
   // Linha 2 - Serviço
@@ -148,9 +148,9 @@ const generateProfessionalPDF = async (data: BudgetPDFData): Promise<Blob> => {
   doc.rect(20, yPos, 170, 8, 'F');
   doc.rect(20, yPos, 170, 8, 'S');
   
-  doc.setTextColor(...primaryColor);
+  doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
   doc.text('Serviço Solicitado', 25, yPos + 5);
-  doc.setTextColor(...accentColor);
+  doc.setTextColor(accentColor[0], accentColor[1], accentColor[2]);
   doc.text(data.issue, 100, yPos + 5);
   
   // Linha 3 - Marca/Tipo
@@ -159,16 +159,16 @@ const generateProfessionalPDF = async (data: BudgetPDFData): Promise<Blob> => {
   doc.rect(20, yPos, 170, 8, 'F');
   doc.rect(20, yPos, 170, 8, 'S');
   
-  doc.setTextColor(...primaryColor);
+  doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
   doc.text('Marca da Peça', 25, yPos + 5);
-  doc.setTextColor(...accentColor);
+  doc.setTextColor(accentColor[0], accentColor[1], accentColor[2]);
   doc.text(data.device_type || 'Original', 100, yPos + 5);
   
   // Seção Valores
   yPos += 25;
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(14);
-  doc.setTextColor(...primaryColor);
+  doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
   doc.text('Valores', 20, yPos);
   
   yPos += 15;
@@ -185,7 +185,7 @@ const generateProfessionalPDF = async (data: BudgetPDFData): Promise<Blob> => {
   
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(12);
-  doc.setTextColor(...accentColor);
+  doc.setTextColor(accentColor[0], accentColor[1], accentColor[2]);
   doc.text(cashPrice, 20, yPos + 8);
   
   // Valor Parcelado (se houver)
@@ -193,7 +193,7 @@ const generateProfessionalPDF = async (data: BudgetPDFData): Promise<Blob> => {
     yPos += 20;
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(11);
-    doc.setTextColor(...primaryColor);
+    doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
     doc.text('Valor Parcelado:', 20, yPos);
     
     const installmentPrice = (data.installment_price / 100).toLocaleString('pt-BR', {
@@ -203,7 +203,7 @@ const generateProfessionalPDF = async (data: BudgetPDFData): Promise<Blob> => {
     
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(12);
-    doc.setTextColor(...accentColor);
+    doc.setTextColor(accentColor[0], accentColor[1], accentColor[2]);
     doc.text(`${installmentPrice} em até ${data.installments}x`, 20, yPos + 8);
   }
   
@@ -211,7 +211,7 @@ const generateProfessionalPDF = async (data: BudgetPDFData): Promise<Blob> => {
   yPos += 30;
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(14);
-  doc.setTextColor(...primaryColor);
+  doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
   doc.text('Garantia', 20, yPos);
   
   yPos += 15;
@@ -224,19 +224,19 @@ const generateProfessionalPDF = async (data: BudgetPDFData): Promise<Blob> => {
     : `${data.warranty_months} meses`;
   
   doc.setFont('helvetica', 'normal');
-  doc.setTextColor(...accentColor);
+  doc.setTextColor(accentColor[0], accentColor[1], accentColor[2]);
   doc.text(warrantyText, 20, yPos + 6);
   
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(9);
-  doc.setTextColor(...mediumGray);
+  doc.setTextColor(mediumGray[0], mediumGray[1], mediumGray[2]);
   doc.text('A garantia não cobre danos causados por quebra ou contato com líquidos.', 20, yPos + 15);
   
   // Seção Observações
   yPos += 30;
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(14);
-  doc.setTextColor(...primaryColor);
+  doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
   doc.text('Observações', 20, yPos);
   
   // Caixa de observações
@@ -249,7 +249,7 @@ const generateProfessionalPDF = async (data: BudgetPDFData): Promise<Blob> => {
   
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(10);
-  doc.setTextColor(...accentColor);
+  doc.setTextColor(accentColor[0], accentColor[1], accentColor[2]);
   doc.text('- Inclui busca e entrega do aparelho', 25, yPos + 7);
   doc.text('- Inclui película de proteção', 25, yPos + 14);
   
@@ -257,7 +257,7 @@ const generateProfessionalPDF = async (data: BudgetPDFData): Promise<Blob> => {
   yPos = 280;
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(12);
-  doc.setTextColor(...primaryColor);
+  doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
   doc.text('Agradecemos a preferência!', 105, yPos, { align: 'center' });
   
   // Converter para blob
