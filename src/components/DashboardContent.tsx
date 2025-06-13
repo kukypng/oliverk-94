@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { FileText, DollarSign, TrendingUp, Smartphone, Eye, Edit, Copy, Plus } from 'lucide-react';
+import { FileText, DollarSign, TrendingUp, Smartphone, Eye, Edit, Copy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DashboardSkeleton } from '@/components/ui/loading-states';
 import { EmptyState } from '@/components/EmptyState';
@@ -36,7 +36,7 @@ export const DashboardContent = () => {
         const { data: budgets, error } = await supabase
           .from('budgets')
           .select('id, total_price, device_model, created_at, client_name, status')
-          .eq('owner_id', user.id); // Garantir que só busca orçamentos do usuário atual
+          .eq('owner_id', user.id);
 
         if (error) {
           console.error('Error fetching budgets for dashboard:', error);
@@ -83,7 +83,7 @@ export const DashboardContent = () => {
         throw error;
       }
     },
-    enabled: !!user, // Só executar se houver usuário logado
+    enabled: !!user,
     retry: 3,
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
@@ -161,12 +161,12 @@ export const DashboardContent = () => {
 
   return (
     <ErrorBoundary>
-      <div className="p-4 lg:p-8 space-y-6 lg:space-y-8 animate-fade-in">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="p-3 lg:p-8 space-y-4 lg:space-y-8 animate-fade-in">
+        {/* Header - Mobile Optimized */}
+        <div className="flex flex-col space-y-2 lg:flex-row lg:items-center lg:justify-between lg:space-y-0">
           <div>
-            <h1 className="text-2xl lg:text-3xl font-bold text-foreground">Meu Dashboard</h1>
-            <p className="text-muted-foreground mt-1">
+            <h1 className="text-xl lg:text-3xl font-bold text-foreground">Meu Dashboard</h1>
+            <p className="text-sm lg:text-base text-muted-foreground mt-1">
               Visão geral dos seus orçamentos
               {profile && (
                 <span className="ml-2 text-xs bg-muted px-2 py-1 rounded">
@@ -175,14 +175,14 @@ export const DashboardContent = () => {
               )}
             </p>
           </div>
-          <div className="flex items-center space-x-2 text-sm text-muted-foreground bg-muted/50 px-3 py-2 rounded-lg">
+          <div className="flex items-center space-x-2 text-xs lg:text-sm text-muted-foreground bg-muted/50 px-3 py-2 rounded-lg">
             <TrendingUp className="h-4 w-4 text-green-600" />
             <span>{stats?.monthlyGrowth || 0} orçamentos este mês</span>
           </div>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+        {/* Stats Cards - Mobile Grid */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-6">
           {cards.map((card, index) => {
             const Icon = card.icon;
             return (
@@ -191,16 +191,16 @@ export const DashboardContent = () => {
                 className="glass-card hover:shadow-lg transition-all duration-200 hover:scale-[1.02] animate-scale-in border-0" 
                 style={{ animationDelay: `${index * 100}ms` }}
               >
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 lg:pb-3">
+                  <CardTitle className="text-xs lg:text-sm font-medium text-muted-foreground line-clamp-2">
                     {card.title}
                   </CardTitle>
-                  <div className={`p-2.5 rounded-xl ${card.bgColor} shadow-sm`}>
-                    <Icon className={`h-4 w-4 ${card.color}`} />
+                  <div className={`p-1.5 lg:p-2.5 rounded-xl ${card.bgColor} shadow-sm`}>
+                    <Icon className={`h-3 w-3 lg:h-4 lg:w-4 ${card.color}`} />
                   </div>
                 </CardHeader>
-                <CardContent className="space-y-1">
-                  <div className="text-2xl font-bold text-foreground">
+                <CardContent className="space-y-1 p-3 lg:p-6 pt-0">
+                  <div className="text-lg lg:text-2xl font-bold text-foreground break-words">
                     {card.value}
                   </div>
                   {card.change && (
@@ -215,7 +215,7 @@ export const DashboardContent = () => {
                       >
                         {card.change}
                       </Badge>
-                      <span className="text-xs text-muted-foreground">vs mês anterior</span>
+                      <span className="text-xs text-muted-foreground hidden lg:inline">vs mês anterior</span>
                     </div>
                   )}
                   {card.subtitle && (
@@ -227,42 +227,42 @@ export const DashboardContent = () => {
           })}
         </div>
 
-        {/* Recent Budgets */}
+        {/* Recent Budgets - Mobile Optimized */}
         <Card className="glass-card border-0 shadow-sm animate-slide-up">
-          <CardHeader className="flex flex-row items-center justify-between">
+          <CardHeader className="flex flex-row items-center justify-between pb-3">
             <div>
-              <CardTitle className="text-lg font-semibold text-foreground">
+              <CardTitle className="text-base lg:text-lg font-semibold text-foreground">
                 Orçamentos Recentes
               </CardTitle>
-              <p className="text-sm text-muted-foreground mt-1">
+              <p className="text-xs lg:text-sm text-muted-foreground mt-1">
                 Últimos 5 orçamentos criados
               </p>
             </div>
             {hasPermission('view_all_budgets') && (
-              <Button size="sm" variant="outline">
+              <Button size="sm" variant="outline" className="hidden lg:flex">
                 Ver todos
               </Button>
             )}
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-3 lg:p-6">
             {stats?.recentBudgets && stats.recentBudgets.length > 0 ? (
-              <div className="space-y-3">
+              <div className="space-y-2 lg:space-y-3">
                 {stats.recentBudgets.map((budget, index) => (
                   <div 
                     key={budget.id} 
-                    className="flex items-center justify-between p-4 border border-border/50 rounded-xl hover:bg-muted/30 transition-all duration-150 group animate-fade-in"
+                    className="flex items-center justify-between p-3 lg:p-4 border border-border/50 rounded-xl hover:bg-muted/30 transition-all duration-150 group animate-fade-in"
                     style={{ animationDelay: `${index * 50}ms` }}
                   >
-                    <div className="flex-1">
-                      <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-2 sm:space-y-0">
-                        <div className="flex-1">
-                          <p className="font-medium text-foreground group-hover:text-primary transition-colors">
+                    <div className="flex-1 min-w-0 pr-2">
+                      <div className="flex flex-col space-y-1 lg:space-y-2">
+                        <div>
+                          <p className="font-medium text-sm lg:text-base text-foreground group-hover:text-primary transition-colors truncate">
                             {budget.client_name || 'Cliente não informado'}
                           </p>
-                          <p className="text-sm text-muted-foreground">{budget.device_model}</p>
+                          <p className="text-xs lg:text-sm text-muted-foreground truncate">{budget.device_model}</p>
                         </div>
-                        <div className="text-left sm:text-right">
-                          <p className="font-semibold text-foreground">
+                        <div className="flex items-center justify-between">
+                          <p className="font-semibold text-sm lg:text-base text-foreground">
                             R$ {((budget.total_price || 0) / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                           </p>
                           <Badge 
@@ -282,14 +282,14 @@ export const DashboardContent = () => {
                       </div>
                     </div>
                     {hasPermission('edit_own_budgets') && (
-                      <div className="flex space-x-1 ml-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="flex lg:space-x-1 ml-2 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
                         <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                          <Eye className="h-4 w-4" />
+                          <Eye className="h-3 w-3 lg:h-4 lg:w-4" />
                         </Button>
-                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hidden lg:flex">
                           <Edit className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hidden lg:flex">
                           <Copy className="h-4 w-4" />
                         </Button>
                       </div>
