@@ -9,8 +9,8 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { AuthProvider } from "@/hooks/useAuth";
 import { ToastProvider } from "@/components/ui/toast-provider";
 import Index from "./pages/Index";
-import AuthPage from "./pages/AuthPage";
-import Dashboard from "./pages/Dashboard";
+import { AuthPage } from "./pages/AuthPage";
+import { Dashboard } from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
