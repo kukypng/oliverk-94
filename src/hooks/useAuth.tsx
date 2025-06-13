@@ -1,8 +1,9 @@
+
 import { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
-import { toast } from 'sonner';
+import { useEnhancedToast } from '@/hooks/useEnhancedToast';
 import { useNavigate } from 'react-router-dom';
 
 export type UserRole = 'admin' | 'manager' | 'user';
@@ -42,12 +43,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const { showSuccess, showError, showLoading } = useEnhancedToast();
 
   const { data: profile } = useQuery({
     queryKey: ['user-profile', user?.id],
     queryFn: async () => {
       if (!user?.id) return null;
       
+      console.log('Fetching user profile for:', user.id);
       const { data, error } = await supabase
         .from('user_profiles')
         .select('*')
@@ -58,12 +61,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         console.error('Error fetching profile:', error);
         return null;
       }
+      console.log('Profile loaded:', data);
       return data as UserProfile;
     },
     enabled: !!user?.id,
+    staleTime: 1000 * 60 * 5, // Cache profile for 5 minutes
+    gcTime: 1000 * 60 * 10, // Keep in cache for 10 minutes
   });
 
   useEffect(() => {
+    console.log('Setting up auth state listener');
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
@@ -83,6 +90,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 .single();
 
               if (!existingProfile) {
+                console.log('Creating new user profile');
                 const { error } = await supabase
                   .from('user_profiles')
                   .insert({
@@ -107,6 +115,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     // THEN check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log('Initial session check:', session?.user?.email || 'No session');
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
@@ -117,19 +126,30 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signIn = async (email: string, password: string) => {
     try {
+      console.log('Attempting sign in for:', email);
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
       
       if (error) {
-        toast.error('Erro no login', {
-          description: error.message === 'Invalid login credentials' 
-            ? 'Email ou senha incorretos'
-            : error.message
+        const errorMessage = error.message === 'Invalid login credentials' 
+          ? 'Email ou senha incorretos'
+          : error.message;
+        
+        showError({
+          title: 'Erro no login',
+          description: errorMessage,
+          action: {
+            label: 'Tentar Novamente',
+            onClick: () => console.log('Retry login clicked')
+          }
         });
       } else {
-        toast.success('Login realizado com sucesso!');
+        showSuccess({
+          title: 'Login realizado com sucesso!',
+          description: 'Redirecionando para o dashboard...'
+        });
         // Redirecionar para o dashboard após login bem-sucedido
         setTimeout(() => {
           window.location.href = '/dashboard';
@@ -139,12 +159,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       return { error };
     } catch (error) {
       console.error('Sign in error:', error);
+      showError({
+        title: 'Erro inesperado',
+        description: 'Ocorreu um erro durante o login. Tente novamente.'
+      });
       return { error };
     }
   };
 
   const signUp = async (email: string, password: string, userData: { name: string; role?: string }) => {
     try {
+      console.log('Attempting sign up for:', email);
       const redirectUrl = `${window.location.origin}/`;
       
       const { error } = await supabase.auth.signUp({
@@ -160,32 +185,51 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       });
       
       if (error) {
-        toast.error('Erro no cadastro', {
-          description: error.message === 'User already registered'
-            ? 'Usuário já cadastrado'
-            : error.message
+        const errorMessage = error.message === 'User already registered'
+          ? 'Usuário já cadastrado'
+          : error.message;
+          
+        showError({
+          title: 'Erro no cadastro',
+          description: errorMessage,
+          action: {
+            label: 'Tentar Novamente',
+            onClick: () => console.log('Retry signup clicked')
+          }
         });
       } else {
-        toast.success('Cadastro realizado!', {
-          description: 'Verifique seu email para confirmar a conta.'
+        showSuccess({
+          title: 'Cadastro realizado!',
+          description: 'Verifique seu email para confirmar a conta.',
+          duration: 6000
         });
       }
       
       return { error };
     } catch (error) {
       console.error('Sign up error:', error);
+      showError({
+        title: 'Erro inesperado',
+        description: 'Ocorreu um erro durante o cadastro. Tente novamente.'
+      });
       return { error };
     }
   };
 
   const signOut = async () => {
     try {
+      console.log('Signing out user');
       await supabase.auth.signOut();
-      toast.success('Logout realizado', {
+      showSuccess({
+        title: 'Logout realizado',
         description: 'Você foi desconectado com sucesso.'
       });
     } catch (error) {
       console.error('Sign out error:', error);
+      showError({
+        title: 'Erro no logout',
+        description: 'Ocorreu um erro ao desconectar. Tente novamente.'
+      });
     }
   };
 

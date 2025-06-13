@@ -17,13 +17,23 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 1000 * 60 * 5, // 5 minutes
+      gcTime: 1000 * 60 * 10, // 10 minutes (formerly cacheTime)
+      refetchOnWindowFocus: false, // Prevent unnecessary refetches
+      refetchOnReconnect: 'always',
+      refetchOnMount: true,
       retry: (failureCount, error: any) => {
         // Don't retry on auth errors
         if (error?.message?.includes('JWT') || error?.message?.includes('auth')) {
           return false;
         }
+        // Exponential backoff with max 3 retries
         return failureCount < 3;
       },
+      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000), // Exponential backoff
+    },
+    mutations: {
+      retry: 1,
+      retryDelay: 1000,
     },
   },
 });
@@ -35,7 +45,20 @@ const App = () => (
         <ErrorBoundary>
           <AuthProvider>
             <Toaster />
-            <Sonner />
+            <Sonner 
+              position="top-right"
+              expand={false}
+              richColors
+              closeButton
+              duration={4000}
+              toastOptions={{
+                style: {
+                  background: 'hsl(var(--background))',
+                  color: 'hsl(var(--foreground))',
+                  border: '1px solid hsl(var(--border))',
+                },
+              }}
+            />
             <ToastProvider />
             <BrowserRouter>
               <Routes>
