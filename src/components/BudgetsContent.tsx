@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useQuery } from '@tanstack/react-query';
@@ -15,10 +14,12 @@ import { BudgetsSkeleton } from '@/components/ui/loading-skeleton';
 import { EmptyState } from '@/components/EmptyState';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/hooks/useAuth';
+import { usePDFGenerator } from '@/hooks/usePDFGenerator';
 
 export const BudgetsContent = () => {
   const { showSuccess, showError } = useEnhancedToast();
   const { user } = useAuth();
+  const { generatePDF, isGenerating } = usePDFGenerator();
   const [editingBudget, setEditingBudget] = useState<any>(null);
   const [deletingBudget, setDeletingBudget] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -70,6 +71,28 @@ export const BudgetsContent = () => {
         title: "Erro ao compartilhar",
         description: "Ocorreu um erro ao preparar o compartilhamento.",
       });
+    }
+  };
+
+  const handleGeneratePDF = async (budget: any) => {
+    try {
+      await generatePDF({
+        id: budget.id,
+        device_model: budget.device_model,
+        device_type: budget.device_type,
+        issue: budget.issue,
+        total_price: budget.total_price,
+        installments: budget.installments,
+        warranty_months: budget.warranty_months,
+        client_name: budget.client_name,
+        client_phone: budget.client_phone,
+        created_at: budget.created_at,
+        valid_until: budget.valid_until,
+        includes_delivery: budget.includes_delivery,
+        includes_screen_protector: budget.includes_screen_protector,
+      });
+    } catch (error) {
+      console.error('Error generating PDF:', error);
     }
   };
 
@@ -221,8 +244,10 @@ export const BudgetsContent = () => {
                           <Button 
                             variant="ghost" 
                             size="sm" 
-                            className="h-8 w-8 p-0"
-                            title="Visualizar"
+                            onClick={() => handleGeneratePDF(budget)}
+                            disabled={isGenerating}
+                            className="h-8 w-8 p-0 hover:bg-blue-50 hover:text-blue-600"
+                            title="Gerar PDF"
                           >
                             <Eye className="h-4 w-4" />
                           </Button>
