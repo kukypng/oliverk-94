@@ -84,6 +84,13 @@ export type Database = {
             referencedRelation: "budgets"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "fk_budget_parts_budget_id"
+            columns: ["budget_id"]
+            isOneToOne: false
+            referencedRelation: "budgets"
+            referencedColumns: ["id"]
+          },
         ]
       }
       budgets: {
@@ -295,6 +302,10 @@ export type Database = {
         Args: { p_user_id: string }
         Returns: Json
       }
+      get_user_role: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       get_username_from_email: {
         Args: { email: string }
         Returns: string
@@ -313,6 +324,10 @@ export type Database = {
         Returns: boolean
       }
       is_admin: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
+      is_user_admin: {
         Args: Record<PropertyKey, never>
         Returns: boolean
       }
