@@ -11,7 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Plus, User, Smartphone, DollarSign, Settings } from 'lucide-react';
+import { ArrowLeft, Plus } from 'lucide-react';
 
 interface BudgetFormData {
   clientName: string;
@@ -185,274 +185,221 @@ export const NewBudgetForm = ({ onBack }: NewBudgetFormProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-muted/20 p-4 sm:p-8 mobile-padding">
-      <div className="animate-fade-in">
-        <div className="flex items-center mb-8">
-          <Button
-            variant="ghost"
-            onClick={onBack}
-            className="mr-4 hover-lift"
-            size="lg"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Voltar
-          </Button>
-          <div>
-            <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-2">Novo Orçamento</h1>
-            <p className="text-muted-foreground mobile-text">Crie um novo orçamento para seu cliente</p>
-          </div>
+    <div className="p-8">
+      <div className="flex items-center mb-8">
+        <Button
+          variant="ghost"
+          onClick={onBack}
+          className="mr-4"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Voltar
+        </Button>
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Novo Orçamento</h1>
+          <p className="text-gray-600 mt-2">Crie um novo orçamento para seu cliente</p>
         </div>
+      </div>
 
-        <form onSubmit={handleSubmit} className="max-w-4xl mx-auto space-y-6">
-          <Card className="hover-lift glass-effect mobile-card animate-slide-up">
-            <CardHeader className="pb-4">
-              <CardTitle className="flex items-center text-xl">
-                <User className="h-5 w-5 mr-2 text-primary" />
-                Informações do Cliente
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Informações do Cliente</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label htmlFor="clientName">Nome do Cliente *</Label>
+              <Input
+                id="clientName"
+                value={formData.clientName}
+                onChange={(e) => setFormData({...formData, clientName: e.target.value})}
+                placeholder="Digite o nome completo"
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="clientPhone">Telefone *</Label>
+              <Input
+                id="clientPhone"
+                value={formData.clientPhone}
+                onChange={(e) => setFormData({...formData, clientPhone: e.target.value})}
+                placeholder="(11) 99999-9999"
+                required
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Informações do Dispositivo</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label htmlFor="deviceModel">Modelo do Aparelho *</Label>
+              <Input
+                id="deviceModel"
+                value={formData.deviceModel}
+                onChange={(e) => setFormData({...formData, deviceModel: e.target.value})}
+                placeholder="Ex: iPhone 12, Redmi Note 8"
+                required
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="partType">Qual peça vai ser trocada? / Serviço a ser realizado *</Label>
+              <Input
+                id="partType"
+                value={formData.partType}
+                onChange={(e) => setFormData({...formData, partType: e.target.value})}
+                placeholder="Ex: Tela, Bateria, Troca de conector, Limpeza..."
+                required
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="brand">Marca da Peça</Label>
+              <Input
+                id="brand"
+                value={formData.brand}
+                onChange={(e) => setFormData({...formData, brand: e.target.value})}
+                placeholder="Ex: Original, Incell, OLED, Compatível..."
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="warranty">Garantia</Label>
+              <Select 
+                value={formData.warrantyMonths.toString()} 
+                onValueChange={(value) => setFormData({...formData, warrantyMonths: parseInt(value)})}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {warrantyPeriods?.map((period) => (
+                    <SelectItem key={period.id} value={period.months.toString()}>
+                      {period.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Preços</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label htmlFor="cashPrice">Valor à Vista (R$) *</Label>
+              <Input
+                id="cashPrice"
+                type="number"
+                step="0.01"
+                value={formData.cashPrice}
+                onChange={(e) => setFormData({...formData, cashPrice: parseFloat(e.target.value) || 0})}
+                placeholder="0,00"
+                required
+              />
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="enableInstallmentPrice"
+                checked={formData.enableInstallmentPrice}
+                onCheckedChange={(checked) => setFormData({...formData, enableInstallmentPrice: checked})}
+              />
+              <Label htmlFor="enableInstallmentPrice">Ativar valor parcelado</Label>
+            </div>
+
+            {formData.enableInstallmentPrice && (
+              <>
                 <div>
-                  <Label htmlFor="clientName" className="mobile-text">Nome do Cliente *</Label>
+                  <Label htmlFor="installmentPrice">Valor Parcelado (R$)</Label>
                   <Input
-                    id="clientName"
-                    value={formData.clientName}
-                    onChange={(e) => setFormData({...formData, clientName: e.target.value})}
-                    placeholder="Digite o nome completo"
-                    required
-                    className="mt-1 h-12 transition-all duration-200 focus:ring-2 focus:ring-primary/20"
+                    id="installmentPrice"
+                    type="number"
+                    step="0.01"
+                    value={formData.installmentPrice}
+                    onChange={(e) => setFormData({...formData, installmentPrice: parseFloat(e.target.value) || 0})}
+                    placeholder="0,00"
                   />
                 </div>
-                <div>
-                  <Label htmlFor="clientPhone" className="mobile-text">Telefone *</Label>
-                  <Input
-                    id="clientPhone"
-                    value={formData.clientPhone}
-                    onChange={(e) => setFormData({...formData, clientPhone: e.target.value})}
-                    placeholder="(11) 99999-9999"
-                    required
-                    className="mt-1 h-12 transition-all duration-200 focus:ring-2 focus:ring-primary/20"
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="hover-lift glass-effect mobile-card animate-slide-up" style={{animationDelay: '0.1s'}}>
-            <CardHeader className="pb-4">
-              <CardTitle className="flex items-center text-xl">
-                <Smartphone className="h-5 w-5 mr-2 text-primary" />
-                Informações do Dispositivo
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label htmlFor="deviceModel" className="mobile-text">Modelo do Aparelho *</Label>
-                <Input
-                  id="deviceModel"
-                  value={formData.deviceModel}
-                  onChange={(e) => setFormData({...formData, deviceModel: e.target.value})}
-                  placeholder="Ex: iPhone 12, Redmi Note 8"
-                  required
-                  className="mt-1 h-12 transition-all duration-200 focus:ring-2 focus:ring-primary/20"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="partType" className="mobile-text">Qual peça vai ser trocada? / Serviço a ser realizado *</Label>
-                <Input
-                  id="partType"
-                  value={formData.partType}
-                  onChange={(e) => setFormData({...formData, partType: e.target.value})}
-                  placeholder="Ex: Tela, Bateria, Troca de conector, Limpeza..."
-                  required
-                  className="mt-1 h-12 transition-all duration-200 focus:ring-2 focus:ring-primary/20"
-                />
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="brand" className="mobile-text">Marca da Peça</Label>
-                  <Input
-                    id="brand"
-                    value={formData.brand}
-                    onChange={(e) => setFormData({...formData, brand: e.target.value})}
-                    placeholder="Ex: Original, Incell, OLED, Compatível..."
-                    className="mt-1 h-12 transition-all duration-200 focus:ring-2 focus:ring-primary/20"
-                  />
-                </div>
 
                 <div>
-                  <Label htmlFor="warranty" className="mobile-text">Garantia</Label>
+                  <Label htmlFor="installments">Número de Parcelas</Label>
                   <Select 
-                    value={formData.warrantyMonths.toString()} 
-                    onValueChange={(value) => setFormData({...formData, warrantyMonths: parseInt(value)})}
+                    value={formData.installments.toString()} 
+                    onValueChange={(value) => setFormData({...formData, installments: parseInt(value)})}
                   >
-                    <SelectTrigger className="mt-1 h-12 transition-all duration-200">
+                    <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-popover border border-border shadow-lg">
-                      {warrantyPeriods?.map((period) => (
-                        <SelectItem key={period.id} value={perio                        />
+                    <SelectContent>
+                      {paymentConditions?.map((condition) => (
+                        <SelectItem key={condition.id} value={condition.installments.toString()}>
+                          {condition.name}
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              </>
+            )}
+          </CardContent>
+        </Card>
 
-          <Card className="hover-lift glass-effect mobile-card animate-slide-up" style={{animationDelay: '0.2s'}}>
-            <CardHeader className="pb-4">
-              <CardTitle className="flex items-center text-xl">
-                <DollarSign className="h-5 w-5 mr-2 text-primary" />
-                Preços
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label htmlFor="cashPrice" className="mobile-text">Valor à Vista (R$) *</Label>
-                <Input
-                  id="cashPrice"
-                  type="number"
-                  step="0.01"
-                  value={formData.cashPrice}
-                  onChange={(e) => setFormData({...formData, cashPrice: parseFloat(e.target.value) || 0})}
-                  placeholder="0,00"
-                  required
-                  className="mt-1 h-12 transition-all duration-200 focus:ring-2 focus:ring-primary/20"
-                />
-              </div>
+        <Card>
+          <CardHeader>
+            <CardTitle>Opções Adicionais</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="delivery"
+                checked={formData.includesDelivery}
+                onCheckedChange={(checked) => setFormData({...formData, includesDelivery: checked as boolean})}
+              />
+              <Label htmlFor="delivery">Incluir entrega e busca</Label>
+            </div>
 
-              <div className="flex items-center space-x-3 p-4 bg-muted/50 rounded-lg">
-                <Switch
-                  id="enableInstallmentPrice"
-                  checked={formData.enableInstallmentPrice}
-                  onCheckedChange={(checked) => setFormData({...formData, enableInstallmentPrice: checked})}
-                  className="data-[state=checked]:bg-primary"
-                />
-                <Label htmlFor="enableInstallmentPrice" className="mobile-text cursor-pointer">
-                  Ativar valor parcelado
-                </Label>
-              </div>
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="screenProtector"
+                checked={formData.includesScreenProtector}
+                onCheckedChange={(checked) => setFormData({...formData, includesScreenProtector: checked as boolean})}
+              />
+              <Label htmlFor="screenProtector">Incluir película de brinde</Label>
+            </div>
 
-              {formData.enableInstallmentPrice && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-slide-up">
-                  <div>
-                    <Label htmlFor="installmentPrice" className="mobile-text">Valor Parcelado (R$)</Label>
-                    <Input
-                      id="installmentPrice"
-                      type="number"
-                      step="0.01"
-                      value={formData.installmentPrice}
-                      onChange={(e) => setFormData({...formData, installmentPrice: parseFloat(e.target.value) || 0})}
-                      placeholder="0,00"
-                      className="mt-1 h-12 transition-all duration-200 focus:ring-2 focus:ring-primary/20"
-                    />
-                  </div>
+            <div>
+              <Label htmlFor="notes">Observações</Label>
+              <Textarea
+                id="notes"
+                value={formData.notes}
+                onChange={(e) => setFormData({...formData, notes: e.target.value})}
+                placeholder="Observações adicionais sobre o orçamento..."
+              />
+            </div>
+          </CardContent>
+        </Card>
 
-                  <div>
-                    <Label htmlFor="installments" className="mobile-text">Número de Parcelas</Label>
-                    <Select 
-                      value={formData.installments.toString()} 
-                      onValueChange={(value) => setFormData({...formData, installments: parseInt(value)})}
-                    >
-                      <SelectTrigger className="mt-1 h-12 transition-all duration-200">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="bg-popover border border-border shadow-lg">
-                        {paymentConditions?.map((condition) => (
-                          <SelectItem key={condition.id} value={condition.installments.toString()}>
-                            {condition.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          <Card className="hover-lift glass-effect mobile-card animate-slide-up" style={{animationDelay: '0.3s'}}>
-            <CardHeader className="pb-4">
-              <CardTitle className="flex items-center text-xl">
-                <Settings className="h-5 w-5 mr-2 text-primary" />
-                Opções Adicionais
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-4">
-                <div className="flex items-center space-x-3 p-3 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors">
-                  <Checkbox
-                    id="delivery"
-                    checked={formData.includesDelivery}
-                    onCheckedChange={(checked) => setFormData({...formData, includesDelivery: checked as boolean})}
-                    className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
-                  />
-                  <Label htmlFor="delivery" className="mobile-text cursor-pointer">
-                    Incluir entrega e busca
-                  </Label>
-                </div>
-
-                <div className="flex items-center space-x-3 p-3 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors">
-                  <Checkbox
-                    id="screenProtector"
-                    checked={formData.includesScreenProtector}
-                    onCheckedChange={(checked) => setFormData({...formData, includesScreenProtector: checked as boolean})}
-                    className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
-                  />
-                  <Label htmlFor="screenProtector" className="mobile-text cursor-pointer">
-                    Incluir película de brinde
-                  </Label>
-                </div>
-              </div>
-
-              <div>
-                <Label htmlFor="notes" className="mobile-text">Observações</Label>
-                <Textarea
-                  id="notes"
-                  value={formData.notes}
-                  onChange={(e) => setFormData({...formData, notes: e.target.value})}
-                  placeholder="Observações adicionais sobre o orçamento..."
-                  className="mt-1 min-h-[100px] transition-all duration-200 focus:ring-2 focus:ring-primary/20"
-                />
-              </div>
-            </CardContent>
-          </Card>
-
-          <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 animate-slide-up" style={{animationDelay: '0.4s'}}>
-            <Button 
-              type="button" 
-              variant="outline" 
-              onClick={onBack} 
-              className="flex-1 h-12 hover-lift"
-              size="lg"
-            >
-              Cancelar
-            </Button>
-            <Button 
-              type="submit" 
-              className="flex-1 h-12 bg-primary hover:bg-primary/90 text-primary-foreground hover-lift"
-              disabled={createBudgetMutation.isPending}
-              size="lg"
-            >
-              {createBudgetMutation.isPending ? (
-                <>
-                  <Plus className="mr-2 h-4 w-4 animate-spin" />
-                  Criando...
-                </>
-              ) : (
-                <>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Criar Orçamento
-                </>
-              )}
-            </Button>
-          </div>
-        </form>
-      </div>
+        <div className="flex space-x-4">
+          <Button type="button" variant="outline" onClick={onBack} className="flex-1">
+            Cancelar
+          </Button>
+          <Button 
+            type="submit" 
+            className="flex-1"
+            disabled={createBudgetMutation.isPending}
+          >
+            {createBudgetMutation.isPending ? 'Criando...' : 'Criar Orçamento'}
+          </Button>
+        </div>
+      </form>
     </div>
   );
 };
