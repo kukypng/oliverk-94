@@ -54,42 +54,48 @@ export const AuthPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 p-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-primary/5 p-4 mobile-padding">
+      <div className="w-full max-w-md animate-fade-in">
         {/* Logo/Brand */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-amber-500 rounded-2xl mb-4 shadow-lg">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-primary rounded-2xl mb-4 shadow-lg hover-lift">
             <div className="flex items-center space-x-1">
-              <Smartphone className="h-6 w-6 text-white" />
-              <Wrench className="h-5 w-5 text-white" />
+              <Smartphone className="h-6 w-6 text-primary-foreground" />
+              <Wrench className="h-5 w-5 text-primary-foreground" />
             </div>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Oliver</h1>
-          <p className="text-gray-600">Sistema de Gestão de Orçamentos</p>
+          <h1 className="text-3xl font-bold text-foreground mb-2 sm:text-4xl">Oliver</h1>
+          <p className="text-muted-foreground mobile-text">Sistema de Gestão de Orçamentos</p>
         </div>
 
-        <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm">
+        <Card className="shadow-2xl border-0 glass-effect mobile-card hover-lift">
           <CardHeader className="text-center pb-4">
-            <CardTitle className="text-2xl text-gray-900">Bem-vindo</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-2xl text-foreground">Bem-vindo</CardTitle>
+            <CardDescription className="mobile-text">
               Acesse sua conta ou crie uma nova para começar
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="login" className="w-full">
-              <TabsList className="grid w-full grid-cols-2 mb-6 bg-gray-100">
-                <TabsTrigger value="login" className="data-[state=active]:bg-amber-500 data-[state=active]:text-white">
+              <TabsList className="grid w-full grid-cols-2 mb-6 bg-muted/50">
+                <TabsTrigger 
+                  value="login" 
+                  className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all duration-200"
+                >
                   Entrar
                 </TabsTrigger>
-                <TabsTrigger value="signup" className="data-[state=active]:bg-amber-500 data-[state=active]:text-white">
+                <TabsTrigger 
+                  value="signup" 
+                  className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all duration-200"
+                >
                   Cadastrar
                 </TabsTrigger>
               </TabsList>
 
-              <TabsContent value="login">
+              <TabsContent value="login" className="animate-slide-up">
                 <form onSubmit={handleLogin} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
+                    <Label htmlFor="email" className="mobile-text">Email</Label>
                     <Input
                       id="email"
                       type="email"
@@ -97,11 +103,11 @@ export const AuthPage = () => {
                       value={loginForm.email}
                       onChange={(e) => setLoginForm({ ...loginForm, email: e.target.value })}
                       required
-                      className="h-12 text-base"
+                      className="h-12 text-base transition-all duration-200 focus:ring-2 focus:ring-primary/20"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="password">Senha</Label>
+                    <Label htmlFor="password" className="mobile-text">Senha</Label>
                     <Input
                       id="password"
                       type="password"
@@ -109,12 +115,12 @@ export const AuthPage = () => {
                       value={loginForm.password}
                       onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
                       required
-                      className="h-12 text-base"
+                      className="h-12 text-base transition-all duration-200 focus:ring-2 focus:ring-primary/20"
                     />
                   </div>
                   <Button 
                     type="submit" 
-                    className="w-full h-12 bg-amber-500 hover:bg-amber-600 text-white font-medium text-base"
+                    className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-medium text-base transition-all duration-200 hover-lift"
                     disabled={loading}
                   >
                     {loading ? (
@@ -129,10 +135,10 @@ export const AuthPage = () => {
                 </form>
               </TabsContent>
 
-              <TabsContent value="signup">
+              <TabsContent value="signup" className="animate-slide-up">
                 <form onSubmit={handleSignup} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="signup-name">Nome Completo</Label>
+                    <Label htmlFor="signup-name" className="mobile-text">Nome Completo</Label>
                     <Input
                       id="signup-name"
                       type="text"
@@ -140,11 +146,11 @@ export const AuthPage = () => {
                       value={signupForm.name}
                       onChange={(e) => setSignupForm({ ...signupForm, name: e.target.value })}
                       required
-                      className="h-12 text-base"
+                      className="h-12 text-base transition-all duration-200 focus:ring-2 focus:ring-primary/20"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="signup-email">Email</Label>
+                    <Label htmlFor="signup-email" className="mobile-text">Email</Label>
                     <Input
                       id="signup-email"
                       type="email"
@@ -152,11 +158,11 @@ export const AuthPage = () => {
                       value={signupForm.email}
                       onChange={(e) => setSignupForm({ ...signupForm, email: e.target.value })}
                       required
-                      className="h-12 text-base"
+                      className="h-12 text-base transition-all duration-200 focus:ring-2 focus:ring-primary/20"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="signup-password">Senha</Label>
+                    <Label htmlFor="signup-password" className="mobile-text">Senha</Label>
                     <Input
                       id="signup-password"
                       type="password"
@@ -164,11 +170,11 @@ export const AuthPage = () => {
                       value={signupForm.password}
                       onChange={(e) => setSignupForm({ ...signupForm, password: e.target.value })}
                       required
-                      className="h-12 text-base"
+                      className="h-12 text-base transition-all duration-200 focus:ring-2 focus:ring-primary/20"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="signup-confirm">Confirmar Senha</Label>
+                    <Label htmlFor="signup-confirm" className="mobile-text">Confirmar Senha</Label>
                     <Input
                       id="signup-confirm"
                       type="password"
@@ -176,12 +182,12 @@ export const AuthPage = () => {
                       value={signupForm.confirmPassword}
                       onChange={(e) => setSignupForm({ ...signupForm, confirmPassword: e.target.value })}
                       required
-                      className="h-12 text-base"
+                      className="h-12 text-base transition-all duration-200 focus:ring-2 focus:ring-primary/20"
                     />
                   </div>
                   <Button 
                     type="submit" 
-                    className="w-full h-12 bg-amber-500 hover:bg-amber-600 text-white font-medium text-base"
+                    className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-medium text-base transition-all duration-200 hover-lift"
                     disabled={loading || signupForm.password !== signupForm.confirmPassword}
                   >
                     {loading ? (
@@ -199,7 +205,7 @@ export const AuthPage = () => {
           </CardContent>
         </Card>
 
-        <div className="text-center mt-6 text-sm text-gray-600">
+        <div className="text-center mt-6 text-sm text-muted-foreground mobile-text">
           <p>Sistema de assistência técnica profissional</p>
         </div>
       </div>

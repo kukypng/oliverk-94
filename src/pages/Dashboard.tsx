@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { Sidebar } from '@/components/Sidebar';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { DashboardContent } from '@/components/DashboardContent';
 import { BudgetsContent } from '@/components/BudgetsContent';
 import { NewBudgetContent } from '@/components/NewBudgetContent';
@@ -31,10 +32,15 @@ export const Dashboard = () => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-background">
       <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
       <main className="flex-1 overflow-auto">
-        {renderContent()}
+        <div className="sticky top-0 z-10 glass-effect border-b border-border/50 px-6 py-3 flex justify-end">
+          <ThemeToggle />
+        </div>
+        <div className="animate-fade-in">
+          {renderContent()}
+        </div>
       </main>
     </div>
   );
