@@ -57,7 +57,8 @@ Aparelho: *${budget.device_model}*
 ${priceSection}
 
 *DETALHES*
-Peça: ${budget.brand || 'Compatível'}
+Serviço: ${budget.part_type}
+Especificação: ${budget.brand || 'Padrão'}
 Garantia de: ${warrantyText}
 
 *Garantia não cobre quebrado ou molhado*${additionalServices}`;

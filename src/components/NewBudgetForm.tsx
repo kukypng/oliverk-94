@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -14,7 +15,10 @@ import { ArrowLeft } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 
 interface BudgetFormData {
+  deviceType: string;
   deviceModel: string;
+  deviceBrand: string;
+  issue: string;
   partType: string;
   brand: string;
   warrantyMonths: number;
@@ -25,6 +29,7 @@ interface BudgetFormData {
   includesScreenProtector: boolean;
   enableInstallmentPrice: boolean;
   notes: string;
+  validityDays: number;
 }
 
 interface NewBudgetFormProps {
@@ -37,7 +42,10 @@ export const NewBudgetForm = ({ onBack }: NewBudgetFormProps) => {
   const queryClient = useQueryClient();
   
   const [formData, setFormData] = useState<BudgetFormData>({
+    deviceType: '',
     deviceModel: '',
+    deviceBrand: '',
+    issue: '',
     partType: '',
     brand: '',
     warrantyMonths: 3,
@@ -47,7 +55,28 @@ export const NewBudgetForm = ({ onBack }: NewBudgetFormProps) => {
     includesDelivery: false,
     includesScreenProtector: false,
     enableInstallmentPrice: true,
-    notes: ''
+    notes: '',
+    validityDays: 15
+  });
+
+  // Buscar tipos de dispositivo
+  const { data: deviceTypes } = useQuery({
+    queryKey: ['device-types'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('device_types').select('*').order('name');
+      if (error) throw error;
+      return data;
+    }
+  });
+
+  // Buscar tipos de defeito
+  const { data: defectTypes } = useQuery({
+    queryKey: ['defect-types'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('defect_types').select('*').order('name');
+      if (error) throw error;
+      return data;
+    }
   });
 
   // Buscar períodos de garantia
@@ -78,14 +107,19 @@ export const NewBudgetForm = ({ onBack }: NewBudgetFormProps) => {
 
       console.log('Creating budget for user:', user.id);
       
-      // Criar orçamento com owner_id explícito (o trigger vai garantir que seja o usuário atual)
+      // Calcular data de validade baseada nos dias especificados
+      const validUntil = new Date();
+      validUntil.setDate(validUntil.getDate() + data.validityDays);
+      
+      // Criar orçamento com owner_id explícito
       const { data: budget, error: budgetError } = await supabase
         .from('budgets')
         .insert({
-          owner_id: user.id, // Explicitamente definir o owner_id
+          owner_id: user.id,
+          device_type: data.deviceType,
           device_model: data.deviceModel,
-          device_type: 'Smartphone',
-          issue: `Troca de ${data.partType}`,
+          device_brand: data.deviceBrand,
+          issue: data.issue,
           part_type: data.partType,
           warranty_months: data.warrantyMonths,
           cash_price: Math.round(data.cashPrice * 100),
@@ -95,7 +129,8 @@ export const NewBudgetForm = ({ onBack }: NewBudgetFormProps) => {
           includes_delivery: data.includesDelivery,
           includes_screen_protector: data.includesScreenProtector,
           notes: data.notes,
-          status: 'pending'
+          status: 'pending',
+          valid_until: validUntil.toISOString()
         })
         .select('id')
         .single();
@@ -133,7 +168,7 @@ export const NewBudgetForm = ({ onBack }: NewBudgetFormProps) => {
     onSuccess: () => {
       showSuccess({
         title: "Orçamento criado com sucesso!",
-        description: "O orçamento foi criado e está válido por 15 dias.",
+        description: `O orçamento foi criado e está válido por ${formData.validityDays} dias.`,
       });
       queryClient.invalidateQueries({ queryKey: ['dashboard-stats'] });
       queryClient.invalidateQueries({ queryKey: ['budgets'] });
@@ -161,7 +196,7 @@ export const NewBudgetForm = ({ onBack }: NewBudgetFormProps) => {
     if (!formData.deviceModel || !formData.partType) {
       showError({
         title: "Preencha os campos obrigatórios",
-        description: "Modelo do aparelho e tipo de peça são obrigatórios.",
+        description: "Modelo do aparelho e tipo de serviço são obrigatórios.",
       });
       return;
     }
@@ -190,7 +225,7 @@ export const NewBudgetForm = ({ onBack }: NewBudgetFormProps) => {
         </Button>
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Novo Orçamento</h1>
-          <p className="text-gray-600 mt-2">Crie um novo orçamento válido por 15 dias</p>
+          <p className="text-gray-600 mt-2">Crie um novo orçamento personalizado</p>
         </div>
       </div>
 
@@ -200,6 +235,25 @@ export const NewBudgetForm = ({ onBack }: NewBudgetFormProps) => {
             <CardTitle>Informações do Dispositivo</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
+            <div>
+              <Label htmlFor="deviceType">Tipo de Dispositivo</Label>
+              <Select 
+                value={formData.deviceType} 
+                onValueChange={(value) => setFormData({...formData, deviceType: value})}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione o tipo de dispositivo" />
+                </SelectTrigger>
+                <SelectContent>
+                  {deviceTypes?.map((type) => (
+                    <SelectItem key={type.id} value={type.name}>
+                      {type.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
             <div>
               <Label htmlFor="deviceModel">Modelo do Aparelho *</Label>
               <Input
@@ -212,23 +266,52 @@ export const NewBudgetForm = ({ onBack }: NewBudgetFormProps) => {
             </div>
 
             <div>
-              <Label htmlFor="partType">Qual peça vai ser trocada? / Serviço a ser realizado *</Label>
+              <Label htmlFor="deviceBrand">Marca do Dispositivo</Label>
+              <Input
+                id="deviceBrand"
+                value={formData.deviceBrand}
+                onChange={(e) => setFormData({...formData, deviceBrand: e.target.value})}
+                placeholder="Ex: Apple, Samsung, Xiaomi"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="issue">Problema/Defeito</Label>
+              <Select 
+                value={formData.issue} 
+                onValueChange={(value) => setFormData({...formData, issue: value})}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione o tipo de problema" />
+                </SelectTrigger>
+                <SelectContent>
+                  {defectTypes?.map((defect) => (
+                    <SelectItem key={defect.id} value={defect.name}>
+                      {defect.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label htmlFor="partType">Qual serviço será realizado? *</Label>
               <Input
                 id="partType"
                 value={formData.partType}
                 onChange={(e) => setFormData({...formData, partType: e.target.value})}
-                placeholder="Ex: Tela, Bateria, Troca de conector, Limpeza..."
+                placeholder="Ex: Troca de tela, Troca de bateria, Limpeza..."
                 required
               />
             </div>
 
             <div>
-              <Label htmlFor="brand">Marca da Peça</Label>
+              <Label htmlFor="brand">Especificação do Serviço</Label>
               <Input
                 id="brand"
                 value={formData.brand}
                 onChange={(e) => setFormData({...formData, brand: e.target.value})}
-                placeholder="Ex: Original, Incell, OLED, Compatível..."
+                placeholder="Ex: Peça original, Incell, OLED, Compatível..."
               />
             </div>
 
@@ -319,9 +402,25 @@ export const NewBudgetForm = ({ onBack }: NewBudgetFormProps) => {
 
         <Card>
           <CardHeader>
-            <CardTitle>Opções Adicionais</CardTitle>
+            <CardTitle>Configurações do Orçamento</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
+            <div>
+              <Label htmlFor="validityDays">Validade do Orçamento (dias)</Label>
+              <Input
+                id="validityDays"
+                type="number"
+                min="1"
+                max="365"
+                value={formData.validityDays}
+                onChange={(e) => setFormData({...formData, validityDays: parseInt(e.target.value) || 15})}
+                placeholder="15"
+              />
+              <p className="text-sm text-gray-500 mt-1">
+                O orçamento será válido por {formData.validityDays} dias a partir da criação
+              </p>
+            </div>
+
             <div className="flex items-center space-x-2">
               <Checkbox
                 id="delivery"
