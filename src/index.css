@@ -372,6 +372,13 @@
   }
 }
 
+/* Custom shadow-medium utility */
+@layer utilities {
+  .shadow-medium {
+    box-shadow: 0 8px 24px 0 rgba(0,0,0,0.08);
+  }
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
