@@ -1,22 +1,18 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AlertTriangle, MessageCircle, Clock } from 'lucide-react';
-
 export const LicenseExpiredPage = () => {
   const handleWhatsAppContact = () => {
     window.open('https://wa.me/556496028022', '_blank');
   };
-
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-50 to-orange-50 p-4">
-      <Card className="w-full max-w-md shadow-xl">
+  return <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-50 to-orange-50 p-4">
+      <Card className="w-full max-w-md shadow-xl bg-zinc-900">
         <CardHeader className="text-center">
-          <div className="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
+          <div className="mx-auto w-16 h-16 rounded-full flex items-center justify-center mb-4 bg-black/0">
             <AlertTriangle className="w-8 h-8 text-red-600" />
           </div>
-          <CardTitle className="text-2xl font-bold text-red-700">
+          <CardTitle className="text-2xl font-bold text-[#ff0000]">
             Licença Expirada
           </CardTitle>
         </CardHeader>
@@ -26,32 +22,28 @@ export const LicenseExpiredPage = () => {
               <Clock className="w-5 h-5" />
               <span className="font-medium">Sua licença de 30 dias expirou</span>
             </div>
-            <p className="text-gray-600">
+            <p className="text-slate-50">
               Para continuar usando o sistema, você precisa renovar sua licença.
             </p>
           </div>
 
-          <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-            <h3 className="font-semibold text-green-800 mb-2">
+          <div className="border border-green-200 rounded-lg p-4 bg-black">
+            <h3 className="font-semibold mb-2 text-slate-50">
               Renove sua licença agora
             </h3>
-            <p className="text-sm text-green-700 mb-4">
+            <p className="text-sm mb-4 text-slate-50">
               Entre em contato conosco pelo WhatsApp para renovar sua licença e continuar aproveitando todos os recursos do sistema.
             </p>
-            <Button
-              onClick={handleWhatsAppContact}
-              className="w-full bg-green-600 hover:bg-green-700 text-white"
-            >
+            <Button onClick={handleWhatsAppContact} className="w-full bg-green-600 hover:bg-green-700 text-white">
               <MessageCircle className="w-4 h-4 mr-2" />
               Renovar pelo WhatsApp
             </Button>
           </div>
 
-          <div className="text-xs text-gray-500 border-t pt-4">
-            <p>Após a renovação, você terá acesso completo ao sistema por mais 30 dias.</p>
+          <div className="text-xs text-gray-500 border-t pt-4 bg-zinc-900">
+            <p className="text-white">Após a renovação, você terá acesso completo ao sistema por mais 30 dias.</p>
           </div>
         </CardContent>
       </Card>
-    </div>
-  );
+    </div>;
 };
