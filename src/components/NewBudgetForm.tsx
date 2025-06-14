@@ -400,9 +400,11 @@ export const NewBudgetForm = ({
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {paymentConditions?.map(condition => <SelectItem key={condition.id} value={condition.installments.toString()}>
-                          {condition.name}
-                        </SelectItem>)}
+                      {Array.from({ length: 12 }, (_, i) => i + 1).map((installment) => (
+                        <SelectItem key={installment} value={installment.toString()}>
+                          {`${installment}x`}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>

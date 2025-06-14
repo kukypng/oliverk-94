@@ -15,6 +15,7 @@ import { EmptyState } from '@/components/EmptyState';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/hooks/useAuth';
 import { usePdfGeneration } from '@/hooks/usePdfGeneration';
+import { ConfirmationDialog } from './ConfirmationDialog';
 export const BudgetsContent = () => {
   const {
     showSuccess,
@@ -31,6 +32,11 @@ export const BudgetsContent = () => {
   const [deletingBudget, setDeletingBudget] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [actualSearchTerm, setActualSearchTerm] = useState('');
+  const [confirmation, setConfirmation] = useState<{
+    action: () => void;
+    title: string;
+    description: string;
+  } | null>(null);
   const {
     data: budgets,
     isLoading,
@@ -74,26 +80,38 @@ export const BudgetsContent = () => {
     }
   };
   const handleShareWhatsApp = (budget: any) => {
-    try {
-      const message = generateWhatsAppMessage(budget);
-      shareViaWhatsApp(message);
-      showSuccess({
-        title: "Compartilhando via WhatsApp",
-        description: "O orçamento será compartilhado via WhatsApp."
-      });
-    } catch (error) {
-      showError({
-        title: "Erro ao compartilhar",
-        description: "Ocorreu um erro ao preparar o compartilhamento."
-      });
-    }
+    setConfirmation({
+      action: () => {
+        try {
+          const message = generateWhatsAppMessage(budget);
+          shareViaWhatsApp(message);
+          showSuccess({
+            title: "Redirecionando...",
+            description: "Você será redirecionado para o WhatsApp para compartilhar o orçamento."
+          });
+        } catch (error) {
+          showError({
+            title: "Erro ao compartilhar",
+            description: "Ocorreu um erro ao preparar o compartilhamento."
+          });
+        }
+      },
+      title: "Compartilhar via WhatsApp?",
+      description: "Você será redirecionado para o WhatsApp para enviar os detalhes do orçamento."
+    });
   };
-  const handleViewPDF = async (budget: any) => {
-    try {
-      await generateAndSharePDF(budget);
-    } catch (error) {
-      console.error('Erro ao gerar PDF:', error);
-    }
+  const handleViewPDF = (budget: any) => {
+    setConfirmation({
+      action: async () => {
+        try {
+          await generateAndSharePDF(budget);
+        } catch (error) {
+          console.error('Erro ao gerar PDF:', error);
+        }
+      },
+      title: "Gerar e compartilhar PDF?",
+      description: "Um PDF do orçamento será gerado e a opção de compartilhamento será exibida."
+    });
   };
   if (!user) {
     return <div className="p-4 lg:p-8">
@@ -301,5 +319,18 @@ export const BudgetsContent = () => {
       <EditBudgetModal budget={editingBudget} open={!!editingBudget} onOpenChange={open => !open && setEditingBudget(null)} />
 
       <DeleteBudgetConfirm budget={deletingBudget} open={!!deletingBudget} onOpenChange={open => !open && setDeletingBudget(null)} />
+
+      <ConfirmationDialog
+        open={!!confirmation}
+        onOpenChange={() => setConfirmation(null)}
+        onConfirm={() => {
+          if (confirmation) {
+            confirmation.action();
+            setConfirmation(null);
+          }
+        }}
+        title={confirmation?.title || ''}
+        description={confirmation?.description || ''}
+      />
     </div>;
 };
