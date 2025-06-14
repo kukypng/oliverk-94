@@ -160,15 +160,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           return { error: profileError || new Error('Profile not found') };
         }
 
-        if (profileData.role !== 'admin') {
-          await supabase.auth.signOut();
-          showError({
-            title: 'Acesso Negado',
-            description: 'Apenas administradores podem acessar o sistema.',
-          });
-          return { error: new Error('User is not an admin') };
-        }
-
         if (!profileData.is_active) {
             await supabase.auth.signOut();
             showError({
@@ -178,7 +169,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             return { error: new Error('User account is inactive or expired') };
         }
         
-        // Admin user, proceed
+        // User logged in, proceed
         showSuccess({
           title: 'Login realizado com sucesso!',
           description: 'Redirecionando para o dashboard...'
