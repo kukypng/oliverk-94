@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { NewBudgetForm } from './NewBudgetForm';
 import { Button } from '@/components/ui/button';
@@ -20,7 +19,7 @@ export const NewBudgetContent = () => {
   const [selectedBudget, setSelectedBudget] = useState<any | null>(null);
   const { user } = useAuth();
   const { showSuccess } = useEnhancedToast();
-  const { generateAndSharePdf, isGenerating } = usePdfGeneration();
+  const { generateAndSharePDF, isGenerating } = usePdfGeneration();
 
   const { data: recentBudgets, isLoading } = useQuery({
     queryKey: ['recent-budgets-for-new', user?.id],
@@ -63,11 +62,7 @@ export const NewBudgetContent = () => {
 
   const handleViewPdf = async (budget: any) => {
     if (!budget.id) return;
-    await generateAndSharePdf(budget.id, {
-        action: 'open',
-        whatsAppNumber: budget.client_phone,
-        clientName: budget.client_name,
-    });
+    await generateAndSharePDF(budget);
   };
 
   const handleFormBack = () => {
@@ -180,7 +175,7 @@ export const NewBudgetContent = () => {
       </div>
       {selectedBudget && (
         <EditBudgetModal
-          isOpen={isEditModalOpen}
+          open={isEditModalOpen}
           onOpenChange={setIsEditModalOpen}
           budget={selectedBudget}
         />
