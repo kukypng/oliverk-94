@@ -1,4 +1,3 @@
-
 import * as XLSX from 'xlsx';
 import * as FileSaver from 'file-saver';
 import { supabase } from '@/integrations/supabase/client';
@@ -46,7 +45,7 @@ export const useExcelData = () => {
         'Tipo de Aparelho': b.device_type,
         'Modelo': b.device_model,
         'Problema': b.issue,
-        'Preço Total': Number(b.total_price).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+        'Preço Total': Number(b.total_price),
         'Condição de Pagamento': b.payment_condition,
         'Data de Criação': new Date(b.created_at).toLocaleDateString('pt-BR'),
         'Observações': b.notes,
@@ -56,8 +55,15 @@ export const useExcelData = () => {
       const workbook = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(workbook, worksheet, 'Orçamentos');
       
-      const columnWidths = Object.keys(formattedData[0] || {}).map(key => ({ wch: Math.max(key.length, 20) }));
-      worksheet['!cols'] = columnWidths;
+      const headers = Object.keys(formattedData[0] || {});
+      const columnFormats = headers.map(key => {
+        const style: { wch: number, z?: string } = { wch: Math.max(key.length, 20) };
+        if (key === 'Preço Total') {
+          style.z = '"R$" #,##0.00';
+        }
+        return style;
+      });
+      worksheet['!cols'] = columnFormats;
 
       const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
       const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
