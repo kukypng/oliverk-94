@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -56,7 +55,7 @@
   }
 
   .dark {
-    --background: 300 1% 15%;
+    --background: 0 0% 0%;
     --foreground: 0 0% 88%;
 
     --card: 300 1% 15%;
@@ -109,8 +108,6 @@
     @apply bg-background text-foreground antialiased;
     font-feature-settings: "rlig" 1, "calt" 1;
     overscroll-behavior: none;
-    /* Premium mobile background */
-    background: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(var(--muted)) 100%);
   }
 
   /* Apple-style scrollbars */
