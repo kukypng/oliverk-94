@@ -11,7 +11,6 @@ import { useAuth } from '@/hooks/useAuth';
 import { useEnhancedToast } from '@/hooks/useEnhancedToast';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { HelpDialog } from '@/components/HelpDialog';
-import { DashboardChart } from '@/components/DashboardChart';
 
 export const DashboardContent = () => {
   const { profile, hasPermission, user } = useAuth();
@@ -34,8 +33,7 @@ export const DashboardContent = () => {
           pendingBudgets: 0,
           approvedBudgets: 0,
           rejectedBudgets: 0,
-          recentBudgets: [],
-          chartData: [],
+          recentBudgets: []
         };
       }
 
@@ -103,36 +101,6 @@ export const DashboardContent = () => {
         const approvedBudgets = budgets?.filter(b => b.status === 'approved').length || 0;
         const rejectedBudgets = budgets?.filter(b => b.status === 'rejected').length || 0;
 
-        // Chart data processing for the last 6 months
-        const monthlyRevenueData = Array.from({ length: 6 }).map((_, i) => {
-            const d = new Date();
-            d.setDate(1); // Set to start of month to avoid issues
-            d.setMonth(d.getMonth() - i);
-            return {
-                month: d.toLocaleString('pt-BR', { month: 'short' }),
-                year: d.getFullYear(),
-                revenue: 0,
-            };
-        }).reverse();
-
-        budgets?.forEach(budget => {
-            if(!budget.total_price) return;
-            const budgetDate = new Date(budget.created_at);
-            const monthIndex = monthlyRevenueData.findIndex(entry => 
-                entry.month === budgetDate.toLocaleString('pt-BR', { month: 'short' }) &&
-                entry.year === budgetDate.getFullYear()
-            );
-
-            if (monthIndex > -1) {
-                monthlyRevenueData[monthIndex].revenue += Number(budget.total_price) / 100;
-            }
-        });
-
-        const chartData = monthlyRevenueData.map(d => ({
-            name: d.month.charAt(0).toUpperCase() + d.month.slice(1),
-            Faturamento: parseFloat(d.revenue.toFixed(2))
-        }));
-
         return {
           totalBudgets: total,
           monthlyRevenue,
@@ -144,8 +112,7 @@ export const DashboardContent = () => {
           pendingBudgets,
           approvedBudgets,
           rejectedBudgets,
-          recentBudgets: budgets?.slice(-5).reverse() || [],
-          chartData,
+          recentBudgets: budgets?.slice(-5).reverse() || []
         };
       } catch (error: any) {
         console.error('Dashboard stats error:', error);
@@ -323,11 +290,6 @@ export const DashboardContent = () => {
             );
           })}
         </div>
-
-        {/* Chart */}
-        {stats?.chartData && stats.chartData.length > 0 && (
-          <DashboardChart data={stats.chartData} />
-        )}
         
         {/* Quick Access */}
         <Card className="glass-card border-0 shadow-lg animate-slide-up bg-white/50 dark:bg-black/50 backdrop-blur-xl">
