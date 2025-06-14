@@ -11,43 +11,50 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { EditBudgetModal } from '@/components/EditBudgetModal';
 import { useEnhancedToast } from '@/hooks/useEnhancedToast';
 import { usePdfGeneration } from '@/hooks/usePdfGeneration';
-
 export const NewBudgetContent = () => {
   const [showForm, setShowForm] = useState(false);
   const [copiedBudgetData, setCopiedBudgetData] = useState<any | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedBudget, setSelectedBudget] = useState<any | null>(null);
-  const { user } = useAuth();
-  const { showSuccess } = useEnhancedToast();
-  const { generateAndSharePDF, isGenerating } = usePdfGeneration();
-
-  const { data: recentBudgets, isLoading } = useQuery({
+  const {
+    user
+  } = useAuth();
+  const {
+    showSuccess
+  } = useEnhancedToast();
+  const {
+    generateAndSharePDF,
+    isGenerating
+  } = usePdfGeneration();
+  const {
+    data: recentBudgets,
+    isLoading
+  } = useQuery({
     queryKey: ['recent-budgets-for-new', user?.id],
     queryFn: async () => {
       if (!user) return [];
-      const { data, error } = await supabase
-        .from('budgets')
-        .select('*')
-        .eq('owner_id', user.id)
-        .order('created_at', { ascending: false })
-        .limit(3);
-
+      const {
+        data,
+        error
+      } = await supabase.from('budgets').select('*').eq('owner_id', user.id).order('created_at', {
+        ascending: false
+      }).limit(3);
       if (error) {
         console.error('Error fetching recent budgets:', error);
         return [];
       }
       return data;
     },
-    enabled: !!user,
+    enabled: !!user
   });
-
   const handleEdit = (budget: any) => {
     setSelectedBudget(budget);
     setIsEditModalOpen(true);
   };
-
   const handleCopy = (budget: any) => {
-    const budgetToCopy = { ...budget };
+    const budgetToCopy = {
+      ...budget
+    };
     delete budgetToCopy.client_name;
     delete budgetToCopy.client_phone;
     delete budgetToCopy.status;
@@ -55,28 +62,21 @@ export const NewBudgetContent = () => {
     delete budgetToCopy.created_at;
     delete budgetToCopy.updated_at;
     delete budgetToCopy.search_vector;
-
     setCopiedBudgetData(budgetToCopy);
     setShowForm(true);
   };
-
   const handleViewPdf = async (budget: any) => {
     if (!budget.id) return;
     await generateAndSharePDF(budget);
   };
-
   const handleFormBack = () => {
     setShowForm(false);
     setCopiedBudgetData(null);
   };
-
-
   if (showForm) {
     return <NewBudgetForm onBack={handleFormBack} initialData={copiedBudgetData} />;
   }
-
-  return (
-    <>
+  return <>
       <div className="p-4 lg:p-8 space-y-6 lg:space-y-8 animate-fade-in">
         <div className="flex items-center justify-between">
           <div>
@@ -106,24 +106,20 @@ export const NewBudgetContent = () => {
           </CardContent>
         </Card>
         
-        <div className="animate-slide-up" style={{ animationDelay: '200ms' }}>
+        <div className="animate-slide-up" style={{
+        animationDelay: '200ms'
+      }}>
           <h2 className="text-xl lg:text-2xl font-bold text-foreground mb-4">Orçamentos Recentes</h2>
           <Card className="glass-card border-0 bg-white/50 dark:bg-black/50 backdrop-blur-xl">
             <CardContent className="p-4 lg:p-6 space-y-3">
-              {isLoading && (
-                <>
+              {isLoading && <>
                   <RecentBudgetSkeleton />
                   <RecentBudgetSkeleton />
                   <RecentBudgetSkeleton />
-                </>
-              )}
-              {!isLoading && recentBudgets && recentBudgets.length > 0 ? (
-                recentBudgets.map((budget: any, index: number) => (
-                  <div 
-                    key={budget.id} 
-                    className="flex items-center justify-between p-4 glass-card border border-white/10 rounded-2xl hover:bg-muted/20 transition-all duration-300 group"
-                    style={{ animationDelay: `${index * 50}ms` }}
-                  >
+                </>}
+              {!isLoading && recentBudgets && recentBudgets.length > 0 ? recentBudgets.map((budget: any, index: number) => <div key={budget.id} className="flex items-center justify-between p-4 glass-card border border-white/10 rounded-2xl hover:bg-muted/20 transition-all duration-300 group" style={{
+              animationDelay: `${index * 50}ms`
+            }}>
                     <div className="flex-1 min-w-0 pr-3">
                       <div className="flex flex-col space-y-2">
                         <div>
@@ -134,21 +130,11 @@ export const NewBudgetContent = () => {
                         </div>
                         <div className="flex items-center justify-between">
                           <p className="font-bold text-sm lg:text-base text-foreground">
-                            R$ {((budget.total_price || 0) / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                            R$ {((budget.total_price || 0) / 100).toLocaleString('pt-BR', {
+                        minimumFractionDigits: 2
+                      })}
                           </p>
-                          <Badge 
-                            variant="secondary" 
-                            className={`text-xs capitalize ${
-                              budget.status === 'approved' 
-                                ? 'bg-green-50 text-green-700 border-green-200 dark:bg-green-950 dark:text-green-400'
-                                : budget.status === 'rejected'
-                                ? 'bg-red-50 text-red-700 border-red-200 dark:bg-red-950 dark:text-red-400'
-                                : 'bg-yellow-50 text-yellow-700 border-yellow-200 dark:bg-yellow-950 dark:text-yellow-400'
-                            }`}
-                          >
-                            {budget.status === 'pending' ? 'Pendente' : 
-                             budget.status === 'approved' ? 'Aprovado' : 'Rejeitado'}
-                          </Badge>
+                          
                         </div>
                       </div>
                     </div>
@@ -159,33 +145,18 @@ export const NewBudgetContent = () => {
                       <Button variant="ghost" size="sm" className="h-9 w-9 p-0 rounded-xl hover:bg-blue-50 hover:text-blue-600" onClick={() => handleEdit(budget)}>
                         <Edit className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="sm" className="h-9 w-9 p-0 rounded-xl hover:bg-purple-50 hover:text-purple-600" onClick={() => handleCopy(budget)}>
-                        <Copy className="h-4 w-4" />
-                      </Button>
+                      
                     </div>
-                  </div>
-                ))
-              ) : null}
-              {!isLoading && (!recentBudgets || recentBudgets.length === 0) && (
-                <p className="text-muted-foreground text-center py-4">Nenhum orçamento recente encontrado.</p>
-              )}
+                  </div>) : null}
+              {!isLoading && (!recentBudgets || recentBudgets.length === 0) && <p className="text-muted-foreground text-center py-4">Nenhum orçamento recente encontrado.</p>}
             </CardContent>
           </Card>
         </div>
       </div>
-      {selectedBudget && (
-        <EditBudgetModal
-          open={isEditModalOpen}
-          onOpenChange={setIsEditModalOpen}
-          budget={selectedBudget}
-        />
-      )}
-    </>
-  );
+      {selectedBudget && <EditBudgetModal open={isEditModalOpen} onOpenChange={setIsEditModalOpen} budget={selectedBudget} />}
+    </>;
 };
-
-const RecentBudgetSkeleton = () => (
-  <div className="flex items-center justify-between p-4 border border-border/10 rounded-2xl">
+const RecentBudgetSkeleton = () => <div className="flex items-center justify-between p-4 border border-border/10 rounded-2xl">
     <div className="flex-1 min-w-0 pr-3 space-y-2">
       <Skeleton className="h-4 w-3/4" />
       <Skeleton className="h-3 w-1/2" />
@@ -195,5 +166,4 @@ const RecentBudgetSkeleton = () => (
       <Skeleton className="h-9 w-9 rounded-xl" />
       <Skeleton className="h-9 w-9 rounded-xl" />
     </div>
-  </div>
-);
+  </div>;
