@@ -16,7 +16,8 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 44 100% 58%;
+    /* Primary color refined: slightly less saturated and deeper for sophistication */
+    --primary: 42 95% 55%; /* Original: 44 100% 58% */
     --primary-foreground: 0 0% 0%;
 
     --secondary: 210 40% 96.1%;
@@ -25,7 +26,8 @@
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 44 100% 58%;
+    /* Accent color refined to match new primary */
+    --accent: 42 95% 55%; /* Original: 44 100% 58% */
     --accent-foreground: 0 0% 0%;
 
     --destructive: 0 84.2% 60.2%;
@@ -33,24 +35,27 @@
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 44 100% 58%;
+    /* Ring color refined to match new primary */
+    --ring: 42 95% 55%; /* Original: 44 100% 58% */
 
     --radius: 0.75rem;
 
     --sidebar-background: 0 0% 99%;
     --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 44 100% 58%;
+    /* Sidebar primary refined */
+    --sidebar-primary: 42 95% 55%; /* Original: 44 100% 58% */
     --sidebar-primary-foreground: 0 0% 0%;
-    --sidebar-accent: 44 20% 95%;
+    --sidebar-accent: 44 20% 95%; /* Keeping this distinct for now, or could be var(--primary) with opacity */
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 44 100% 58%;
+    /* Sidebar ring refined */
+    --sidebar-ring: 42 95% 55%; /* Original: 44 100% 58% */
 
     /* Apple-style design tokens */
     --blur-glass: blur(20px);
-    --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.1);
-    --shadow-medium: 0 16px 48px rgba(0, 0, 0, 0.15);
-    --shadow-strong: 0 24px 64px rgba(0, 0, 0, 0.2);
+    --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.08); /* Softened shadow */
+    --shadow-medium: 0 16px 48px rgba(0, 0, 0, 0.12); /* Softened shadow */
+    --shadow-strong: 0 24px 64px rgba(0, 0, 0, 0.18); /* Softened shadow */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-spring: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   }
@@ -65,7 +70,8 @@
     --popover: 240 10% 3.9%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 44 100% 58%;
+    /* Primary color refined for dark mode */
+    --primary: 42 95% 55%; /* Original: 44 100% 58% */
     --primary-foreground: 0 0% 0%;
 
     --secondary: 240 3.7% 15.9%;
@@ -74,7 +80,8 @@
     --muted: 240 3.7% 15.9%;
     --muted-foreground: 240 5% 64.9%;
 
-    --accent: 44 100% 58%;
+    /* Accent color refined for dark mode */
+    --accent: 42 95% 55%; /* Original: 44 100% 58% */
     --accent-foreground: 0 0% 0%;
 
     --destructive: 0 72% 51%;
@@ -82,21 +89,23 @@
 
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
-    --ring: 44 100% 58%;
+    /* Ring color refined for dark mode */
+    --ring: 42 95% 55%; /* Original: 44 100% 58% */
 
+    /* Sidebar colors refined for dark mode */
     --sidebar-background: 240 6% 6%;
     --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 44 100% 58%;
+    --sidebar-primary: 42 95% 55%; /* Original: 44 100% 58% */
     --sidebar-primary-foreground: 0 0% 0%;
-    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent: 240 3.7% 15.9%; /* Keeping this distinct for now, or could be var(--primary) with opacity */
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 44 100% 58%;
+    --sidebar-ring: 42 95% 55%; /* Original: 44 100% 58% */
 
-    /* Dark mode adjustments */
-    --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.3);
-    --shadow-medium: 0 16px 48px rgba(0, 0, 0, 0.4);
-    --shadow-strong: 0 24px 64px rgba(0, 0, 0, 0.5);
+    /* Dark mode shadow adjustments */
+    --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.25); /* Softened shadow */
+    --shadow-medium: 0 16px 48px rgba(0, 0, 0, 0.35); /* Softened shadow */
+    --shadow-strong: 0 24px 64px rgba(0, 0, 0, 0.45); /* Softened shadow */
   }
 }
 
@@ -106,8 +115,8 @@
   }
 
   body {
-    @apply bg-background text-foreground antialiased;
-    font-feature-settings: "rlig" 1, "calt" 1;
+    @apply bg-background text-foreground antialiased font-sans; /* Added font-sans */
+    font-feature-settings: "rlig" 1, "calt" 1, "ss01" 1; /* Added stylistic sets for Inter if available */
     overscroll-behavior: none;
     /* Premium mobile background */
     background: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(var(--muted)) 100%);
@@ -144,9 +153,9 @@
     overscroll-behavior: none;
   }
 
-  /* Prevent zoom on iOS */
+  /* Prevent zoom on iOS - Ensure this is still desired */
   input, select, textarea {
-    font-size: 16px;
+    font-size: 16px; /* Standard for iOS to prevent zoom */
   }
 
   @media screen and (max-width: 768px) {
@@ -175,24 +184,24 @@
 @layer components {
   /* Premium Glass morphism effect */
   .glass {
-    @apply backdrop-blur-xl bg-white/80 dark:bg-black/80;
+    @apply backdrop-blur-xl bg-white/70 dark:bg-black/60; /* Slightly adjusted opacity for clarity */
     backdrop-filter: var(--blur-glass);
     -webkit-backdrop-filter: var(--blur-glass);
   }
 
   .glass-card {
-    @apply glass border border-white/20 dark:border-white/10 shadow-xl;
+    @apply glass border border-white/15 dark:border-white/5 shadow-xl; /* Adjusted border and shadow for refinement */
     background: linear-gradient(135deg, 
-      rgba(255, 255, 255, 0.1) 0%, 
-      rgba(255, 255, 255, 0.05) 100%);
+      hsla(var(--card) / 0.1) 0%, 
+      hsla(var(--card) / 0.05) 100%);
   }
 
   /* Premium Apple-style buttons */
   .btn-apple {
-    @apply relative overflow-hidden rounded-2xl px-6 py-4 font-medium;
+    @apply relative overflow-hidden rounded-xl px-5 py-3 font-medium; /* Adjusted padding and rounding */
     @apply bg-primary text-primary-foreground;
-    @apply transform transition-all duration-300 ease-out;
-    @apply hover:scale-[1.02] active:scale-[0.98];
+    @apply transform transition-all duration-200 ease-out; /* Faster transition */
+    @apply hover:scale-[1.02] active:scale-[0.97]; /* Refined interaction scale */
     @apply shadow-lg hover:shadow-xl;
   }
 
@@ -205,25 +214,25 @@
   /* Premium Floating action button */
   .fab {
     @apply fixed bottom-24 right-6 z-40 lg:bottom-6;
-    @apply w-16 h-16 rounded-3xl bg-gradient-to-br from-[#fec832] to-[#fec832]/80;
+    @apply w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-primary/80; /* Adjusted size and rounding */
     @apply flex items-center justify-center shadow-2xl;
-    @apply transform transition-all duration-500 ease-out;
-    @apply hover:scale-110 active:scale-95;
-    @apply text-black;
+    @apply transform transition-all duration-300 ease-out; /* Smoother transition */
+    @apply hover:scale-105 active:scale-95; /* Refined interaction scale */
+    @apply text-primary-foreground;
   }
 
   /* Premium Card animations */
   .card-hover {
-    @apply transition-all duration-500 ease-out;
-    @apply hover:scale-[1.02] hover:shadow-2xl;
-    @apply hover:-translate-y-2;
+    @apply transition-all duration-300 ease-out; /* Smoother transition */
+    @apply hover:scale-[1.015] hover:shadow-2xl; /* Refined scale and shadow */
+    @apply hover:-translate-y-1; /* Subtle lift */
   }
 
   /* Premium Input focus animations */
   .input-focus {
-    @apply transition-all duration-300 ease-out;
-    @apply focus:ring-4 focus:ring-[#fec832]/20 focus:border-[#fec832];
-    @apply focus:scale-[1.01];
+    @apply transition-all duration-200 ease-out; /* Faster transition */
+    @apply focus:ring-2 focus:ring-ring/30 focus:border-ring; /* Adjusted ring and border */
+    @apply focus:scale-[1.005]; /* Subtle scale */
   }
 
   /* Mobile optimizations */
@@ -232,13 +241,13 @@
   }
 
   .mobile-touch {
-    @apply min-h-[44px] min-w-[44px];
+    @apply min-h-[48px] min-w-[48px]; /* Increased touch target for mobile */
     touch-action: manipulation;
   }
 
   /* Premium Mobile spacing */
   .mobile-padding {
-    @apply p-4 lg:p-6;
+    @apply p-4 sm:p-5 lg:p-6; /* Adjusted padding for different screens */
   }
 
   .mobile-text {
@@ -255,47 +264,48 @@
 
   /* Premium smooth animations */
   .animate-fade-in {
-    animation: fadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1); /* Smoother timing */
   }
 
   .animate-slide-up {
-    animation: slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: slideUp 0.5s cubic-bezier(0.4, 0, 0.2, 1); /* Smoother timing */
   }
 
   .animate-scale-in {
-    animation: scaleIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: scaleIn 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* Smoother timing */
   }
 
   .animate-bounce-subtle {
-    animation: bounceSubtle 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    animation: bounceSubtle 0.7s cubic-bezier(0.68, -0.55, 0.265, 1.55); /* Smoother timing */
   }
 
-  /* Color replacements - Orange to #fec832 */
-  .text-orange-600 {
-    color: #fec832 !important;
+  /* Color replacements - Updated to use var(--primary) or its HSL values */
+  /* Ensure these are still needed or adjust them based on the new --primary color */
+  .text-orange-600 { /* This might need to be .text-primary now */
+    color: hsl(var(--primary)) !important;
   }
   
-  .bg-orange-50 {
-    background-color: rgba(254, 200, 50, 0.1) !important;
+  .bg-orange-50 { /* This could be bg-primary/10 or similar */
+    background-color: hsla(var(--primary), 0.1) !important;
   }
   
-  .border-orange-600 {
-    border-color: #fec832 !important;
+  .border-orange-600 { /* This might need to be .border-primary now */
+    border-color: hsl(var(--primary)) !important;
   }
   
-  .hover\\:text-orange-700:hover {
-    color: #e6b42e !important;
+  .hover\\:text-orange-700:hover { /* This should be hover:text-primary/90 or similar */
+    color: hsl(var(--primary) / 0.9) !important; 
   }
   
-  .hover\\:bg-orange-50:hover {
-    background-color: rgba(254, 200, 50, 0.1) !important;
+  .hover\\:bg-orange-50:hover { /* This could be hover:bg-primary/10 or hover:bg-primary/20 */
+    background-color: hsla(var(--primary), 0.15) !important;
   }
 }
 
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(15px); /* Slightly adjusted transform */
   }
   to {
     opacity: 1;
@@ -306,7 +316,7 @@
 @keyframes slideUp {
   from {
     opacity: 0;
-    transform: translateY(30px);
+    transform: translateY(25px); /* Slightly adjusted transform */
   }
   to {
     opacity: 1;
@@ -317,7 +327,7 @@
 @keyframes scaleIn {
   from {
     opacity: 0;
-    transform: scale(0.9);
+    transform: scale(0.96); /* Slightly adjusted scale */
   }
   to {
     opacity: 1;
@@ -328,13 +338,13 @@
 @keyframes bounceSubtle {
   0% {
     opacity: 0;
-    transform: scale(0.3);
+    transform: scale(0.5); /* Adjusted scale */
   }
   50% {
-    transform: scale(1.05);
+    transform: scale(1.03); /* Adjusted scale */
   }
   70% {
-    transform: scale(0.9);
+    transform: scale(0.95); /* Adjusted scale */
   }
   100% {
     opacity: 1;
@@ -345,7 +355,7 @@
 /* Premium Responsive design improvements */
 @media (max-width: 768px) {
   .container {
-    @apply px-4;
+    @apply px-4 sm:px-5; /* Adjusted padding */
   }
   
   .text-responsive {
@@ -353,22 +363,22 @@
   }
   
   .spacing-mobile {
-    @apply space-y-4;
+    @apply space-y-4 sm:space-y-5; /* Adjusted spacing */
   }
 
   /* Better touch targets */
-  button {
-    @apply min-h-[44px] mobile-touch;
+  button, a, [role="button"] { /* Extended to links and role=button */
+    @apply min-h-[48px] mobile-touch; /* Increased touch target */
   }
 
   /* Improved card spacing */
   .card {
-    @apply m-3;
+    @apply m-2 sm:m-3; /* Adjusted margin */
   }
   
   /* Mobile table improvements */
   table {
-    font-size: 16px;
+    font-size: 15px; /* Slightly reduced for more content if needed, but ensure readability */
   }
   
   /* Mobile navigation */
@@ -378,23 +388,23 @@
 
   /* Premium mobile effects */
   .glass-card {
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: var(--blur-glass); /* Ensure consistency */
+    -webkit-backdrop-filter: var(--blur-glass);
   }
 }
 
 @media (max-width: 480px) {
   /* Extra small devices */
   .container {
-    @apply px-3;
+    @apply px-3 sm:px-4; /* Adjusted padding */
   }
   
   h1 {
-    @apply text-xl;
+    @apply text-xl font-semibold; /* Ensure consistent styling */
   }
   
   h2 {
-    @apply text-lg;
+    @apply text-lg font-medium; /* Ensure consistent styling */
   }
   
   .card {
@@ -404,24 +414,24 @@
 
 /* Premium Dark mode toggle animation */
 .dark-mode-transition {
-  @apply transition-all duration-500 ease-in-out;
+  @apply transition-all duration-300 ease-in-out; /* Adjusted duration */
 }
 
 /* Safe area handling for mobile devices */
 @supports (padding-bottom: env(safe-area-inset-bottom)) {
   .pb-safe-bottom {
-    padding-bottom: calc(env(safe-area-inset-bottom) + 1rem);
+    padding-bottom: calc(env(safe-area-inset-bottom) + 0.75rem); /* Adjusted padding */
   }
 }
 
 /* Landscape mobile improvements */
 @media (max-height: 500px) and (orientation: landscape) {
   .mobile-nav {
-    display: none;
+    display: none; /* Keep hidden for landscape focus */
   }
   
-  .pb-24 {
-    padding-bottom: 0;
+  .pb-24 { /* This class might need review based on its usage */
+    padding-bottom: 1rem; /* Or less, depending on context */
   }
 }
 
@@ -436,10 +446,10 @@
 .loading-shimmer {
   background: linear-gradient(90deg, 
     hsla(var(--muted)) 25%, 
-    hsla(var(--muted-foreground) / 0.1) 50%, 
+    hsla(var(--muted-foreground) / 0.08) 50%, /* Adjusted opacity for subtlety */
     hsla(var(--muted)) 75%);
   background-size: 200% 100%;
-  animation: shimmer 2s infinite;
+  animation: shimmer 1.8s infinite linear; /* Adjusted speed and timing */
 }
 
 @keyframes shimmer {
@@ -451,31 +461,31 @@
   }
 }
 
-/* Premium focus states */
+/* Premium focus states - standardizing to focus-visible for accessibility */
 .focus-ring {
-  @apply focus:outline-none focus:ring-4 focus:ring-[#fec832]/20 focus:border-[#fec832];
+  @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:border-ring; /* Adjusted ring opacity */
 }
 
 /* Premium hover effects */
 .hover-lift {
-  @apply transition-all duration-300 ease-out hover:scale-[1.02] hover:shadow-lg hover:-translate-y-1;
+  @apply transition-all duration-200 ease-out hover:scale-[1.015] hover:shadow-lg hover:-translate-y-0.5; /* Subtle lift and scale */
 }
 
-/* Premium mobile-first typography */
+/* Premium mobile-first typography adjustments */
 @media (max-width: 768px) {
   h1 {
-    @apply text-2xl leading-tight;
+    @apply text-2xl leading-tight font-semibold; /* Ensured font weight */
   }
   
   h2 {
-    @apply text-xl leading-tight;
+    @apply text-xl leading-tight font-semibold; /* Ensured font weight */
   }
   
   h3 {
-    @apply text-lg leading-tight;
+    @apply text-lg leading-tight font-medium; /* Ensured font weight */
   }
   
-  p {
+  p, li, span, div { /* Broadened application for consistency */
     @apply text-base leading-relaxed;
   }
 }
