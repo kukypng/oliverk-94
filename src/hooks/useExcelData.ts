@@ -4,17 +4,20 @@ import { saveAs } from 'file-saver';
 import { supabase } from '@/integrations/supabase/client';
 import { useEnhancedToast } from '@/hooks/useEnhancedToast';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 // Usando 'any' pois o tipo completo do orçamento é extenso
 type Budget = any;
 
 export const useExcelData = () => {
-  const { showSuccess, showError, showWarning, showLoading } = useEnhancedToast();
+  const { showSuccess, showError, showWarning } = useEnhancedToast();
   const [isProcessing, setIsProcessing] = useState(false);
 
   const fetchAndExportBudgets = async () => {
     setIsProcessing(true);
-    const exportPromise = new Promise(async (resolve, reject) => {
+    const toastId = toast.loading('Exportando orçamentos...');
+
+    const exportPromise = new Promise<string>(async (resolve, reject) => {
       try {
         const { data: budgets, error } = await supabase
           .from('budgets')
@@ -25,7 +28,7 @@ export const useExcelData = () => {
 
         if (!budgets || budgets.length === 0) {
             showWarning({ title: 'Nenhum Orçamento', description: 'Não há dados para exportar.' });
-            resolve(true); // Não é um erro, apenas não há dados
+            resolve('no-data'); // Não é um erro, apenas não há dados
             return;
         }
 
@@ -53,14 +56,21 @@ export const useExcelData = () => {
         const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
         const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
         saveAs(blob, `orçamentos_exportados_${new Date().toISOString().slice(0,10)}.xlsx`);
-        resolve(true);
+        resolve('success');
       } catch (err) {
         reject(err);
       }
     });
 
-    showLoading('Exportando orçamentos...', exportPromise)
+    exportPromise
+      .then((status) => {
+        toast.dismiss(toastId);
+        if (status === 'success') {
+          showSuccess({ title: 'Exportação Concluída', description: 'O arquivo foi baixado com sucesso.' });
+        }
+      })
       .catch((err: any) => {
+        toast.dismiss(toastId);
         showError({ title: 'Erro na Exportação', description: err.message });
       })
       .finally(() => setIsProcessing(false));
@@ -96,6 +106,8 @@ export const useExcelData = () => {
 
   const processImportedFile = async (file: File) => {
     setIsProcessing(true);
+    const toastId = toast.loading('Processando arquivo...');
+
     const importPromise = new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -126,11 +138,13 @@ export const useExcelData = () => {
         reader.readAsBinaryString(file);
     });
 
-    showLoading('Processando arquivo...', importPromise)
+    importPromise
       .then((data) => {
+          toast.dismiss(toastId);
           showSuccess({ title: 'Arquivo Processado', description: `${(data as any[]).length} registros prontos para serem importados.` });
       })
       .catch((err: any) => {
+          toast.dismiss(toastId);
           showError({ title: 'Erro na Importação', description: err.message });
       })
       .finally(() => setIsProcessing(false));
