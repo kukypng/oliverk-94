@@ -1,16 +1,14 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Shield, MessageCircle, Lock } from 'lucide-react';
-
 export const SecuritySettings = () => {
   const handleSupportContact = () => {
     window.open('https://wa.me/556496028022', '_blank');
   };
-
-  return (
-    <Card className="glass-card animate-scale-in card-hover" style={{ animationDelay: '100ms' }}>
+  return <Card style={{
+    animationDelay: '100ms'
+  }} className="glass-card animate-scale-in card-hover py-0 px-0 my-[11px] mx-0">
       <CardHeader>
         <CardTitle className="flex items-center text-lg">
           <Shield className="h-5 w-5 mr-2 text-primary" />
@@ -19,20 +17,7 @@ export const SecuritySettings = () => {
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-4">
-          <div className="flex items-center justify-between p-4 border rounded-lg">
-            <div className="flex items-center space-x-3">
-              <Lock className="h-5 w-5 text-muted-foreground" />
-              <div>
-                <p className="font-medium">Alterar Senha</p>
-                <p className="text-sm text-muted-foreground">
-                  Atualize sua senha de acesso
-                </p>
-              </div>
-            </div>
-            <Button variant="outline" size="sm">
-              Alterar
-            </Button>
-          </div>
+          
           
           <div className="flex items-center justify-between p-4 border rounded-lg">
             <div className="flex items-center space-x-3">
@@ -44,17 +29,11 @@ export const SecuritySettings = () => {
                 </p>
               </div>
             </div>
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={handleSupportContact}
-              className="text-green-600 border-green-600 hover:bg-green-50"
-            >
+            <Button variant="outline" size="sm" onClick={handleSupportContact} className="text-green-600 border-green-600 hover:bg-green-50">
               Contatar
             </Button>
           </div>
         </div>
       </CardContent>
-    </Card>
-  );
+    </Card>;
 };
