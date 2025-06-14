@@ -126,6 +126,13 @@ export const DashboardContent = () => {
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Bom dia";
+    if (hour < 18) return "Boa tarde";
+    return "Boa noite";
+  };
+
   if (!user) {
     return (
       <div className="p-4 lg:p-8">
@@ -218,7 +225,7 @@ export const DashboardContent = () => {
         {/* Header - Premium Mobile Design */}
         <div className="flex flex-col space-y-3 lg:flex-row lg:items-center lg:justify-between lg:space-y-0">
           <div className="animate-slide-up">
-            <h1 className="text-2xl lg:text-3xl font-bold text-foreground">Meu Dashboard</h1>
+            <h1 className="text-2xl lg:text-3xl font-bold text-foreground">{getGreeting()}, {profile?.name || 'usuário'}!</h1>
             <div className="flex items-center space-x-2 mt-2">
               <p className="text-sm lg:text-base text-muted-foreground">
                 Visão geral dos seus orçamentos
@@ -337,14 +344,14 @@ export const DashboardContent = () => {
                       </div>
                     </div>
                     {hasPermission('edit_own_budgets') && (
-                      <div className="flex space-x-1 ml-2 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
+                      <div className="flex space-x-1 ml-2 opacity-100 transition-opacity">
                         <Button variant="ghost" size="sm" className="h-9 w-9 p-0 rounded-xl hover:bg-[#fec832]/10 hover:text-[#fec832]">
                           <Eye className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="sm" className="h-9 w-9 p-0 rounded-xl hover:bg-blue-50 hover:text-blue-600 hidden lg:flex">
+                        <Button variant="ghost" size="sm" className="h-9 w-9 p-0 rounded-xl hover:bg-blue-50 hover:text-blue-600">
                           <Edit className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="sm" className="h-9 w-9 p-0 rounded-xl hover:bg-purple-50 hover:text-purple-600 hidden lg:flex">
+                        <Button variant="ghost" size="sm" className="h-9 w-9 p-0 rounded-xl hover:bg-purple-50 hover:text-purple-600">
                           <Copy className="h-4 w-4" />
                         </Button>
                       </div>

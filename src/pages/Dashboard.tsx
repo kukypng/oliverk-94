@@ -56,9 +56,7 @@ export const Dashboard = () => {
             
             {/* Main content */}
             <main className="flex-1 overflow-y-auto">
-              <div className="p-6">
-                {renderContent()}
-              </div>
+              {renderContent()}
             </main>
           </SidebarInset>
         </div>
