@@ -1,9 +1,8 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { FileText, DollarSign, TrendingUp, Smartphone, Eye, Edit, Copy, Calendar, Target, Clock } from 'lucide-react';
+import { FileText, DollarSign, TrendingUp, Smartphone, Eye, Edit, Copy, Calendar, Target, Clock, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DashboardSkeleton } from '@/components/ui/loading-states';
 import { EmptyState } from '@/components/EmptyState';
@@ -166,7 +165,7 @@ export const DashboardContent = () => {
       value: `R$ ${((stats?.monthlyRevenue || 0) / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
       icon: DollarSign,
       color: 'text-green-600',
-      bgColor: 'bg-green-50',
+      bgColor: 'bg-green-50 dark:bg-green-950',
       change: `${stats?.monthlyGrowth > 0 ? '+' : ''}${stats?.monthlyGrowth.toFixed(1)}%`,
       changeType: stats?.monthlyGrowth >= 0 ? 'positive' : 'negative'
     },
@@ -175,7 +174,7 @@ export const DashboardContent = () => {
       value: `R$ ${((stats?.weeklyRevenue || 0) / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
       icon: Calendar,
       color: 'text-blue-600',
-      bgColor: 'bg-blue-50',
+      bgColor: 'bg-blue-50 dark:bg-blue-950',
       change: `${stats?.weeklyGrowth || 0} esta semana`,
       changeType: 'positive'
     },
@@ -184,7 +183,7 @@ export const DashboardContent = () => {
       value: `R$ ${((stats?.averageTicket || 0) / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
       icon: TrendingUp,
       color: 'text-purple-600',
-      bgColor: 'bg-purple-50',
+      bgColor: 'bg-purple-50 dark:bg-purple-950',
       subtitle: `${stats?.totalBudgets || 0} orçamentos`
     },
     {
@@ -200,7 +199,7 @@ export const DashboardContent = () => {
       value: stats?.pendingBudgets || 0,
       icon: Clock,
       color: 'text-yellow-600',
-      bgColor: 'bg-yellow-50',
+      bgColor: 'bg-yellow-50 dark:bg-yellow-950',
       subtitle: 'Aguardando aprovação'
     },
     {
@@ -208,53 +207,55 @@ export const DashboardContent = () => {
       value: `${stats?.totalBudgets > 0 ? ((stats?.approvedBudgets / stats?.totalBudgets) * 100).toFixed(1) : 0}%`,
       icon: Target,
       color: 'text-emerald-600',
-      bgColor: 'bg-emerald-50',
+      bgColor: 'bg-emerald-50 dark:bg-emerald-950',
       subtitle: `${stats?.approvedBudgets}/${stats?.totalBudgets} aprovados`
     }
   ];
 
   return (
     <ErrorBoundary>
-      <div className="p-3 lg:p-8 space-y-4 lg:space-y-8 animate-fade-in">
-        {/* Header - Mobile Optimized */}
-        <div className="flex flex-col space-y-2 lg:flex-row lg:items-center lg:justify-between lg:space-y-0">
-          <div>
-            <h1 className="text-xl lg:text-3xl font-bold text-foreground">Meu Dashboard</h1>
-            <p className="text-sm lg:text-base text-muted-foreground mt-1">
-              Visão geral dos seus orçamentos
+      <div className="p-4 lg:p-8 space-y-6 lg:space-y-8 animate-fade-in pb-24 lg:pb-0">
+        {/* Header - Premium Mobile Design */}
+        <div className="flex flex-col space-y-3 lg:flex-row lg:items-center lg:justify-between lg:space-y-0">
+          <div className="animate-slide-up">
+            <h1 className="text-2xl lg:text-3xl font-bold text-foreground">Meu Dashboard</h1>
+            <div className="flex items-center space-x-2 mt-2">
+              <p className="text-sm lg:text-base text-muted-foreground">
+                Visão geral dos seus orçamentos
+              </p>
               {profile && (
-                <span className="ml-2 text-xs bg-muted px-2 py-1 rounded">
+                <Badge variant="secondary" className="bg-[#fec832]/10 text-[#fec832] border-[#fec832]/20 text-xs">
                   {profile.role.toUpperCase()}
-                </span>
+                </Badge>
               )}
-            </p>
+            </div>
           </div>
-          <div className="flex items-center space-x-2 text-xs lg:text-sm text-muted-foreground bg-muted/50 px-3 py-2 rounded-lg">
+          <div className="flex items-center space-x-2 text-sm text-muted-foreground glass-card p-3 rounded-2xl border border-white/10 animate-scale-in">
             <TrendingUp className="h-4 w-4 text-green-600" />
             <span>{stats?.weeklyGrowth || 0} orçamentos esta semana</span>
           </div>
         </div>
 
-        {/* Stats Cards - Mobile Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-6">
+        {/* Stats Cards - Improved Mobile Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
           {cards.map((card, index) => {
             const Icon = card.icon;
             return (
               <Card 
                 key={index} 
-                className="glass-card hover:shadow-lg transition-all duration-200 hover:scale-[1.02] animate-scale-in border-0" 
+                className="glass-card hover:shadow-xl transition-all duration-300 hover:scale-[1.02] animate-scale-in border-0 bg-white/50 dark:bg-black/50 backdrop-blur-xl" 
                 style={{ animationDelay: `${index * 100}ms` }}
               >
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 lg:pb-3 p-3 lg:p-6">
-                  <CardTitle className="text-xs lg:text-sm font-medium text-muted-foreground line-clamp-2">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 p-4 lg:p-6">
+                  <CardTitle className="text-sm lg:text-sm font-medium text-muted-foreground">
                     {card.title}
                   </CardTitle>
-                  <div className={`p-1.5 lg:p-2.5 rounded-xl ${card.bgColor} shadow-sm`}>
-                    <Icon className={`h-3 w-3 lg:h-4 lg:w-4 ${card.color}`} />
+                  <div className={`p-2.5 lg:p-3 rounded-2xl ${card.bgColor} shadow-lg`}>
+                    <Icon className={`h-4 w-4 lg:h-5 lg:w-5 ${card.color}`} />
                   </div>
                 </CardHeader>
-                <CardContent className="space-y-1 p-3 lg:p-6 pt-0">
-                  <div className="text-sm lg:text-2xl font-bold text-foreground break-words">
+                <CardContent className="space-y-2 p-4 lg:p-6 pt-0">
+                  <div className="text-lg lg:text-2xl font-bold text-foreground break-words">
                     {card.value}
                   </div>
                   {card.change && (
@@ -263,8 +264,8 @@ export const DashboardContent = () => {
                         variant="secondary" 
                         className={`text-xs ${
                           card.changeType === 'positive' 
-                            ? 'bg-green-50 text-green-700 border-green-200' 
-                            : 'bg-red-50 text-red-700 border-red-200'
+                            ? 'bg-green-50 text-green-700 border-green-200 dark:bg-green-950 dark:text-green-400' 
+                            : 'bg-red-50 text-red-700 border-red-200 dark:bg-red-950 dark:text-red-400'
                         }`}
                       >
                         {card.change}
@@ -281,52 +282,52 @@ export const DashboardContent = () => {
           })}
         </div>
 
-        {/* Recent Budgets - Mobile Optimized */}
-        <Card className="glass-card border-0 shadow-sm animate-slide-up">
-          <CardHeader className="flex flex-row items-center justify-between pb-3 p-3 lg:p-6">
+        {/* Recent Budgets - Premium Mobile Design */}
+        <Card className="glass-card border-0 shadow-lg animate-slide-up bg-white/50 dark:bg-black/50 backdrop-blur-xl">
+          <CardHeader className="flex flex-row items-center justify-between pb-4 p-4 lg:p-6">
             <div>
-              <CardTitle className="text-base lg:text-lg font-semibold text-foreground">
+              <CardTitle className="text-lg lg:text-xl font-semibold text-foreground">
                 Orçamentos Recentes
               </CardTitle>
-              <p className="text-xs lg:text-sm text-muted-foreground mt-1">
+              <p className="text-sm text-muted-foreground mt-1">
                 Últimos 5 orçamentos criados
               </p>
             </div>
             {hasPermission('view_all_budgets') && (
-              <Button size="sm" variant="outline" className="hidden lg:flex">
+              <Button size="sm" variant="outline" className="hidden lg:flex rounded-xl border-[#fec832]/20 text-[#fec832] hover:bg-[#fec832]/10">
                 Ver todos
               </Button>
             )}
           </CardHeader>
-          <CardContent className="p-3 lg:p-6">
+          <CardContent className="p-4 lg:p-6">
             {stats?.recentBudgets && stats.recentBudgets.length > 0 ? (
-              <div className="space-y-2 lg:space-y-3">
+              <div className="space-y-3 lg:space-y-4">
                 {stats.recentBudgets.map((budget, index) => (
                   <div 
                     key={budget.id} 
-                    className="flex items-center justify-between p-3 lg:p-4 border border-border/50 rounded-xl hover:bg-muted/30 transition-all duration-150 group animate-fade-in"
+                    className="flex items-center justify-between p-4 lg:p-5 glass-card border border-white/10 rounded-2xl hover:bg-muted/20 transition-all duration-300 group animate-fade-in hover:scale-[1.01]"
                     style={{ animationDelay: `${index * 50}ms` }}
                   >
-                    <div className="flex-1 min-w-0 pr-2">
-                      <div className="flex flex-col space-y-1 lg:space-y-2">
+                    <div className="flex-1 min-w-0 pr-3">
+                      <div className="flex flex-col space-y-2">
                         <div>
-                          <p className="font-medium text-sm lg:text-base text-foreground group-hover:text-primary transition-colors truncate">
+                          <p className="font-semibold text-sm lg:text-base text-foreground group-hover:text-[#fec832] transition-colors truncate">
                             {budget.client_name || 'Cliente não informado'}
                           </p>
                           <p className="text-xs lg:text-sm text-muted-foreground truncate">{budget.device_model}</p>
                         </div>
                         <div className="flex items-center justify-between">
-                          <p className="font-semibold text-sm lg:text-base text-foreground">
+                          <p className="font-bold text-sm lg:text-base text-foreground">
                             R$ {((budget.total_price || 0) / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                           </p>
                           <Badge 
                             variant="secondary" 
                             className={`text-xs capitalize ${
                               budget.status === 'approved' 
-                                ? 'bg-green-50 text-green-700 border-green-200'
+                                ? 'bg-green-50 text-green-700 border-green-200 dark:bg-green-950 dark:text-green-400'
                                 : budget.status === 'rejected'
-                                ? 'bg-red-50 text-red-700 border-red-200'
-                                : 'bg-yellow-50 text-yellow-700 border-yellow-200'
+                                ? 'bg-red-50 text-red-700 border-red-200 dark:bg-red-950 dark:text-red-400'
+                                : 'bg-yellow-50 text-yellow-700 border-yellow-200 dark:bg-yellow-950 dark:text-yellow-400'
                             }`}
                           >
                             {budget.status === 'pending' ? 'Pendente' : 
@@ -336,14 +337,14 @@ export const DashboardContent = () => {
                       </div>
                     </div>
                     {hasPermission('edit_own_budgets') && (
-                      <div className="flex lg:space-x-1 ml-2 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
-                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                          <Eye className="h-3 w-3 lg:h-4 lg:w-4" />
+                      <div className="flex space-x-1 ml-2 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
+                        <Button variant="ghost" size="sm" className="h-9 w-9 p-0 rounded-xl hover:bg-[#fec832]/10 hover:text-[#fec832]">
+                          <Eye className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hidden lg:flex">
+                        <Button variant="ghost" size="sm" className="h-9 w-9 p-0 rounded-xl hover:bg-blue-50 hover:text-blue-600 hidden lg:flex">
                           <Edit className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hidden lg:flex">
+                        <Button variant="ghost" size="sm" className="h-9 w-9 p-0 rounded-xl hover:bg-purple-50 hover:text-purple-600 hidden lg:flex">
                           <Copy className="h-4 w-4" />
                         </Button>
                       </div>

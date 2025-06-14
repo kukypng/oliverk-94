@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useQuery } from '@tanstack/react-query';
@@ -6,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Eye, Edit, Trash2, MessageCircle, Search, Filter, Download } from 'lucide-react';
+import { Eye, Edit, Trash2, MessageCircle, Search, Filter, Download, Star } from 'lucide-react';
 import { generateWhatsAppMessage, shareViaWhatsApp } from '@/utils/whatsappUtils';
 import { useEnhancedToast } from '@/hooks/useEnhancedToast';
 import { EditBudgetModal } from '@/components/EditBudgetModal';
@@ -130,59 +129,66 @@ export const BudgetsContent = () => {
   const filteredBudgets = budgets || [];
 
   return (
-    <div className="p-3 lg:p-8 space-y-4 lg:space-y-8 animate-fade-in">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-xl lg:text-3xl font-bold text-foreground">Meus Orçamentos</h1>
-          <p className="text-sm lg:text-base text-muted-foreground mt-1">
-            Gerencie todos os seus orçamentos ({filteredBudgets.length})
-          </p>
+    <div className="p-4 lg:p-8 space-y-6 lg:space-y-8 animate-fade-in pb-24 lg:pb-0">
+      {/* Header - Premium Design */}
+      <div className="flex flex-col space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0">
+        <div className="animate-slide-up">
+          <h1 className="text-2xl lg:text-3xl font-bold text-foreground">Meus Orçamentos</h1>
+          <div className="flex items-center space-x-2 mt-2">
+            <p className="text-sm lg:text-base text-muted-foreground">
+              Gerencie todos os seus orçamentos
+            </p>
+            <Badge variant="secondary" className="bg-[#fec832]/10 text-[#fec832] border-[#fec832]/20">
+              {filteredBudgets.length}
+            </Badge>
+          </div>
         </div>
         
         <div className="flex items-center space-x-2 lg:space-x-3">
-          <Button variant="outline" size="sm" className="text-xs lg:text-sm">
-            <Download className="mr-1 lg:mr-2 h-3 w-3 lg:h-4 lg:w-4" />
+          <Button variant="outline" size="sm" className="rounded-xl border-white/20 hover:bg-muted/20">
+            <Download className="mr-2 h-4 w-4" />
             <span className="hidden sm:inline">Exportar</span>
           </Button>
-          <Button variant="outline" size="sm" className="text-xs lg:text-sm">
-            <Filter className="mr-1 lg:mr-2 h-3 w-3 lg:h-4 lg:w-4" />
+          <Button variant="outline" size="sm" className="rounded-xl border-white/20 hover:bg-muted/20">
+            <Filter className="mr-2 h-4 w-4" />
             <span className="hidden sm:inline">Filtros</span>
           </Button>
         </div>
       </div>
 
-      {/* Search Bar */}
-      <Card className="glass-card border-0">
-        <CardContent className="p-3 lg:p-4">
-          <div className="flex items-center space-x-2">
+      {/* Search Bar - Premium Design */}
+      <Card className="glass-card border-0 bg-white/50 dark:bg-black/50 backdrop-blur-xl animate-scale-in">
+        <CardContent className="p-4 lg:p-6">
+          <div className="flex items-center space-x-3">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
               <Input
                 placeholder="Buscar por cliente, dispositivo ou problema..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onKeyPress={handleKeyPress}
-                className="pl-10 h-9 lg:h-10 text-sm lg:text-base"
+                className="pl-12 h-12 rounded-2xl border-white/20 bg-white/50 dark:bg-black/50 text-base lg:text-sm focus:ring-[#fec832] focus:border-[#fec832]"
               />
             </div>
             <Button 
               onClick={handleSearch}
               size="sm"
-              className="h-9 lg:h-10 px-3 lg:px-4 bg-[#fec832] hover:bg-[#fec832]/90 text-black"
+              className="h-12 px-6 bg-[#fec832] hover:bg-[#fec832]/90 text-black rounded-2xl font-medium shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
             >
-              <Search className="h-4 w-4 lg:mr-2" />
+              <Search className="h-5 w-5 lg:mr-2" />
               <span className="hidden lg:inline">Buscar</span>
             </Button>
           </div>
         </CardContent>
       </Card>
       
-      <Card className="glass-card border-0 shadow-sm animate-scale-in">
-        <CardHeader className="p-3 lg:p-6">
-          <CardTitle className="flex items-center justify-between text-base lg:text-lg">
+      {/* Budgets List - Mobile Optimized */}
+      <Card className="glass-card border-0 shadow-lg animate-slide-up bg-white/50 dark:bg-black/50 backdrop-blur-xl">
+        <CardHeader className="p-4 lg:p-6">
+          <CardTitle className="flex items-center justify-between text-lg lg:text-xl">
             <span>Lista de Orçamentos</span>
             {filteredBudgets.length > 0 && (
-              <Badge variant="secondary" className="ml-2 text-xs">
+              <Badge variant="secondary" className="bg-[#fec832]/10 text-[#fec832] border-[#fec832]/20">
                 {filteredBudgets.length}
               </Badge>
             )}
@@ -190,115 +196,187 @@ export const BudgetsContent = () => {
         </CardHeader>
         <CardContent className="p-0 lg:p-6 lg:pt-0">
           {filteredBudgets.length > 0 ? (
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader className="hidden lg:table-header-group">
-                  <TableRow className="hover:bg-transparent border-border/50">
-                    <TableHead className="font-semibold">Dispositivo</TableHead>
-                    <TableHead className="font-semibold">Problema</TableHead>
-                    <TableHead className="font-semibold">Valor</TableHead>
-                    <TableHead className="font-semibold">Data</TableHead>
-                    <TableHead className="font-semibold text-center">Ações</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredBudgets.map((budget, index) => (
-                    <TableRow 
-                      key={budget.id} 
-                      className="hover:bg-muted/30 transition-colors border-border/30 animate-fade-in block lg:table-row border-b lg:border-b-0"
-                      style={{ animationDelay: `${index * 50}ms` }}
-                    >
-                      <TableCell className="block lg:table-cell p-3 lg:p-4">
-                        <div className="space-y-1">
-                          <p className="font-medium text-foreground text-sm lg:text-base">{budget.device_model}</p>
-                          <p className="text-xs lg:text-sm text-muted-foreground">{budget.device_type}</p>
-                          {budget.client_name && (
-                            <p className="text-xs text-muted-foreground">
-                              {budget.client_name}
-                            </p>
-                          )}
+            <div className="space-y-3 lg:space-y-0 p-4 lg:p-0">
+              {/* Mobile Cards View */}
+              <div className="block lg:hidden space-y-4">
+                {filteredBudgets.map((budget, index) => (
+                  <div 
+                    key={budget.id}
+                    className="glass-card border border-white/10 rounded-2xl p-4 hover:shadow-lg transition-all duration-300 hover:scale-[1.01] animate-fade-in"
+                    style={{ animationDelay: `${index * 50}ms` }}
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-2 mb-1">
+                          <h3 className="font-semibold text-base text-foreground">{budget.device_model}</h3>
+                          <Badge variant="secondary" className="text-xs bg-muted/50">
+                            {budget.device_type}
+                          </Badge>
                         </div>
-                        {/* Mobile-only info */}
-                        <div className="mt-2 lg:hidden space-y-1">
-                          <p className="text-xs text-muted-foreground">{budget.issue}</p>
-                          <div className="flex items-center justify-between">
-                            <p className="font-semibold text-sm text-foreground">
+                        {budget.client_name && (
+                          <p className="text-sm text-muted-foreground mb-1">{budget.client_name}</p>
+                        )}
+                        <p className="text-sm text-muted-foreground">{budget.issue}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-bold text-lg text-foreground">
+                          R$ {((budget.total_price || 0) / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {new Date(budget.created_at).toLocaleDateString('pt-BR')}
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center justify-between pt-3 border-t border-white/10">
+                      <div className="flex items-center space-x-2">
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => handleShareWhatsApp(budget)}
+                          className="h-10 w-10 p-0 text-green-600 hover:text-green-700 hover:bg-green-50 dark:hover:bg-green-950 rounded-xl"
+                        >
+                          <MessageCircle className="h-5 w-5" />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          onClick={() => handleViewPDF(budget)}
+                          disabled={isGenerating}
+                          className="h-10 w-10 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-950 rounded-xl"
+                        >
+                          <Eye className="h-5 w-5" />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => setEditingBudget(budget)}
+                          className="h-10 w-10 p-0 hover:bg-muted/20 hover:text-[#fec832] rounded-xl"
+                        >
+                          <Edit className="h-5 w-5" />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => setDeletingBudget(budget)}
+                          className="h-10 w-10 p-0 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950 rounded-xl"
+                        >
+                          <Trash2 className="h-5 w-5" />
+                        </Button>
+                      </div>
+                      <Badge 
+                        variant="secondary" 
+                        className={`text-xs capitalize ${
+                          budget.status === 'approved' 
+                            ? 'bg-green-50 text-green-700 border-green-200 dark:bg-green-950 dark:text-green-400'
+                            : budget.status === 'rejected'
+                            ? 'bg-red-50 text-red-700 border-red-200 dark:bg-red-950 dark:text-red-400'
+                            : 'bg-yellow-50 text-yellow-700 border-yellow-200 dark:bg-yellow-950 dark:text-yellow-400'
+                        }`}
+                      >
+                        {budget.status === 'pending' ? 'Pendente' : 
+                         budget.status === 'approved' ? 'Aprovado' : 'Rejeitado'}
+                      </Badge>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Desktop Table View */}
+              <div className="hidden lg:block overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="hover:bg-transparent border-white/10">
+                      <TableHead className="font-semibold">Dispositivo</TableHead>
+                      <TableHead className="font-semibold">Problema</TableHead>
+                      <TableHead className="font-semibold">Valor</TableHead>
+                      <TableHead className="font-semibold">Data</TableHead>
+                      <TableHead className="font-semibold text-center">Ações</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredBudgets.map((budget, index) => (
+                      <TableRow 
+                        key={budget.id} 
+                        className="hover:bg-muted/20 transition-colors border-white/10 animate-fade-in"
+                        style={{ animationDelay: `${index * 50}ms` }}
+                      >
+                        <TableCell>
+                          <div className="space-y-1">
+                            <p className="font-medium text-foreground">{budget.device_model}</p>
+                            <p className="text-sm text-muted-foreground">{budget.device_type}</p>
+                            {budget.client_name && (
+                              <p className="text-sm text-muted-foreground">
+                                {budget.client_name}
+                              </p>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <span className="text-sm">{budget.issue}</span>
+                        </TableCell>
+                        <TableCell>
+                          <div className="space-y-1">
+                            <p className="font-semibold text-foreground">
                               R$ {((budget.total_price || 0) / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                             </p>
-                            <span className="text-xs text-muted-foreground">
-                              {new Date(budget.created_at).toLocaleDateString('pt-BR')}
-                            </span>
+                            {budget.installments > 1 && (
+                              <p className="text-xs text-muted-foreground">
+                                {budget.installments}x
+                              </p>
+                            )}
                           </div>
-                        </div>
-                      </TableCell>
-                      <TableCell className="hidden lg:table-cell">
-                        <span className="text-sm">{budget.issue}</span>
-                      </TableCell>
-                      <TableCell className="hidden lg:table-cell">
-                        <div className="space-y-1">
-                          <p className="font-semibold text-foreground">
-                            R$ {((budget.total_price || 0) / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                          </p>
-                          {budget.installments > 1 && (
-                            <p className="text-xs text-muted-foreground">
-                              {budget.installments}x
-                            </p>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell className="hidden lg:table-cell">
-                        <span className="text-sm text-muted-foreground">
-                          {new Date(budget.created_at).toLocaleDateString('pt-BR')}
-                        </span>
-                      </TableCell>
-                      <TableCell className="block lg:table-cell p-3 lg:p-4">
-                        <div className="flex items-center justify-center lg:justify-center space-x-1 lg:space-x-1">
-                          <Button 
-                            variant="ghost" 
-                            size="sm"
-                            onClick={() => handleShareWhatsApp(budget)}
-                            className="h-8 w-8 p-0 text-green-600 hover:text-green-700 hover:bg-green-50"
-                            title="Compartilhar no WhatsApp"
-                          >
-                            <MessageCircle className="h-4 w-4" />
-                          </Button>
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            onClick={() => handleViewPDF(budget)}
-                            disabled={isGenerating}
-                            className="h-8 w-8 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                            title="Gerar PDF e Compartilhar"
-                          >
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                          <Button 
-                            variant="ghost" 
-                            size="sm"
-                            onClick={() => setEditingBudget(budget)}
-                            className="h-8 w-8 p-0 hover:bg-blue-50 hover:text-blue-600"
-                            title="Editar"
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button 
-                            variant="ghost" 
-                            size="sm"
-                            onClick={() => setDeletingBudget(budget)}
-                            className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
-                            title="Excluir"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                        </TableCell>
+                        <TableCell>
+                          <span className="text-sm text-muted-foreground">
+                            {new Date(budget.created_at).toLocaleDateString('pt-BR')}
+                          </span>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center justify-center space-x-1">
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              onClick={() => handleShareWhatsApp(budget)}
+                              className="h-9 w-9 p-0 text-green-600 hover:text-green-700 hover:bg-green-50 dark:hover:bg-green-950 rounded-xl"
+                            >
+                              <MessageCircle className="h-4 w-4" />
+                            </Button>
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              onClick={() => handleViewPDF(budget)}
+                              disabled={isGenerating}
+                              className="h-9 w-9 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-950 rounded-xl"
+                            >
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              onClick={() => setEditingBudget(budget)}
+                              className="h-9 w-9 p-0 hover:bg-muted/20 hover:text-[#fec832] rounded-xl"
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              onClick={() => setDeletingBudget(budget)}
+                              className="h-9 w-9 p-0 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950 rounded-xl"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
             </div>
           ) : (
-            <div className="p-3 lg:p-0">
+            <div className="p-6">
               <EmptyState
                 icon={MessageCircle}
                 title={actualSearchTerm ? "Nenhum resultado encontrado" : "Nenhum orçamento encontrado"}
