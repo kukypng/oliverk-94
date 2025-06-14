@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -7,10 +6,8 @@ import { AdminLogs } from '@/components/AdminLogs';
 import { AdminDebugPanel } from '@/components/AdminDebugPanel';
 import { AdminTestPanel } from '@/components/AdminTestPanel';
 import { Users, FileText, Shield, TestTube } from 'lucide-react';
-
 export const AdminPanel = () => {
-  return (
-    <div className="container mx-auto p-6 space-y-6">
+  return <div className="container mx-auto p-6 space-y-6 bg-zinc-950">
       <div className="flex items-center space-x-3">
         <Shield className="h-8 w-8 text-primary" />
         <div>
@@ -55,6 +52,5 @@ export const AdminPanel = () => {
           <AdminDebugPanel />
         </TabsContent>
       </Tabs>
-    </div>
-  );
+    </div>;
 };
