@@ -8,11 +8,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { AlertTriangle, Eye, EyeOff, RefreshCw } from 'lucide-react';
 
 interface DebugInfo {
-  user_id: string;
-  user_email: string;
-  user_role: string;
-  is_active: boolean;
-  is_admin: boolean;
+  user_id: string | null;
+  user_email: string | null;
+  user_role: string | null;
+  is_active: boolean | null;
+  is_admin: boolean | null;
 }
 
 interface AdminDebugPanelProps {
@@ -25,18 +25,36 @@ export const AdminDebugPanel = ({ error, showByDefault = false }: AdminDebugPane
 
   const { data: debugInfo, isLoading, refetch } = useQuery({
     queryKey: ['debug-current-user'],
-    queryFn: async () => {
-      console.log('AdminDebugPanel: Fetching debug info...');
-      const { data, error } = await supabase.rpc('debug_current_user');
-      
-      if (error) {
-        console.error('AdminDebugPanel: Error fetching debug info:', error);
+    queryFn: async (): Promise<DebugInfo | null> => {
+      try {
+        console.log('AdminDebugPanel: Fetching debug info...');
+        const { data, error } = await supabase.rpc('debug_current_user');
+        
+        if (error) {
+          console.error('AdminDebugPanel: Error fetching debug info:', error);
+          throw error;
+        }
+        
+        console.log('AdminDebugPanel: Debug info received:', data);
+        
+        if (!data || !Array.isArray(data) || data.length === 0) {
+          return null;
+        }
+        
+        const debugData = data[0];
+        return {
+          user_id: debugData?.user_id || null,
+          user_email: debugData?.user_email || null,
+          user_role: debugData?.user_role || null,
+          is_active: debugData?.is_active || null,
+          is_admin: debugData?.is_admin || null,
+        };
+      } catch (err) {
+        console.error('AdminDebugPanel: Failed to fetch debug info:', err);
         return null;
       }
-      
-      console.log('AdminDebugPanel: Debug info received:', data);
-      return data?.[0] as DebugInfo;
     },
+    retry: false,
   });
 
   if (!isVisible && !error) {

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -24,11 +25,11 @@ interface User {
 }
 
 interface DebugInfo {
-  user_id: string;
-  user_email: string;
-  user_role: string;
-  is_active: boolean;
-  is_admin: boolean;
+  user_id: string | null;
+  user_email: string | null;
+  user_role: string | null;
+  is_active: boolean | null;
+  is_admin: boolean | null;
 }
 
 export const UserManagement = () => {
@@ -42,42 +43,73 @@ export const UserManagement = () => {
   // Debug query para informações do usuário atual
   const { data: debugInfo } = useQuery({
     queryKey: ['debug-current-user'],
-    queryFn: async () => {
-      console.log('Fetching debug info for current user...');
-      const { data, error } = await supabase.rpc('debug_current_user');
-      
-      if (error) {
-        console.error('Error fetching debug info:', error);
+    queryFn: async (): Promise<DebugInfo | null> => {
+      try {
+        console.log('Fetching debug info for current user...');
+        const { data, error } = await supabase.rpc('debug_current_user');
+        
+        if (error) {
+          console.error('Error fetching debug info:', error);
+          throw error;
+        }
+        
+        console.log('Debug info received:', data);
+        
+        // Garantir que temos dados válidos
+        if (!data || !Array.isArray(data) || data.length === 0) {
+          console.warn('No debug data returned');
+          return null;
+        }
+        
+        const debugData = data[0];
+        return {
+          user_id: debugData?.user_id || null,
+          user_email: debugData?.user_email || null,
+          user_role: debugData?.user_role || null,
+          is_active: debugData?.is_active || null,
+          is_admin: debugData?.is_admin || null,
+        };
+      } catch (err) {
+        console.error('Failed to fetch debug info:', err);
         return null;
       }
-      
-      console.log('Debug info received:', data);
-      return data?.[0] as DebugInfo;
     },
+    retry: false,
   });
 
   const { data: users, isLoading, error, refetch } = useQuery({
     queryKey: ['admin-users'],
-    queryFn: async () => {
-      console.log('Fetching users via admin_get_all_users...');
-      console.log('Current debug info:', debugInfo);
-      
+    queryFn: async (): Promise<User[]> => {
       try {
+        console.log('Fetching users via admin_get_all_users...');
+        console.log('Current debug info:', debugInfo);
+        
         const { data, error } = await supabase.rpc('admin_get_all_users');
         
         if (error) {
           console.error('Error fetching users:', error);
-          console.error('Error details:', {
-            message: error.message,
-            code: error.code,
-            details: error.details,
-            hint: error.hint
-          });
           throw error;
         }
         
         console.log('Fetched users successfully:', data);
-        return data as User[];
+        
+        // Garantir que temos um array válido
+        if (!data || !Array.isArray(data)) {
+          console.warn('Invalid users data received:', data);
+          return [];
+        }
+        
+        // Mapear e validar cada usuário
+        return data.map((user: any) => ({
+          id: user.id || '',
+          name: user.name || 'Nome não disponível',
+          email: user.email || 'Email não disponível',
+          role: user.role || 'user',
+          is_active: Boolean(user.is_active),
+          expiration_date: user.expiration_date || new Date().toISOString(),
+          created_at: user.created_at || new Date().toISOString(),
+          last_sign_in_at: user.last_sign_in_at || null,
+        }));
       } catch (err) {
         console.error('Failed to fetch users:', err);
         throw err;
@@ -88,6 +120,7 @@ export const UserManagement = () => {
       return failureCount < 2;
     },
     retryDelay: 1000,
+    enabled: !!debugInfo?.is_admin, // Só executar se for admin
   });
 
   console.log('UserManagement render - users:', users, 'isLoading:', isLoading, 'error:', error, 'debugInfo:', debugInfo);
@@ -154,7 +187,7 @@ export const UserManagement = () => {
     return <Badge className="bg-green-100 text-green-800">Ativo</Badge>;
   };
 
-  // Renderizar informações de debug se houver erro
+  // Renderizar informações de debug se houver erro ou solicitado
   const renderDebugSection = () => {
     if (!error && !showDebugInfo) return null;
 
@@ -187,6 +220,32 @@ export const UserManagement = () => {
       </Card>
     );
   };
+
+  // Verificar se não é admin
+  if (debugInfo && !debugInfo.is_admin) {
+    return (
+      <>
+        {renderDebugSection()}
+        <Card>
+          <CardContent className="p-6">
+            <div className="text-center py-8">
+              <AlertTriangle className="h-12 w-12 text-yellow-500 mx-auto mb-4" />
+              <p className="text-yellow-600 mb-2 font-semibold">Acesso Restrito</p>
+              <p className="text-sm text-muted-foreground mb-4">
+                Você não tem permissões de administrador para acessar esta seção.
+              </p>
+              <Button 
+                variant="outline" 
+                onClick={() => setShowDebugInfo(!showDebugInfo)}
+              >
+                {showDebugInfo ? 'Ocultar' : 'Mostrar'} Debug
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </>
+    );
+  }
 
   if (error) {
     console.error('UserManagement error:', error);
