@@ -46,7 +46,9 @@ export const useExcelData = () => {
         'Tipo de Aparelho': b.device_type,
         'Modelo': b.device_model,
         'Problema': b.issue,
-        'Preço Total': Number(b.total_price) / 100, // Corrigido para dividir por 100
+        'Preço Total': Number(b.total_price) / 100,
+        'Preço Parcelado': b.installment_price ? Number(b.installment_price) / 100 : 0,
+        'Parcelas': b.installments,
         'Condição de Pagamento': b.payment_condition,
         'Data de Criação': new Date(b.created_at).toLocaleDateString('pt-BR'),
         'Observações': b.notes,
@@ -59,7 +61,7 @@ export const useExcelData = () => {
       const headers = Object.keys(formattedData[0] || {});
       const columnFormats = headers.map(key => {
         const style: { wch: number, z?: string } = { wch: Math.max(key.length, 20) };
-        if (key === 'Preço Total') {
+        if (key === 'Preço Total' || key === 'Preço Parcelado') {
           style.z = '"R$" #,##0.00';
         }
         return style;
@@ -83,8 +85,13 @@ export const useExcelData = () => {
   const downloadImportTemplate = () => {
     setIsProcessing(true);
     try {
-        const templateData = [{'Tipo de Aparelho': '','Modelo do Aparelho': '','Defeito/Problema': '','Observações': '','Preço Total': 0}];
-        const instructions = [["Instruções:", "Preencha as colunas com os dados do orçamento. Não altere os nomes dos cabeçalhos."], ["", "'Preço Total' deve ser um número (ex: 1500.50 ou 1500,50)."]];
+        const templateData = [{'Tipo de Aparelho': '','Modelo do Aparelho': '','Defeito/Problema': '','Observações': '','Preço Total': 0, 'Preço Parcelado': 0, 'Parcelas': 1, 'Condição de Pagamento': 'À Vista'}];
+        const instructions = [
+            ["Instruções:", "Preencha as colunas com os dados do orçamento. Não altere os nomes dos cabeçalhos."],
+            ["", "'Preço Total' e 'Preço Parcelado' devem ser números (ex: 1500.50 ou 1500,50)."],
+            ["", "Se não houver preço parcelado, deixe 'Preço Parcelado' com valor 0 e 'Parcelas' com 1."],
+            ["", "Valores comuns para 'Condição de Pagamento' são: À Vista, Cartão de Crédito, PIX, Dinheiro."]
+        ];
 
         const wsTemplate = XLSX.utils.json_to_sheet(templateData);
         const wsInstructions = XLSX.utils.aoa_to_sheet(instructions);
@@ -141,6 +148,11 @@ export const useExcelData = () => {
                   const priceString = String(row['Preço Total'] || '0').replace(/\./g, '').replace(',', '.');
                   const price = parseFloat(priceString);
 
+                  const installmentPriceString = String(row['Preço Parcelado'] || '0').replace(/\./g, '').replace(',', '.');
+                  const installmentPrice = parseFloat(installmentPriceString);
+
+                  const installments = Number(row['Parcelas'] || 1);
+
                   if (isNaN(price) || price <= 0) {
                     throw new Error(`Preço inválido ou zerado na linha ${index + 2}. O preço deve ser um número maior que zero.`);
                   }
@@ -148,6 +160,8 @@ export const useExcelData = () => {
                   if (!row['Tipo de Aparelho'] || !row['Modelo do Aparelho'] || !row['Defeito/Problema']) {
                     throw new Error(`Dados obrigatórios faltando na linha ${index + 2}. Verifique 'Tipo de Aparelho', 'Modelo do Aparelho' e 'Defeito/Problema'.`);
                   }
+                  
+                  const paymentCondition = row['Condição de Pagamento'] || ((installments > 1 && installmentPrice > 0) ? 'Cartão de Crédito' : 'À Vista');
 
                   return {
                     owner_id: user.id,
@@ -155,8 +169,11 @@ export const useExcelData = () => {
                     device_model: row['Modelo do Aparelho'],
                     issue: row['Defeito/Problema'],
                     notes: row['Observações'] || '',
-                    total_price: Math.round(price * 100), // Corrigido para salvar em centavos
-                    status: 'pending'
+                    total_price: Math.round(price * 100),
+                    status: 'pending',
+                    installment_price: isNaN(installmentPrice) || installmentPrice <= 0 ? null : Math.round(installmentPrice * 100),
+                    installments: isNaN(installments) || installments <= 1 ? 1 : installments,
+                    payment_condition: paymentCondition
                   };
                 });
                 
