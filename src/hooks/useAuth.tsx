@@ -1,3 +1,4 @@
+
 import { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -72,7 +73,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     console.log('Setting up auth state listener');
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
         console.log('Auth state changed:', event, session?.user?.email);
         setSession(session);
         setUser(session?.user ?? null);
@@ -242,11 +243,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signOut = async () => {
     try {
       console.log('Signing out user');
-      await supabase.auth.signOut();
-      showSuccess({
-        title: 'Logout realizado',
-        description: 'Você foi desconectado com sucesso.'
-      });
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        throw error;
+      }
+      // Force a reload to clear all state and re-evaluate auth status.
+      // This ensures the user is properly redirected to the login page.
+      window.location.reload();
     } catch (error) {
       console.error('Sign out error:', error);
       showError({
