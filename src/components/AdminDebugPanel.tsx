@@ -68,7 +68,7 @@ export const AdminDebugPanel = ({
   return <Card className="mb-4 border-yellow-200 bg-black py-[17px]">
       <CardHeader className="bg-black px-[83px] my-[28px] mx-[12px] py-0">
         <CardTitle className="flex items-center justify-between text-yellow-800">
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2 px-[6px]">
             <AlertTriangle className="h-5 w-5 bg-black/0" />
             <span className="text-[#f6f7f6]">Painel de Debug</span>
           </div>
@@ -89,7 +89,7 @@ export const AdminDebugPanel = ({
             <div className="h-4 bg-yellow-200 rounded w-1/2"></div>
           </div> : debugInfo ? <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <h4 className="font-semibold text-yellow-900">Informações do Usuário</h4>
+              <h4 className="font-semibold text-[#fec832]">Informações do Usuário</h4>
               <div className="space-y-1">
                 <p className="bg-black"><strong>ID:</strong> <code className="text-xs bg-yellow-100 px-1 rounded">{debugInfo.user_id || 'N/A'}</code></p>
                 <p><strong>Email:</strong> {debugInfo.user_email || 'N/A'}</p>
