@@ -164,8 +164,8 @@ export const DashboardContent = () => {
       title: 'Faturamento Mensal',
       value: `R$ ${((stats?.monthlyRevenue || 0) / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
       icon: DollarSign,
-      color: 'text-green-600',
-      bgColor: 'bg-green-50 dark:bg-green-950',
+      color: 'text-gold-500',
+      bgColor: 'bg-gold-50 dark:bg-gold-900/80',
       change: `${stats?.monthlyGrowth > 0 ? '+' : ''}${stats?.monthlyGrowth.toFixed(1)}%`,
       changeType: stats?.monthlyGrowth >= 0 ? 'positive' : 'negative'
     },
@@ -190,8 +190,8 @@ export const DashboardContent = () => {
       title: 'Dispositivo Popular',
       value: stats?.topDevice || 'N/A',
       icon: Smartphone,
-      color: 'text-[#fec832]',
-      bgColor: 'bg-[#fec832]/10',
+      color: 'text-gold-500',
+      bgColor: 'bg-gold-50/40',
       subtitle: 'Mais reparado'
     },
     {
@@ -214,57 +214,57 @@ export const DashboardContent = () => {
 
   return (
     <ErrorBoundary>
-      <div className="p-4 lg:p-8 space-y-6 lg:space-y-8 animate-fade-in pb-24 lg:pb-0">
-        {/* Header - Premium Mobile Design */}
+      <div className="p-4 lg:p-8 space-y-8 animate-fade-in pb-24 lg:pb-0">
+        {/* Header - Premium */}
         <div className="flex flex-col space-y-3 lg:flex-row lg:items-center lg:justify-between lg:space-y-0">
-          <div className="animate-slide-up">
-            <h1 className="text-2xl lg:text-3xl font-bold text-foreground">Meu Dashboard</h1>
+          <div>
+            <h1 className="text-3xl font-heading font-bold text-foreground animate-slide-up">Meu Dashboard</h1>
             <div className="flex items-center space-x-2 mt-2">
-              <p className="text-sm lg:text-base text-muted-foreground">
+              <p className="text-base text-gold-700">
                 Visão geral dos seus orçamentos
               </p>
               {profile && (
-                <Badge variant="secondary" className="bg-[#fec832]/10 text-[#fec832] border-[#fec832]/20 text-xs">
+                <Badge variant="secondary" className="bg-gold-50 text-gold-700 border-gold-100 text-xs">
                   {profile.role.toUpperCase()}
                 </Badge>
               )}
             </div>
           </div>
-          <div className="flex items-center space-x-2 text-sm text-muted-foreground glass-card p-3 rounded-2xl border border-white/10 animate-scale-in">
-            <TrendingUp className="h-4 w-4 text-green-600" />
+          <div className="flex items-center space-x-2 text-base text-gold-800 glass-card p-3 rounded-2xl border animate-scale-in">
+            <TrendingUp className="h-5 w-5 text-green-600" />
             <span>{stats?.weeklyGrowth || 0} orçamentos esta semana</span>
           </div>
         </div>
 
-        {/* Stats Cards - Improved Mobile Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-7 animate-fade-in">
           {cards.map((card, index) => {
             const Icon = card.icon;
             return (
-              <Card 
-                key={index} 
-                className="glass-card hover:shadow-xl transition-all duration-300 hover:scale-[1.02] animate-scale-in border-0 bg-white/50 dark:bg-black/50 backdrop-blur-xl" 
-                style={{ animationDelay: `${index * 100}ms` }}
+              <Card
+                key={index}
+                className="glass-card hover:shadow-strong glow-hover transition-all duration-300 animate-scale-in border-0 bg-white/90 dark:bg-zinc-900/80 backdrop-blur-xl pop-animate"
+                style={{ animationDelay: `${index * 90}ms` }}
               >
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 p-4 lg:p-6">
-                  <CardTitle className="text-sm lg:text-sm font-medium text-muted-foreground">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 p-4 lg:p-6 card-header">
+                  <CardTitle className="text-base font-semibold text-gold-700">
                     {card.title}
                   </CardTitle>
-                  <div className={`p-2.5 lg:p-3 rounded-2xl ${card.bgColor} shadow-lg`}>
-                    <Icon className={`h-4 w-4 lg:h-5 lg:w-5 ${card.color}`} />
+                  <div className={`p-2.5 rounded-2xl ${card.bgColor} shadow-lg`}>
+                    <Icon className={`h-5 w-5 ${card.color}`} />
                   </div>
                 </CardHeader>
-                <CardContent className="space-y-2 p-4 lg:p-6 pt-0">
-                  <div className="text-lg lg:text-2xl font-bold text-foreground break-words">
+                <CardContent className="space-y-2 p-4 lg:p-6 pt-0 card-content">
+                  <div className="text-2xl lg:text-3xl font-bold text-zinc-900 break-words">
                     {card.value}
                   </div>
                   {card.change && (
                     <div className="flex items-center space-x-1">
-                      <Badge 
-                        variant="secondary" 
+                      <Badge
+                        variant="secondary"
                         className={`text-xs ${
-                          card.changeType === 'positive' 
-                            ? 'bg-green-50 text-green-700 border-green-200 dark:bg-green-950 dark:text-green-400' 
+                          card.changeType === 'positive'
+                            ? 'bg-green-50 text-green-700 border-green-200 dark:bg-green-950 dark:text-green-400'
                             : 'bg-red-50 text-red-700 border-red-200 dark:bg-red-950 dark:text-red-400'
                         }`}
                       >

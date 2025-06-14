@@ -157,8 +157,11 @@ export const BudgetsContent = () => {
       </div>
 
       {/* Search Bar - Premium Design */}
-      <Card className="glass-card border-0 bg-white/50 dark:bg-black/50 backdrop-blur-xl animate-scale-in">
-        <CardContent className="p-4 lg:p-6">
+      <Card className="glass-card shadow-soft border-gold-100 rounded-xxl animate-fade-in">
+        <CardHeader className="p-6 border-b border-gold-50 bg-gradient-to-r from-gold-50 via-white to-gold-50/50">
+          <CardTitle className="font-heading text-2xl text-gold-800">Orçamentos</CardTitle>
+        </CardHeader>
+        <CardContent className="card-content">
           <div className="flex items-center space-x-3">
             <div className="relative flex-1">
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
