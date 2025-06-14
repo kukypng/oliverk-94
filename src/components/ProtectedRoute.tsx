@@ -4,6 +4,8 @@ import { useAuth, UserRole } from '@/hooks/useAuth';
 import { EmptyState } from '@/components/EmptyState';
 import { Shield, User } from 'lucide-react';
 import { DashboardSkeleton } from '@/components/ui/loading-states';
+import { useLicenseValidation } from '@/hooks/useLicenseValidation';
+import { LicenseExpiredPage } from '@/pages/LicenseExpiredPage';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -19,8 +21,9 @@ export const ProtectedRoute = ({
   fallback 
 }: ProtectedRouteProps) => {
   const { user, profile, loading, hasRole, hasPermission } = useAuth();
+  const { data: isLicenseValid, isLoading: licenseLoading } = useLicenseValidation();
 
-  if (loading) {
+  if (loading || licenseLoading) {
     return <DashboardSkeleton />;
   }
 
@@ -48,22 +51,17 @@ export const ProtectedRoute = ({
     );
   }
 
+  // Check license validity
+  if (isLicenseValid === false) {
+    return <LicenseExpiredPage />;
+  }
+
   if (!profile.is_active) {
     return (
       <EmptyState
         icon={Shield}
         title="Conta Inativa"
         description="Sua conta está inativa. Entre em contato com o administrador para reativar."
-      />
-    );
-  }
-
-  if (new Date(profile.expiration_date) < new Date()) {
-    return (
-      <EmptyState
-        icon={Shield}
-        title="Acesso Expirado"
-        description="Seu acesso ao sistema expirou. Entre em contato com o administrador para renovar."
       />
     );
   }

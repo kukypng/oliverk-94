@@ -7,12 +7,15 @@ import {
   Home, 
   FileText, 
   Settings, 
+  Plus,
   LogOut, 
-  Smartphone,
-  Wrench,
-  Plus
+  User,
+  Star,
+  Shield,
+  Users
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
 
 interface SidebarProps {
   activeTab: string;
@@ -20,89 +23,86 @@ interface SidebarProps {
 }
 
 export const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
-  const { signOut, user } = useAuth();
+  const { signOut, user, profile, hasRole } = useAuth();
 
-  const menuItems = [
+  const navigationItems = [
     { id: 'dashboard', label: 'Dashboard', icon: Home },
     { id: 'budgets', label: 'Orçamentos', icon: FileText },
     { id: 'new-budget', label: 'Novo Orçamento', icon: Plus },
+    ...(hasRole('admin') ? [{ id: 'admin', label: 'Administração', icon: Users }] : []),
     { id: 'settings', label: 'Configurações', icon: Settings },
   ];
 
   return (
-    <div className="w-64 h-screen bg-sidebar border-r border-sidebar-border flex flex-col shadow-lg lg:shadow-none animate-slide-up">
-      {/* Header */}
-      <div className="p-6 border-b border-sidebar-border/50">
-        <div className="flex items-center space-x-3 animate-fade-in">
-          <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-primary to-primary/80 rounded-2xl shadow-lg transform transition-transform duration-300 hover:scale-110">
-            <div className="flex items-center space-x-1">
-              <Smartphone className="h-5 w-5 text-primary-foreground" />
-              <Wrench className="h-4 w-4 text-primary-foreground" />
+    <div className="hidden lg:flex lg:w-64 lg:flex-col lg:fixed lg:inset-y-0 z-50">
+      <div className="flex flex-col flex-grow bg-background border-r border-border overflow-y-auto">
+        {/* Header */}
+        <div className="flex items-center h-16 flex-shrink-0 px-4 bg-primary text-primary-foreground">
+          <div className="flex items-center space-x-3">
+            <div className="flex items-center justify-center w-8 h-8 bg-primary-foreground/20 rounded-lg">
+              <FileText className="h-4 w-4" />
             </div>
-          </div>
-          <div>
-            <h1 className="text-xl font-bold text-sidebar-foreground">Oliver</h1>
-            <p className="text-sm text-sidebar-foreground/70">Gestão de Orçamentos</p>
+            <span className="text-lg font-bold">Oliver</span>
           </div>
         </div>
-      </div>
 
-      {/* User Info */}
-      <div className="p-4 border-b border-sidebar-border/50">
-        <div className="flex items-center justify-between animate-fade-in">
+        {/* User Info */}
+        <div className="p-4 border-b border-border">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
-              <span className="text-sm font-semibold text-primary">
-                {user?.email?.charAt(0).toUpperCase()}
-              </span>
+            <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+              <User className="h-5 w-5 text-primary" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-sidebar-foreground truncate">
-                {user?.user_metadata?.name || user?.email}
+              <p className="text-sm font-medium text-foreground truncate">
+                {profile?.name || 'Usuário'}
               </p>
-              <p className="text-xs text-sidebar-foreground/60 truncate">
+              <p className="text-xs text-muted-foreground truncate">
                 {user?.email}
               </p>
+              <Badge variant="secondary" className="mt-1 text-xs">
+                <Star className="w-3 h-3 mr-1" />
+                {profile?.role === 'admin' ? 'Admin' : 
+                 profile?.role === 'manager' ? 'Gerente' : 'Premium'}
+              </Badge>
             </div>
           </div>
-          <ThemeToggle />
         </div>
-      </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 p-4 space-y-2">
-        {menuItems.map((item, index) => {
-          const Icon = item.icon;
-          return (
-            <Button
-              key={item.id}
-              variant={activeTab === item.id ? "secondary" : "ghost"}
-              className={cn(
-                "w-full justify-start h-12 text-left font-medium rounded-xl transition-all duration-300 ease-out mobile-touch animate-fade-in",
-                activeTab === item.id 
-                  ? "bg-primary/10 text-primary hover:bg-primary/15 shadow-sm scale-[1.02]" 
-                  : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:scale-[1.01]"
-              )}
-              onClick={() => onTabChange(item.id)}
-              style={{ animationDelay: `${index * 50}ms` }}
-            >
-              <Icon className="mr-3 h-5 w-5" />
-              {item.label}
-            </Button>
-          );
-        })}
-      </nav>
+        {/* Navigation */}
+        <nav className="flex-1 px-2 py-4 space-y-1">
+          {navigationItems.map((item) => {
+            const Icon = item.icon;
+            return (
+              <Button
+                key={item.id}
+                variant="ghost"
+                className={cn(
+                  "w-full justify-start",
+                  activeTab === item.id && "bg-muted"
+                )}
+                onClick={() => onTabChange(item.id)}
+              >
+                <Icon className="mr-3 h-4 w-4" />
+                {item.label}
+              </Button>
+            );
+          })}
+        </nav>
 
-      {/* Footer */}
-      <div className="p-4 border-t border-sidebar-border/50">
-        <Button
-          variant="ghost"
-          className="w-full justify-start text-sidebar-foreground hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950 dark:hover:text-red-400 h-12 rounded-xl transition-all duration-300 ease-out mobile-touch"
-          onClick={signOut}
-        >
-          <LogOut className="mr-3 h-5 w-5" />
-          Sair
-        </Button>
+        {/* Footer */}
+        <div className="flex-shrink-0 p-4 border-t border-border space-y-3">
+          <div className="flex justify-center">
+            <ThemeToggle />
+          </div>
+          <Button
+            variant="ghost"
+            className="w-full justify-start text-muted-foreground hover:text-foreground"
+            onClick={signOut}
+          >
+            <LogOut className="mr-3 h-4 w-4" />
+            Sair
+          </Button>
+        </div>
       </div>
     </div>
   );

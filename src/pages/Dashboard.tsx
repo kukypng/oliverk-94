@@ -1,5 +1,7 @@
 
 import React, { useState } from 'react';
+import { useAuth } from '@/hooks/useAuth';
+import { AuthGuard } from '@/components/AuthGuard';
 import { Sidebar } from '@/components/Sidebar';
 import { MobileNavigation } from '@/components/MobileNavigation';
 import { MobileSidebar } from '@/components/MobileSidebar';
@@ -7,12 +9,13 @@ import { DashboardContent } from '@/components/DashboardContent';
 import { BudgetsContent } from '@/components/BudgetsContent';
 import { NewBudgetContent } from '@/components/NewBudgetContent';
 import { SettingsContent } from '@/components/SettingsContent';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { AdminPanel } from '@/components/AdminPanel';
+import { ProtectedRoute } from '@/components/ProtectedRoute';
 
 export const Dashboard = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
-  const isMobile = useIsMobile();
+  const { hasRole } = useAuth();
 
   const renderContent = () => {
     switch (activeTab) {
@@ -22,6 +25,12 @@ export const Dashboard = () => {
         return <BudgetsContent />;
       case 'new-budget':
         return <NewBudgetContent />;
+      case 'admin':
+        return (
+          <ProtectedRoute requiredRole="admin">
+            <AdminPanel />
+          </ProtectedRoute>
+        );
       case 'settings':
         return <SettingsContent />;
       default:
@@ -30,34 +39,31 @@ export const Dashboard = () => {
   };
 
   return (
-    <div className="flex h-screen bg-background">
-      {/* Desktop Sidebar */}
-      {!isMobile && (
-        <div className="hidden lg:block">
-          <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
+    <AuthGuard>
+      <div className="h-screen flex overflow-hidden bg-background">
+        <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
+        
+        <div className="flex flex-col w-0 flex-1 overflow-hidden">
+          <main className="flex-1 relative overflow-y-auto focus:outline-none">
+            <div className="py-6">
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+                {renderContent()}
+              </div>
+            </div>
+          </main>
         </div>
-      )}
-      
-      {/* Mobile Navigation */}
-      {isMobile && (
-        <>
-          <MobileNavigation 
-            activeTab={activeTab} 
-            onTabChange={setActiveTab}
-            onMenuToggle={() => setIsMobileSidebarOpen(true)}
-          />
-          <MobileSidebar 
-            isOpen={isMobileSidebarOpen}
-            onClose={() => setIsMobileSidebarOpen(false)}
-          />
-        </>
-      )}
-      
-      <main className="flex-1 overflow-auto pb-16 lg:pb-0">
-        <div className="animate-fade-in">
-          {renderContent()}
-        </div>
-      </main>
-    </div>
+        
+        <MobileNavigation
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          onMenuToggle={() => setIsMobileSidebarOpen(true)}
+        />
+        
+        <MobileSidebar
+          isOpen={isMobileSidebarOpen}
+          onClose={() => setIsMobileSidebarOpen(false)}
+        />
+      </div>
+    </AuthGuard>
   );
 };

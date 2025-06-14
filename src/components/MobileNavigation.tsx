@@ -1,12 +1,14 @@
 
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/hooks/useAuth';
 import { 
   Home, 
   FileText, 
   Settings, 
   Plus,
-  Menu
+  Menu,
+  Users
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -19,6 +21,7 @@ interface MobileNavigationProps {
 export const MobileNavigation = ({ activeTab, onTabChange, onMenuToggle }: MobileNavigationProps) => {
   const [isHeaderVisible, setIsHeaderVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const { hasRole } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -46,8 +49,9 @@ export const MobileNavigation = ({ activeTab, onTabChange, onMenuToggle }: Mobil
     { id: 'dashboard', label: 'Início', icon: Home },
     { id: 'budgets', label: 'Orçamentos', icon: FileText },
     { id: 'new-budget', label: 'Novo', icon: Plus },
+    ...(hasRole('admin') ? [{ id: 'admin', label: 'Admin', icon: Users }] : []),
     { id: 'settings', label: 'Config', icon: Settings },
-  ];
+  ].slice(0, 4); // Limit to 4 items for mobile
 
   return (
     <>

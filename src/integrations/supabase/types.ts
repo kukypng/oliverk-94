@@ -9,6 +9,33 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      admin_logs: {
+        Row: {
+          action: string
+          admin_user_id: string | null
+          created_at: string | null
+          details: Json | null
+          id: string
+          target_user_id: string | null
+        }
+        Insert: {
+          action: string
+          admin_user_id?: string | null
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          target_user_id?: string | null
+        }
+        Update: {
+          action?: string
+          admin_user_id?: string | null
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          target_user_id?: string | null
+        }
+        Relationships: []
+      }
       admin_users: {
         Row: {
           created_at: string
@@ -365,7 +392,7 @@ export type Database = {
         Insert: {
           budget_limit?: number | null
           created_at?: string
-          expiration_date: string
+          expiration_date?: string
           id: string
           is_active?: boolean
           name: string
@@ -412,6 +439,33 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_delete_user: {
+        Args: { p_user_id: string }
+        Returns: boolean
+      }
+      admin_get_all_users: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          id: string
+          name: string
+          email: string
+          role: string
+          is_active: boolean
+          expiration_date: string
+          created_at: string
+          last_sign_in_at: string
+        }[]
+      }
+      admin_update_user: {
+        Args: {
+          p_user_id: string
+          p_name?: string
+          p_role?: string
+          p_is_active?: boolean
+          p_expiration_date?: string
+        }
+        Returns: boolean
+      }
       check_shop_profile_exists: {
         Args: { p_user_id: string }
         Returns: boolean
@@ -449,6 +503,14 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: boolean
       }
+      is_current_user_admin: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
+      is_license_valid: {
+        Args: { p_user_id?: string }
+        Returns: boolean
+      }
       is_user_admin: {
         Args: Record<PropertyKey, never>
         Returns: boolean
@@ -456,6 +518,10 @@ export type Database = {
       is_user_expired: {
         Args: Record<PropertyKey, never>
         Returns: boolean
+      }
+      log_admin_action: {
+        Args: { p_target_user_id: string; p_action: string; p_details?: Json }
+        Returns: undefined
       }
       set_user_budget_limit: {
         Args: { p_user_id: string; p_budget_limit: number }
