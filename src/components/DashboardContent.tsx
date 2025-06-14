@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { FileText, DollarSign, TrendingUp, Smartphone, Eye, Edit, Copy, Calendar, Target, Clock, Users } from 'lucide-react';
+import { FileText, DollarSign, TrendingUp, Smartphone, Eye, Edit, Copy, Calendar, Target, Clock, Users, LifeBuoy, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DashboardSkeleton } from '@/components/ui/loading-states';
 import { EmptyState } from '@/components/EmptyState';
@@ -10,10 +10,12 @@ import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
 import { useEnhancedToast } from '@/hooks/useEnhancedToast';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { HelpDialog } from '@/components/HelpDialog';
 
 export const DashboardContent = () => {
   const { profile, hasPermission, user } = useAuth();
   const { showError } = useEnhancedToast();
+  const [isHelpDialogOpen, setHelpDialogOpen] = useState(false);
 
   const { data: stats, isLoading, error } = useQuery({
     queryKey: ['dashboard-stats', user?.id],
@@ -288,6 +290,29 @@ export const DashboardContent = () => {
             );
           })}
         </div>
+        
+        {/* Quick Access */}
+        <Card className="glass-card border-0 shadow-lg animate-slide-up bg-white/50 dark:bg-black/50 backdrop-blur-xl">
+          <CardHeader className="p-4 lg:p-6 pb-3">
+              <CardTitle className="text-lg lg:text-xl font-semibold text-foreground">
+                  Acesso Rápido
+              </CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-col sm:flex-row gap-4 p-4 lg:p-6 pt-0">
+              <Button onClick={() => setHelpDialogOpen(true)} className="w-full sm:w-auto">
+                  <LifeBuoy className="mr-2" />
+                  Ajuda
+              </Button>
+              <Button 
+                  variant="outline" 
+                  onClick={() => window.open('https://wa.me/556496028022', '_blank')}
+                  className="w-full sm:w-auto text-green-600 border-green-600 hover:bg-green-50 hover:text-green-700"
+              >
+                  <MessageCircle className="mr-2" />
+                  Suporte WhatsApp
+              </Button>
+          </CardContent>
+        </Card>
 
         {/* Recent Budgets - Premium Mobile Design */}
         <Card className="glass-card border-0 shadow-lg animate-slide-up bg-white/50 dark:bg-black/50 backdrop-blur-xl">
@@ -375,6 +400,7 @@ export const DashboardContent = () => {
             )}
           </CardContent>
         </Card>
+        <HelpDialog open={isHelpDialogOpen} onOpenChange={setHelpDialogOpen} />
       </div>
     </ErrorBoundary>
   );
