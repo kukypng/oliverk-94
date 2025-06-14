@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -127,36 +126,69 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signIn = async (email: string, password: string) => {
     try {
       console.log('Attempting sign in for:', email);
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
-      
-      if (error) {
-        const errorMessage = error.message === 'Invalid login credentials' 
+
+      if (signInError) {
+        const errorMessage = signInError.message === 'Invalid login credentials' 
           ? 'Email ou senha incorretos'
-          : error.message;
+          : signInError.message;
         
         showError({
           title: 'Erro no login',
           description: errorMessage,
-          action: {
-            label: 'Tentar Novamente',
-            onClick: () => console.log('Retry login clicked')
-          }
         });
-      } else {
+        return { error: signInError };
+      }
+
+      if (signInData.user) {
+        // Check user role
+        const { data: profileData, error: profileError } = await supabase
+          .from('user_profiles')
+          .select('role, is_active')
+          .eq('id', signInData.user.id)
+          .single();
+
+        if (profileError || !profileData) {
+          await supabase.auth.signOut();
+          showError({
+            title: 'Erro no login',
+            description: 'Não foi possível verificar seu perfil. Contate o suporte.',
+          });
+          return { error: profileError || new Error('Profile not found') };
+        }
+
+        if (profileData.role !== 'admin') {
+          await supabase.auth.signOut();
+          showError({
+            title: 'Acesso Negado',
+            description: 'Apenas administradores podem acessar o sistema.',
+          });
+          return { error: new Error('User is not an admin') };
+        }
+
+        if (!profileData.is_active) {
+            await supabase.auth.signOut();
+            showError({
+              title: 'Conta Inativa',
+              description: 'Sua conta está inativa ou a licença expirou. Contate o suporte.',
+            });
+            return { error: new Error('User account is inactive or expired') };
+        }
+        
+        // Admin user, proceed
         showSuccess({
           title: 'Login realizado com sucesso!',
           description: 'Redirecionando para o dashboard...'
         });
-        // Redirecionar para o dashboard após login bem-sucedido
         setTimeout(() => {
           window.location.href = '/dashboard';
         }, 500);
       }
       
-      return { error };
+      return { error: null };
     } catch (error) {
       console.error('Sign in error:', error);
       showError({

@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -7,40 +7,39 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { useAuth } from '@/hooks/useAuth';
 import { Loader2, Smartphone, Wrench, Eye, EyeOff } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
-export const AuthPage = () => {
-  const { signIn, user, loading: authLoading } = useAuth();
+export const SignUpPage = () => {
+  const { signUp } = useAuth();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const [loginForm, setLoginForm] = useState({
+  const [signupForm, setSignupForm] = useState({
     email: '',
-    password: ''
+    password: '',
+    confirmPassword: '',
+    name: ''
   });
 
-  // Redirecionar usuários já logados
-  useEffect(() => {
-    if (!authLoading && user) {
-      window.location.href = '/dashboard';
-    }
-  }, [user, authLoading]);
-
-  // Mostrar loading se usuário já está logado
-  if (authLoading || user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-primary/5 to-primary/10">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
-
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (signupForm.password !== signupForm.confirmPassword) {
+      // TODO: show toast error
+      return;
+    }
+    
     setLoading(true);
     
     try {
-      await signIn(loginForm.email, loginForm.password);
+      const { error } = await signUp(signupForm.email, signupForm.password, {
+        name: signupForm.name
+      });
+      if (!error) {
+        setTimeout(() => navigate('/auth'), 5000);
+      }
     } finally {
       setLoading(false);
     }
@@ -48,59 +47,68 @@ export const AuthPage = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-primary/5 to-primary/10 p-4 relative overflow-hidden">
-      {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-1/2 -right-1/2 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute -bottom-1/2 -left-1/2 w-96 h-96 bg-primary/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
       </div>
 
-      {/* Theme toggle */}
       <div className="absolute top-6 right-6 z-10">
         <ThemeToggle />
       </div>
 
       <div className="w-full max-w-md relative z-10">
-        {/* Logo/Brand */}
         <div className="text-center mb-8 animate-fade-in">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-primary to-primary/80 rounded-3xl mb-6 shadow-xl animate-bounce-subtle">
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-primary to-primary/80 rounded-3xl mb-6 shadow-xl">
             <div className="flex items-center space-x-1">
               <Smartphone className="h-8 w-8 text-primary-foreground" />
               <Wrench className="h-7 w-7 text-primary-foreground" />
             </div>
           </div>
           <h1 className="text-4xl font-bold text-foreground mb-3 tracking-tight">Oliver</h1>
-          <p className="text-muted-foreground text-lg">Sistema de Gestão de Orçamentos</p>
+          <p className="text-muted-foreground text-lg">Crie sua conta</p>
         </div>
 
         <Card className="glass-card animate-scale-in border-0 shadow-2xl backdrop-blur-xl">
           <CardHeader className="text-center pb-6">
-            <CardTitle className="text-2xl text-foreground">Acesso Restrito</CardTitle>
+            <CardTitle className="text-2xl text-foreground">Cadastro de Usuário</CardTitle>
             <CardDescription className="text-base">
-              Faça login para continuar
+              Preencha os campos para criar uma nova conta
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleLogin} className="space-y-6">
+            <form onSubmit={handleSignup} className="space-y-6">
               <div className="space-y-3">
-                <Label htmlFor="email" className="text-sm font-medium">Email</Label>
+                <Label htmlFor="signup-name" className="text-sm font-medium">Nome Completo</Label>
                 <Input
-                  id="email"
+                  id="signup-name"
+                  type="text"
+                  placeholder="Seu nome completo"
+                  value={signupForm.name}
+                  onChange={(e) => setSignupForm({ ...signupForm, name: e.target.value })}
+                  required
+                  className="h-12 text-base rounded-xl input-focus mobile-touch"
+                />
+              </div>
+              <div className="space-y-3">
+                <Label htmlFor="signup-email" className="text-sm font-medium">Email</Label>
+                <Input
+                  id="signup-email"
                   type="email"
                   placeholder="seu@email.com"
-                  value={loginForm.email}
-                  onChange={(e) => setLoginForm({ ...loginForm, email: e.target.value })}
+                  value={signupForm.email}
+                  onChange={(e) => setSignupForm({ ...signupForm, email: e.target.value })}
                   required
                   className="h-12 text-base rounded-xl input-focus mobile-touch"
                 />
               </div>
               <div className="space-y-3 relative">
-                <Label htmlFor="password" className="text-sm font-medium">Senha</Label>
+                <Label htmlFor="signup-password" className="text-sm font-medium">Senha</Label>
                 <Input
-                  id="password"
+                  id="signup-password"
                   type={showPassword ? 'text' : 'password'}
                   placeholder="••••••••"
-                  value={loginForm.password}
-                  onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
+                  value={signupForm.password}
+                  onChange={(e) => setSignupForm({ ...signupForm, password: e.target.value })}
                   required
                   className="h-12 text-base rounded-xl input-focus mobile-touch pr-12"
                 />
@@ -114,18 +122,39 @@ export const AuthPage = () => {
                   {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </Button>
               </div>
+              <div className="space-y-3 relative">
+                <Label htmlFor="signup-confirm" className="text-sm font-medium">Confirmar Senha</Label>
+                <Input
+                  id="signup-confirm"
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  placeholder="••••••••"
+                  value={signupForm.confirmPassword}
+                  onChange={(e) => setSignupForm({ ...signupForm, confirmPassword: e.target.value })}
+                  required
+                  className="h-12 text-base rounded-xl input-focus mobile-touch pr-12"
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="absolute bottom-1 right-1 h-10 w-10 text-muted-foreground hover:bg-transparent"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                >
+                  {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </Button>
+              </div>
               <Button 
                 type="submit" 
                 className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-base rounded-xl transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl mobile-touch"
-                disabled={loading}
+                disabled={loading || signupForm.password !== signupForm.confirmPassword}
               >
                 {loading ? (
                   <>
                     <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                    Entrando...
+                    Cadastrando...
                   </>
                 ) : (
-                  'Entrar'
+                  'Criar Conta'
                 )}
               </Button>
             </form>
@@ -133,7 +162,7 @@ export const AuthPage = () => {
         </Card>
 
         <div className="text-center mt-8 text-sm text-muted-foreground animate-fade-in">
-          <p>Não tem uma conta? <Link to="/signup" className="font-semibold text-primary hover:underline">Cadastre-se</Link></p>
+          <p>Já tem uma conta? <Link to="/auth" className="font-semibold text-primary hover:underline">Faça login</Link></p>
         </div>
       </div>
     </div>

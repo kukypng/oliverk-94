@@ -10,6 +10,7 @@ import { AuthProvider } from "@/hooks/useAuth";
 import { ToastProvider } from "@/components/ui/toast-provider";
 import Index from "./pages/Index";
 import { AuthPage } from "./pages/AuthPage";
+import { SignUpPage } from "./pages/SignUpPage";
 import { Dashboard } from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 
@@ -64,6 +65,7 @@ const App = () => (
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/auth" element={<AuthPage />} />
+                <Route path="/signup" element={<SignUpPage />} />
                 <Route path="/dashboard/*" element={<Dashboard />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
