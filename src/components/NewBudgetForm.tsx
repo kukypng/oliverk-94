@@ -45,7 +45,7 @@ export const NewBudgetForm = ({
   } = useAuth();
   const queryClient = useQueryClient();
   const [formData, setFormData] = useState<BudgetFormData>({
-    deviceType: '',
+    deviceType: 'Smartphone',
     deviceModel: '',
     deviceBrand: '',
     issue: '',
