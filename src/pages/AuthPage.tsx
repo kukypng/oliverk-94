@@ -3,7 +3,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { useAuth } from '@/hooks/useAuth';
 import { Loader2, Eye, EyeOff } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -55,7 +54,6 @@ export const AuthPage = () => {
 
       {/* Theme toggle */}
       <div className="absolute top-6 right-6 z-10">
-        <ThemeToggle />
       </div>
 
       <div className="w-full max-w-md relative z-10">
