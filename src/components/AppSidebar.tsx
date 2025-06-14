@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { 
@@ -57,7 +58,7 @@ export const AppSidebar = ({ activeTab, onTabChange }: AppSidebarProps) => {
             <Badge variant="secondary" className="mt-1 text-xs">
               <Star className="w-3 h-3 mr-1" />
               {profile?.role === 'admin' ? 'Admin' : 
-               profile?.role === 'manager' ? 'Gerente' : 'Premium'}
+               profile?.role === 'manager' ? 'Gerente' : 'Usuário'}
             </Badge>
           </div>
         </div>
