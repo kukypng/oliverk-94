@@ -34,7 +34,8 @@
   html {
     height: 100vh;
     height: -webkit-fill-available;
-    overscroll-behavior: none;
+    overscroll-behavior: none; /* This was already here */
+    scroll-behavior: smooth; /* Added for smoother anchor scrolling */
   }
 
   body { /* body styles were already partially defined, merging here */
@@ -72,3 +73,4 @@
     }
   }
 }
+

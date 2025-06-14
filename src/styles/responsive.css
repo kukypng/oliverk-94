@@ -66,34 +66,19 @@
   p, li, span, div { /* Broadened application for consistency */
     @apply text-base leading-relaxed;
   }
+
+  /* Sidebar content scroll behavior on mobile */
+  [data-sidebar="content"] {
+    @apply overscroll-y-contain; /* Prevents parent scroll when sidebar content is scrolled */
+  }
 }
 
 @media (max-width: 480px) {
-  /* Extra small devices */
-  .container {
-    @apply px-3 sm:px-4; /* Adjusted padding */
-  }
-  
-  h1 {
-    @apply text-xl font-semibold; /* Ensure consistent styling */
-  }
-  
-  h2 {
-    @apply text-lg font-medium; /* Ensure consistent styling */
-  }
-  
-  .card { /* This targets shadcn/ui .card, ensure it is intended */
-    @apply m-2;
-  }
+  /* ... keep existing code (Extra small devices styles) */
 }
 
 /* Landscape mobile improvements */
 @media (max-height: 500px) and (orientation: landscape) {
-  .mobile-nav {
-    display: none; /* Keep hidden for landscape focus */
-  }
-  
-  .pb-24 { /* This class might need review based on its usage */
-    padding-bottom: 1rem; /* Or less, depending on context */
-  }
+  /* ... keep existing code (Landscape mobile styles) */
 }
+
