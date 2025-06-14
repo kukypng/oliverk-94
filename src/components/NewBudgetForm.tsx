@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -32,9 +32,11 @@ interface BudgetFormData {
 }
 interface NewBudgetFormProps {
   onBack: () => void;
+  initialData?: any;
 }
 export const NewBudgetForm = ({
-  onBack
+  onBack,
+  initialData
 }: NewBudgetFormProps) => {
   const {
     showSuccess,
@@ -62,6 +64,33 @@ export const NewBudgetForm = ({
     validityDays: 15,
     paymentCondition: 'À Vista'
   });
+
+  useEffect(() => {
+    if (initialData) {
+      setFormData({
+        deviceType: initialData.device_type || 'Smartphone',
+        deviceModel: initialData.device_model || '',
+        deviceBrand: initialData.device_brand || '',
+        issue: initialData.issue || '',
+        partType: initialData.part_type || '',
+        brand: initialData.brand || '',
+        warrantyMonths: initialData.warranty_months || 3,
+        cashPrice: (initialData.cash_price || 0) / 100,
+        installmentPrice: (initialData.installment_price || 0) / 100,
+        installments: initialData.installments || 1,
+        includesDelivery: initialData.includes_delivery || false,
+        includesScreenProtector: initialData.includes_screen_protector || false,
+        enableInstallmentPrice: !!initialData.installment_price,
+        notes: initialData.notes || '',
+        validityDays: 15,
+        paymentCondition: initialData.payment_condition || 'À Vista',
+      });
+      showSuccess({
+        title: "Orçamento copiado!",
+        description: "Ajuste os detalhes e crie um novo orçamento."
+      });
+    }
+  }, [initialData, showSuccess]);
 
   // Buscar tipos de dispositivo
   const {
