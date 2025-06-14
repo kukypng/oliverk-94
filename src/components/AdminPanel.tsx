@@ -7,7 +7,7 @@ import { AdminDebugPanel } from '@/components/AdminDebugPanel';
 import { AdminTestPanel } from '@/components/AdminTestPanel';
 import { Users, FileText, Shield, TestTube } from 'lucide-react';
 export const AdminPanel = () => {
-  return <div className="container mx-auto p-6 space-y-6 bg-zinc-950">
+  return <div className="container mx-auto p-6 space-y-6 bg-zinc-950 rounded-3xl px-[31px]">
       <div className="flex items-center space-x-3">
         <Shield className="h-8 w-8 text-primary" />
         <div>
@@ -16,7 +16,7 @@ export const AdminPanel = () => {
         </div>
       </div>
 
-      <Tabs defaultValue="test" className="space-y-6">
+      <Tabs defaultValue="test" className="space-y-6 px-[58px]">
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="test" className="flex items-center space-x-2">
             <TestTube className="h-4 w-4" />
