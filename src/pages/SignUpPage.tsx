@@ -51,7 +51,6 @@ export const SignUpPage = () => {
       </div>
 
       <div className="absolute top-6 right-6 z-10">
-        <ThemeToggle />
       </div>
 
       <div className="w-full max-w-md relative z-10">
