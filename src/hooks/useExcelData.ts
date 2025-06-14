@@ -1,9 +1,11 @@
+
 import * as XLSX from 'xlsx';
 import * as FileSaver from 'file-saver';
 import { supabase } from '@/integrations/supabase/client';
 import { useEnhancedToast } from '@/hooks/useEnhancedToast';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { useAuth } from './useAuth';
 
 // Usando 'any' pois o tipo completo do orçamento é extenso
 type Budget = any;
@@ -11,15 +13,24 @@ type Budget = any;
 export const useExcelData = () => {
   const { showSuccess, showError, showWarning } = useEnhancedToast();
   const [isProcessing, setIsProcessing] = useState(false);
+  const { user } = useAuth();
 
   const fetchAndExportBudgets = async () => {
     setIsProcessing(true);
     const toastId = toast.loading('Exportando orçamentos...');
 
+    if (!user) {
+      toast.dismiss(toastId);
+      showError({ title: 'Erro de Autenticação', description: 'Você precisa estar logado para exportar dados.' });
+      setIsProcessing(false);
+      return;
+    }
+
     try {
       const { data: budgets, error } = await supabase
         .from('budgets')
         .select('*')
+        .eq('owner_id', user.id)
         .order('created_at', { ascending: false });
 
       if (error) throw new Error('Não foi possível buscar os orçamentos.');
@@ -36,7 +47,6 @@ export const useExcelData = () => {
         'Modelo': b.device_model,
         'Problema': b.issue,
         'Preço Total': Number(b.total_price).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
-        'Status': b.status,
         'Condição de Pagamento': b.payment_condition,
         'Data de Criação': new Date(b.created_at).toLocaleDateString('pt-BR'),
         'Observações': b.notes,
@@ -66,8 +76,8 @@ export const useExcelData = () => {
   const downloadImportTemplate = () => {
     setIsProcessing(true);
     try {
-        const templateData = [{'Nome do Cliente': '','Telefone do Cliente': '','Tipo de Aparelho': '','Modelo do Aparelho': '','Defeito/Problema': '','Observações': '','Preço Total': 0}];
-        const instructions = [["Instruções:", "Preencha as colunas com os dados do orçamento. Não altere os nomes dos cabeçalhos."], ["", "'Preço Total' deve ser um número (ex: 1500.50)."]];
+        const templateData = [{'Tipo de Aparelho': '','Modelo do Aparelho': '','Defeito/Problema': '','Observações': '','Preço Total': 0}];
+        const instructions = [["Instruções:", "Preencha as colunas com os dados do orçamento. Não altere os nomes dos cabeçalhos."], ["", "'Preço Total' deve ser um número (ex: 1500.50 ou 1500,50)."]];
 
         const wsTemplate = XLSX.utils.json_to_sheet(templateData);
         const wsInstructions = XLSX.utils.aoa_to_sheet(instructions);
@@ -95,9 +105,16 @@ export const useExcelData = () => {
     setIsProcessing(true);
     const toastId = toast.loading('Processando arquivo...');
 
-    const importPromise = new Promise((resolve, reject) => {
+    if (!user) {
+      toast.dismiss(toastId);
+      showError({ title: 'Erro de Autenticação', description: 'Você precisa estar logado para importar dados.' });
+      setIsProcessing(false);
+      return;
+    }
+
+    const importPromise = new Promise(async (resolve, reject) => {
         const reader = new FileReader();
-        reader.onload = (e) => {
+        reader.onload = async (e) => {
             try {
                 const data = e.target?.result;
                 const workbook = XLSX.read(data, { type: 'binary' });
@@ -107,15 +124,46 @@ export const useExcelData = () => {
                     throw new Error("Aba 'Modelo de Importação' não encontrada na planilha.");
                 }
                 const worksheet = workbook.Sheets[sheetName];
-                const json = XLSX.utils.sheet_to_json(worksheet);
+                const json = XLSX.utils.sheet_to_json(worksheet) as any[];
                 
                 if (json.length === 0) {
                   throw new Error("A planilha está vazia ou em formato incorreto.");
                 }
 
-                console.log('Dados importados:', json);
-                // A lógica para salvar no banco de dados virá em um próximo passo.
-                resolve(json);
+                const newBudgets = json.map((row, index) => {
+                  const priceString = String(row['Preço Total'] || '0').replace(/\./g, '').replace(',', '.');
+                  const price = parseFloat(priceString);
+
+                  if (isNaN(price) || price <= 0) {
+                    throw new Error(`Preço inválido ou zerado na linha ${index + 2}. O preço deve ser um número maior que zero.`);
+                  }
+
+                  if (!row['Tipo de Aparelho'] || !row['Modelo do Aparelho'] || !row['Defeito/Problema']) {
+                    throw new Error(`Dados obrigatórios faltando na linha ${index + 2}. Verifique 'Tipo de Aparelho', 'Modelo do Aparelho' e 'Defeito/Problema'.`);
+                  }
+
+                  return {
+                    owner_id: user.id,
+                    device_type: row['Tipo de Aparelho'],
+                    device_model: row['Modelo do Aparelho'],
+                    issue: row['Defeito/Problema'],
+                    notes: row['Observações'] || '',
+                    total_price: price,
+                    status: 'pending'
+                  };
+                });
+                
+                const { data: insertedData, error } = await supabase
+                  .from('budgets')
+                  .insert(newBudgets)
+                  .select();
+
+                if (error) {
+                  console.error("Erro ao salvar no Supabase:", error);
+                  throw new Error(`Erro ao salvar os dados: ${error.message}`);
+                }
+
+                resolve(insertedData);
 
             } catch (err: any) {
                 reject(err);
@@ -128,7 +176,7 @@ export const useExcelData = () => {
     importPromise
       .then((data) => {
           toast.dismiss(toastId);
-          showSuccess({ title: 'Arquivo Processado', description: `${(data as any[]).length} registros prontos para serem importados.` });
+          showSuccess({ title: 'Importação Concluída', description: `${(data as any[]).length} orçamentos foram importados com sucesso.` });
       })
       .catch((err: any) => {
           toast.dismiss(toastId);
