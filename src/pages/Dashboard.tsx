@@ -42,7 +42,10 @@ export const Dashboard = () => {
           <AppSidebar activeTab={activeTab} onTabChange={setActiveTab} />
           
           <SidebarInset className="flex-1 flex flex-col">
-            <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center gap-2 border-b border-border bg-background/90 backdrop-blur-md shadow-sm px-4">
+            <header 
+              className="sticky top-0 z-30 flex h-16 shrink-0 items-center gap-2 border-b border-border bg-background/75 backdrop-blur-xl px-4" 
+              style={{ boxShadow: 'var(--shadow-soft)' }} // Applied Apple-style glass effect and shadow
+            >
               <SidebarTrigger className="flex items-center justify-center text-foreground hover:text-accent">
                 <Menu className="h-5 w-5" />
               </SidebarTrigger>

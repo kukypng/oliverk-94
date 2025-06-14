@@ -6,37 +6,52 @@
     @apply bg-primary text-primary-foreground;
     @apply transform transition-all duration-200 ease-out; /* Faster transition */
     @apply hover:scale-[1.02] active:scale-[0.97]; /* Refined interaction scale */
-    @apply shadow-lg hover:shadow-xl;
+    box-shadow: var(--shadow-medium); /* Updated shadow */
+  }
+  .btn-apple:hover {
+    box-shadow: var(--shadow-strong); /* Updated hover shadow */
   }
 
   .btn-apple-secondary {
     @apply btn-apple bg-white/10 text-foreground backdrop-blur-xl;
     @apply border border-white/20;
     @apply hover:bg-white/20;
+    /* box-shadow and hover:box-shadow are inherited from .btn-apple */
   }
 
   /* Premium Floating action button */
   .fab {
     @apply fixed bottom-24 right-6 z-40 lg:bottom-6;
     @apply w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-primary/80; /* Adjusted size and rounding */
-    @apply flex items-center justify-center shadow-2xl;
+    @apply flex items-center justify-center;
     @apply transform transition-all duration-300 ease-out; /* Smoother transition */
     @apply hover:scale-105 active:scale-95; /* Refined interaction scale */
     @apply text-primary-foreground;
+    box-shadow: var(--shadow-strong); /* Updated shadow */
   }
 
   /* Premium Card animations */
   .card-hover {
     @apply transition-all duration-300 ease-out; /* Smoother transition */
-    @apply hover:scale-[1.015] hover:shadow-2xl; /* Refined scale and shadow */
-    @apply hover:-translate-y-1; /* Subtle lift */
+    @apply hover:scale-[1.015] hover:-translate-y-1; /* Subtle lift and scale */
   }
+  .card-hover:hover {
+    box-shadow: var(--shadow-medium); /* Updated hover shadow, base shadow is on the card itself */
+  }
+
 
   /* Premium Input focus animations */
   .input-focus {
     @apply transition-all duration-200 ease-out; /* Faster transition */
     @apply focus:ring-2 focus:ring-ring/30 focus:border-ring; /* Adjusted ring and border */
     @apply focus:scale-[1.005]; /* Subtle scale */
+  }
+
+  /* Glass Pane Effect */
+  .glass-pane {
+    @apply bg-background/75 backdrop-blur-xl; /* Adjusted blur and transparency */
+    @apply dark:border-white/10 border-black/5; /* Subtle border for depth */
+    box-shadow: var(--shadow-soft);
   }
   
   /* Color replacements - Updated to use var(--primary) or its HSL values */
@@ -61,3 +76,4 @@
     background-color: hsla(var(--primary), 0.15) !important;
   }
 }
+
