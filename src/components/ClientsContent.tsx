@@ -58,8 +58,12 @@ export const ClientsContent = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {clients.map((client) => (
-                  <TableRow key={client.id}>
+                {clients.map((client, index) => (
+                  <TableRow 
+                    key={client.id}
+                    className="animate-fade-in"
+                    style={{ animationDelay: `${index * 50}ms` }}
+                  >
                     <TableCell>
                       <p className="font-medium">{client.name}</p>
                     </TableCell>
