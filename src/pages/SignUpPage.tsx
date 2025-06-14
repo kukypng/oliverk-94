@@ -38,7 +38,7 @@ export const SignUpPage = () => {
         name: signupForm.name
       });
       if (!error) {
-        setTimeout(() => navigate('/auth'), 5000);
+        setTimeout(() => navigate('/dashboard'), 5000);
       }
     } finally {
       setLoading(false);
@@ -157,7 +157,7 @@ export const SignUpPage = () => {
         </Card>
 
         <div className="text-center mt-8 text-sm text-muted-foreground animate-fade-in">
-          <p>Já tem uma conta? <Link to="/auth" className="font-semibold text-primary hover:underline">Faça login</Link></p>
+          <p><Link to="/dashboard" className="font-semibold text-primary hover:underline">Voltar para o Dashboard</Link></p>
         </div>
       </div>
     </div>

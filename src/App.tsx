@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -11,6 +12,7 @@ import { SignUpPage } from "./pages/SignUpPage";
 import { Dashboard } from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 import { ThemeProvider } from "./components/ThemeProvider";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -67,7 +69,14 @@ const App = () => (
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/auth" element={<AuthPage />} />
-                <Route path="/signup" element={<SignUpPage />} />
+                <Route
+                  path="/signup"
+                  element={
+                    <ProtectedRoute requiredRole="admin">
+                      <SignUpPage />
+                    </ProtectedRoute>
+                  }
+                />
                 <Route path="/dashboard/*" element={<Dashboard />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>

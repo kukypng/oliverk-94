@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -126,10 +125,6 @@ export const AuthPage = () => {
             </form>
           </CardContent>
         </Card>
-
-        <div className="text-center mt-8 text-sm text-muted-foreground animate-fade-in">
-          <p>Não tem uma conta? <Link to="/signup" className="font-semibold text-primary hover:underline">Cadastre-se</Link></p>
-        </div>
       </div>
     </div>
   );
