@@ -72,26 +72,28 @@ export const MobileNavigation = ({ activeTab, onTabChange, onMenuToggle }: Mobil
         </div>
       </div>
 
-      {/* Mobile Header - Premium Design */}
-      <div className="lg:hidden glass-card border-0 border-b border-white/10 sticky top-0 z-40 bg-white/95 dark:bg-black/95 backdrop-blur-xl">
-        <div className="flex items-center justify-between p-4">
-          <div className="flex items-center space-x-3 animate-fade-in">
-            <div className="relative">
-              <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-[#fec832] to-[#fec832]/80 rounded-2xl shadow-lg">
-                <FileText className="h-6 w-6 text-black" />
+      {/* Mobile Header - Fixed and Improved */}
+      <div className="lg:hidden sticky top-0 z-40 bg-white/98 dark:bg-black/98 backdrop-blur-xl border-b border-border/10">
+        <div className="flex items-center justify-between px-4 py-3 min-h-[60px]">
+          {/* Logo and Title - Simplified */}
+          <div className="flex items-center space-x-3 flex-1 min-w-0">
+            <div className="flex-shrink-0">
+              <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-[#fec832] to-[#fec832]/80 rounded-xl shadow-md">
+                <FileText className="h-5 w-5 text-black" />
               </div>
-              <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white dark:border-black animate-pulse" />
             </div>
-            <div>
-              <h1 className="text-xl font-bold text-foreground">Oliver</h1>
-              <p className="text-xs text-muted-foreground">Gestão Premium</p>
+            <div className="min-w-0 flex-1">
+              <h1 className="text-lg font-bold text-foreground truncate">Oliver</h1>
+              <p className="text-xs text-muted-foreground truncate">Gestão Premium</p>
             </div>
           </div>
+          
+          {/* Menu Button */}
           <Button 
             variant="ghost" 
             size="sm" 
             onClick={onMenuToggle}
-            className="h-10 w-10 rounded-2xl hover:bg-muted/20 transition-all duration-300 hover:scale-110"
+            className="flex-shrink-0 h-10 w-10 rounded-xl hover:bg-muted/20 transition-all duration-300 hover:scale-110"
           >
             <Menu className="h-5 w-5" />
           </Button>
