@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { 
@@ -41,22 +42,23 @@ export const AppSidebar = ({ activeTab, onTabChange }: AppSidebarProps) => {
   ];
 
   return (
-    <Sidebar className="bg-gold-50/60 dark:bg-black/20 shadow-soft border-r border-gold-100/70">
-      <SidebarHeader className="p-6 border-b border-gold-50 bg-gradient-to-r from-gold-50 via-white to-gold-100/30">
+    <Sidebar>
+      <SidebarHeader className="p-4">
         <div className="flex items-center space-x-3">
-          <div className="w-12 h-12 bg-gold-400/10 rounded-full flex items-center justify-center shadow-glow-gold">
-            <User className="h-6 w-6 text-gold-500" />
+          <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+            <User className="h-5 w-5 text-primary" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-semibold text-gold-800 truncate">{profile?.name || "Usuário"}</p>
-            <p className="text-xs text-gold-600 truncate">{user?.email}</p>
-            <Badge variant="secondary" className="mt-1 text-xs bg-gold-50 border-gold-100 text-gold-700">
+            <p className="text-sm font-medium text-foreground truncate">
+              {profile?.name || 'Usuário'}
+            </p>
+            <p className="text-xs text-muted-foreground truncate">
+              {user?.email}
+            </p>
+            <Badge variant="secondary" className="mt-1 text-xs">
               <Star className="w-3 h-3 mr-1" />
-              {profile?.role === "admin"
-                ? "Admin"
-                : profile?.role === "manager"
-                ? "Gerente"
-                : "Premium"}
+              {profile?.role === 'admin' ? 'Admin' : 
+               profile?.role === 'manager' ? 'Gerente' : 'Premium'}
             </Badge>
           </div>
         </div>

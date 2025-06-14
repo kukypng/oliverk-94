@@ -10,14 +10,9 @@ export default {
 	],
 	prefix: "",
 	theme: {
-		fontFamily: {
-			sans: ['Inter', 'Poppins', 'ui-sans-serif', 'system-ui'],
-			heading: ['Poppins', 'Inter', 'sans-serif'],
-			mono: ['ui-monospace', 'SFMono-Regular'],
-		},
 		container: {
 			center: true,
-			padding: "2rem",
+			padding: '2rem',
 			screens: {
 				'2xl': '1400px'
 			}
@@ -29,16 +24,6 @@ export default {
 				ring: 'hsl(var(--ring))',
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
-				gold: {
-					50: "#fffbea",
-					100: "#fef6c3",
-					200: "#fde975",
-					300: "#fcc723",
-					400: "#fec832",
-					500: "#fec832",
-					600: "#e6b42e",
-					700: "#c29420",
-				},
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
 					foreground: 'hsl(var(--primary-foreground))'
@@ -76,19 +61,12 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
-				},
-				boxShadow: {
-					'soft': '0 2px 8px 0 rgba(0,0,0,0.03)',
-					'medium': '0 8px 24px 0 rgba(0,0,0,0.08)',
-					'strong': '0 16px 48px 0 rgba(0,0,0,0.15)',
-					'glow-gold': '0 2px 12px 1px #fec83255'
-				},
+				}
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
-				sm: 'calc(var(--radius) - 4px)',
-				'xxl': '1.25rem'
+				sm: 'calc(var(--radius) - 4px)'
 			},
 			keyframes: {
 				'accordion-down': {
@@ -116,6 +94,3 @@ export default {
 	},
 	plugins: [require("tailwindcss-animate")],
 } satisfies Config;
-
-// Add Google Fonts to index.html manually: 
-// <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Poppins:wght@400;700&display=swap" rel="stylesheet">

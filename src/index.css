@@ -1,12 +1,12 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Set up premium font, colors, and shadows */
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. */
+
 @layer base {
   :root {
-    font-family: 'Inter', 'Poppins', ui-sans-serif, system-ui, sans-serif;
-    --font-heading: 'Poppins', 'Inter', sans-serif;
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
 
@@ -98,29 +98,9 @@
     --shadow-medium: 0 16px 48px rgba(0, 0, 0, 0.4);
     --shadow-strong: 0 24px 64px rgba(0, 0, 0, 0.5);
   }
+}
 
-  body {
-    font-family: 'Inter', 'Poppins', ui-sans-serif, system-ui, sans-serif;
-    @apply antialiased bg-background text-foreground min-h-screen transition-colors duration-300;
-    background: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(var(--muted)) 100%);
-  }
-
-  h1, h2, h3, h4 {
-    font-family: var(--font-heading);
-    @apply font-bold;
-    letter-spacing: -0.015em;
-  }
-
-  h1 { @apply text-3xl md:text-5xl lg:text-6xl; }
-  h2 { @apply text-2xl md:text-3xl; }
-  h3 { @apply text-xl md:text-2xl; }
-  h4 { @apply text-lg; }
-
-  a, button, input, select, textarea {
-    font-feature-settings: "rlig" 1, "calt" 1;
-    @apply transition-all duration-200 focus:outline-none;
-  }
-
+@layer base {
   * {
     @apply border-border;
   }
@@ -192,67 +172,7 @@
   }
 }
 
-/* Premium Buttons */
 @layer components {
-  .btn {
-    @apply inline-flex items-center gap-2 font-semibold rounded-xxl px-6 py-3 transition-all duration-150 shadow-soft hover:shadow-glow-gold;
-    background: linear-gradient(90deg, #fec832 70%, #fff7cc 100%);
-    color: #2d2d2d;
-    border: 0;
-  }
-  .btn-outline {
-    @apply border border-gold-400 bg-white hover:bg-gold-50 text-gold-700;
-    box-shadow: 0 2px 12px 1px #fec83233;
-  }
-  .btn-ghost {
-    @apply bg-transparent hover:bg-gold-50 text-gold-700;
-  }
-  /* CTAs */
-  .btn-cta {
-    @apply btn shadow-medium hover:scale-105 hover:shadow-strong;
-    letter-spacing: 0.01em;
-  }
-
-  /* Premium Cards */
-  .card {
-    @apply rounded-xxl bg-white/70 dark:bg-zinc-900/70 backdrop-blur-xl border border-gold-100 shadow-soft transition-transform duration-300 hover:-translate-y-1 hover:shadow-medium;
-  }
-  .card-header {
-    @apply p-6 pb-2 border-b border-gold-50 bg-gradient-to-r from-gold-50 via-white to-gold-50/50;
-  }
-  .card-content {
-    @apply p-6;
-  }
-
-  /* Premium Inputs */
-  .input {
-    @apply border border-gold-200 rounded-xxl px-4 py-2 focus:border-gold-400 focus:ring-2 focus:ring-gold-400 bg-white/80 text-zinc-900 placeholder:text-gold-900/50 shadow-soft;
-    font-family: 'Inter', sans-serif;
-  }
-  .input:focus, .input:active {
-    @apply ring-2 ring-gold-400 border-gold-400;
-  }
-  .label {
-    @apply text-gold-700 text-sm font-semibold mb-1;
-  }
-
-  /* Table premium */
-  table {
-    @apply w-full text-left bg-white/90 rounded-xxl border-collapse overflow-hidden;
-    font-family: 'Inter', sans-serif;
-  }
-  th, td {
-    @apply px-4 py-2;
-  }
-  th {
-    @apply bg-gold-50 text-gold-800 font-bold;
-  }
-  tr:nth-child(even) {
-    @apply bg-gold-50/20;
-  }
-  tr:hover {
-    @apply bg-gold-100/40;
-  }
   /* Premium Glass morphism effect */
   .glass {
     @apply backdrop-blur-xl bg-white/80 dark:bg-black/80;
@@ -369,19 +289,6 @@
   
   .hover\\:bg-orange-50:hover {
     background-color: rgba(254, 200, 50, 0.1) !important;
-  }
-}
-
-/* Custom shadow-medium utility */
-@layer utilities {
-  .shadow-medium {
-    box-shadow: 0 8px 24px 0 rgba(0,0,0,0.08);
-  }
-  .shadow-strong {
-    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.2);
-  }
-  .shadow-soft {
-    box-shadow: 0 2px 8px 0 rgba(0,0,0,0.07);
   }
 }
 
@@ -571,24 +478,4 @@
   p {
     @apply text-base leading-relaxed;
   }
-}
-
-/* Micro-interactions */
-@keyframes pop {
-  0% { transform: scale(0.95); }
-  60% { transform: scale(1.03); }
-  100% { transform: scale(1); }
-}
-.pop-animate {
-  animation: pop 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Landing page hero gradient */
-.hero-gradient {
-  background: linear-gradient(120deg, #fec832 0%, #fff7cc 100%);
-}
-
-/* Glow on hover */
-.glow-hover:hover {
-  box-shadow: 0 2px 12px 1px #fec83288, 0 1.5px 4px #fff7cc77;
 }
