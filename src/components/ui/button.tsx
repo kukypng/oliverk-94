@@ -17,14 +17,14 @@ const buttonVariants = cva(
           "border border-input bg-background hover:bg-accent hover:text-accent-foreground shadow-sm hover:shadow-md",
         secondary:
           "bg-secondary text-secondary-foreground hover:bg-secondary/80 shadow-sm hover:shadow-md",
-        ghost: "hover:bg-accent hover:text-accent-foreground", // No shadow for ghost
-        link: "text-primary underline-offset-4 hover:underline", // No shadow for link
+        ghost: "hover:bg-accent hover:text-accent-foreground hover:scale-[1.03]", // No shadow for ghost, added scale
+        link: "text-primary underline-offset-4 hover:underline hover:scale-[1.03]", // No shadow for link, added scale
       },
       size: {
         default: "h-10 px-4 py-2",
-        sm: "h-9 rounded-lg px-3", // Ensure consistent rounding if needed, but md is parent
-        lg: "h-11 rounded-lg px-8", // Ensure consistent rounding
-        icon: "h-10 w-10 rounded-lg", // Ensure consistent rounding
+        sm: "h-9 rounded-lg px-3", 
+        lg: "h-11 rounded-lg px-8", 
+        icon: "h-10 w-10 rounded-lg", 
       },
     },
     defaultVariants: {
