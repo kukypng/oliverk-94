@@ -592,6 +592,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      check_if_user_is_admin: {
+        Args: { user_id: string }
+        Returns: boolean
+      }
       check_shop_profile_exists: {
         Args: { p_user_id: string }
         Returns: boolean
@@ -666,6 +670,14 @@ export type Database = {
       set_user_budget_limit: {
         Args: { p_user_id: string; p_budget_limit: number }
         Returns: boolean
+      }
+      test_admin_permissions: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          test_name: string
+          result: boolean
+          details: string
+        }[]
       }
       update_expired_users: {
         Args: Record<PropertyKey, never>
