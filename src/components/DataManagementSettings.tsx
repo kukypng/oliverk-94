@@ -1,25 +1,17 @@
 
-import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { UploadCloud, Download, FileSpreadsheet } from 'lucide-react';
+import { UploadCloud, Download, FileSpreadsheet, Loader2 } from 'lucide-react';
+import { useExcelData } from '@/hooks/useExcelData';
 
 export const DataManagementSettings = () => {
-  const handleExport = () => {
-    // Lógica de exportação será implementada aqui
-    console.log('Exportando dados...');
-  };
-
-  const handleDownloadTemplate = () => {
-    // Lógica de download do modelo será implementada aqui
-    console.log('Baixando modelo...');
-  };
+  const { isProcessing, fetchAndExportBudgets, downloadImportTemplate, processImportedFile } = useExcelData();
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) {
-      console.log('Arquivo selecionado:', file.name);
-      // Lógica de processamento do arquivo será implementada aqui
+    if (file && !isProcessing) {
+      processImportedFile(file);
+      event.target.value = ''; // Reseta o input para permitir selecionar o mesmo arquivo novamente
     }
   };
 
@@ -44,9 +36,13 @@ export const DataManagementSettings = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Button onClick={handleExport} className="w-full">
-              <FileSpreadsheet className="mr-2 h-4 w-4" />
-              Exportar Orçamentos
+            <Button onClick={fetchAndExportBudgets} className="w-full" disabled={isProcessing}>
+              {isProcessing ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <FileSpreadsheet className="mr-2 h-4 w-4" />
+              )}
+              {isProcessing ? 'Processando...' : 'Exportar Orçamentos'}
             </Button>
           </CardContent>
         </Card>
@@ -63,16 +59,24 @@ export const DataManagementSettings = () => {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <Button variant="outline" className="w-full" asChild>
-              <label htmlFor="import-file" className="cursor-pointer">
-                <UploadCloud className="mr-2 h-4 w-4" />
-                Selecionar Arquivo
-                <input type="file" id="import-file" className="hidden" accept=".xlsx, .xls, .csv" onChange={handleFileSelect} />
+            <Button variant="outline" className="w-full" asChild disabled={isProcessing}>
+              <label htmlFor="import-file" className={isProcessing ? 'cursor-not-allowed' : 'cursor-pointer'}>
+                {isProcessing ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <UploadCloud className="mr-2 h-4 w-4" />
+                )}
+                {isProcessing ? 'Processando...' : 'Selecionar Arquivo'}
+                <input type="file" id="import-file" className="hidden" accept=".xlsx, .xls, .csv" onChange={handleFileSelect} disabled={isProcessing}/>
               </label>
             </Button>
-            <Button variant="secondary" onClick={handleDownloadTemplate} className="w-full">
-              <Download className="mr-2 h-4 w-4" />
-              Baixar Modelo
+            <Button variant="secondary" onClick={downloadImportTemplate} className="w-full" disabled={isProcessing}>
+              {isProcessing ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Download className="mr-2 h-4 w-4" />
+              )}
+              {isProcessing ? 'Processando...' : 'Baixar Modelo'}
             </Button>
           </CardContent>
         </Card>
