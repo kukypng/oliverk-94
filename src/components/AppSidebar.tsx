@@ -22,7 +22,8 @@ import {
   LogOut, 
   User,
   Star,
-  Users
+  Users,
+  Briefcase // Exemplo de ícone para o placeholder do logo
 } from 'lucide-react';
 
 interface AppSidebarProps {
@@ -45,8 +46,8 @@ export const AppSidebar = ({ activeTab, onTabChange }: AppSidebarProps) => {
     <Sidebar>
       <SidebarHeader className="p-4">
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-            <User className="h-5 w-5 text-primary" />
+          <div className="w-10 h-10 bg-primary/20 dark:bg-primary/30 rounded-full flex items-center justify-center"> {/* Ajuste de cor de fundo do ícone */}
+            <User className="h-5 w-5 text-primary" /> {/* Ícone do usuário usando a cor primária */}
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-foreground truncate">
@@ -55,8 +56,8 @@ export const AppSidebar = ({ activeTab, onTabChange }: AppSidebarProps) => {
             <p className="text-xs text-muted-foreground truncate">
               {user?.email}
             </p>
-            <Badge variant="secondary" className="mt-1 text-xs">
-              <Star className="w-3 h-3 mr-1" />
+            <Badge variant="secondary" className="mt-1 text-xs bg-primary/10 text-primary-foreground hover:bg-primary/20 border-primary/30"> {/* Badge com cores primárias */}
+              <Star className="w-3 h-3 mr-1 text-primary-foreground" />
               {profile?.role === 'admin' ? 'Admin' : 
                profile?.role === 'manager' ? 'Gerente' : 'Premium'}
             </Badge>

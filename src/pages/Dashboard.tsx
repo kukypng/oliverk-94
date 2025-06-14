@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { AuthGuard } from '@/components/AuthGuard';
@@ -10,9 +9,7 @@ import { NewBudgetContent } from '@/components/NewBudgetContent';
 import { SettingsContent } from '@/components/SettingsContent';
 import { AdminPanel } from '@/components/AdminPanel';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
-import { Menu } from 'lucide-react';
-// Button import not explicitly needed here if only SidebarTrigger is used for buttons.
-// If other Buttons are used, ensure they get the new style.
+import { Menu, Building } from 'lucide-react';
 
 export const Dashboard = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -44,21 +41,19 @@ export const Dashboard = () => {
         <div className="min-h-screen flex w-full bg-background">
           <AppSidebar activeTab={activeTab} onTabChange={setActiveTab} />
           
-          <SidebarInset className="flex-1 flex flex-col"> {/* Added flex flex-col */}
-            {/* Header with menu button */}
+          <SidebarInset className="flex-1 flex flex-col">
             <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center gap-2 border-b border-border bg-background/90 backdrop-blur-md shadow-sm px-4">
-              <SidebarTrigger className="flex items-center justify-center">
+              <SidebarTrigger className="flex items-center justify-center text-foreground hover:text-accent">
                 <Menu className="h-5 w-5" />
               </SidebarTrigger>
               <div className="flex items-center gap-2">
-                <div className="flex items-center justify-center w-8 h-8 bg-primary rounded-lg"> {/* Used rounded-lg */}
-                  <span className="text-primary-foreground font-bold text-sm">O</span>
+                <div className="flex items-center justify-center w-8 h-8 bg-primary rounded-lg">
+                  <Building className="text-primary-foreground h-5 w-5" />
                 </div>
-                <h1 className="text-xl font-bold">Oliver</h1>
+                <h1 className="text-xl font-bold text-foreground">Oliver</h1>
               </div>
             </header>
             
-            {/* Main content */}
             <main className="flex-1 overflow-y-auto">
               <div className="p-6">
                 {renderContent()}
@@ -70,4 +65,3 @@ export const Dashboard = () => {
     </AuthGuard>
   );
 };
-
