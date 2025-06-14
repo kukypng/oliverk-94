@@ -1,0 +1,63 @@
+
+@layer components {
+  /* Premium Apple-style buttons */
+  .btn-apple {
+    @apply relative overflow-hidden rounded-xl px-5 py-3 font-medium; /* Adjusted padding and rounding */
+    @apply bg-primary text-primary-foreground;
+    @apply transform transition-all duration-200 ease-out; /* Faster transition */
+    @apply hover:scale-[1.02] active:scale-[0.97]; /* Refined interaction scale */
+    @apply shadow-lg hover:shadow-xl;
+  }
+
+  .btn-apple-secondary {
+    @apply btn-apple bg-white/10 text-foreground backdrop-blur-xl;
+    @apply border border-white/20;
+    @apply hover:bg-white/20;
+  }
+
+  /* Premium Floating action button */
+  .fab {
+    @apply fixed bottom-24 right-6 z-40 lg:bottom-6;
+    @apply w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-primary/80; /* Adjusted size and rounding */
+    @apply flex items-center justify-center shadow-2xl;
+    @apply transform transition-all duration-300 ease-out; /* Smoother transition */
+    @apply hover:scale-105 active:scale-95; /* Refined interaction scale */
+    @apply text-primary-foreground;
+  }
+
+  /* Premium Card animations */
+  .card-hover {
+    @apply transition-all duration-300 ease-out; /* Smoother transition */
+    @apply hover:scale-[1.015] hover:shadow-2xl; /* Refined scale and shadow */
+    @apply hover:-translate-y-1; /* Subtle lift */
+  }
+
+  /* Premium Input focus animations */
+  .input-focus {
+    @apply transition-all duration-200 ease-out; /* Faster transition */
+    @apply focus:ring-2 focus:ring-ring/30 focus:border-ring; /* Adjusted ring and border */
+    @apply focus:scale-[1.005]; /* Subtle scale */
+  }
+  
+  /* Color replacements - Updated to use var(--primary) or its HSL values */
+  /* Ensure these are still needed or adjust them based on the new --primary color */
+  .text-orange-600 { /* This might need to be .text-primary now */
+    color: hsl(var(--primary)) !important;
+  }
+  
+  .bg-orange-50 { /* This could be bg-primary/10 or similar */
+    background-color: hsla(var(--primary), 0.1) !important;
+  }
+  
+  .border-orange-600 { /* This might need to be .border-primary now */
+    border-color: hsl(var(--primary)) !important;
+  }
+  
+  .hover\\:text-orange-700:hover { /* This should be hover:text-primary/90 or similar */
+    color: hsl(var(--primary) / 0.9) !important; 
+  }
+  
+  .hover\\:bg-orange-50:hover { /* This could be hover:bg-primary/10 or hover:bg-primary/20 */
+    background-color: hsla(var(--primary), 0.15) !important;
+  }
+}
