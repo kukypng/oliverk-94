@@ -30,6 +30,7 @@ interface BudgetFormData {
   enableInstallmentPrice: boolean;
   notes: string;
   validityDays: number;
+  paymentCondition: string;
 }
 
 interface NewBudgetFormProps {
@@ -56,7 +57,8 @@ export const NewBudgetForm = ({ onBack }: NewBudgetFormProps) => {
     includesScreenProtector: false,
     enableInstallmentPrice: true,
     notes: '',
-    validityDays: 15
+    validityDays: 15,
+    paymentCondition: 'À Vista'
   });
 
   // Buscar tipos de dispositivo
@@ -73,7 +75,7 @@ export const NewBudgetForm = ({ onBack }: NewBudgetFormProps) => {
   const { data: defectTypes } = useQuery({
     queryKey: ['defect-types'],
     queryFn: async () => {
-      const { data, error } = await supabase.from('defect_types').select('*').order('name');
+      const { data, error } = await supabase.from('defect_types').select('*').order('label');
       if (error) throw error;
       return data;
     }
@@ -130,7 +132,8 @@ export const NewBudgetForm = ({ onBack }: NewBudgetFormProps) => {
           includes_screen_protector: data.includesScreenProtector,
           notes: data.notes,
           status: 'pending',
-          valid_until: validUntil.toISOString()
+          valid_until: validUntil.toISOString(),
+          payment_condition: data.paymentCondition
         })
         .select('id')
         .single();
@@ -286,8 +289,8 @@ export const NewBudgetForm = ({ onBack }: NewBudgetFormProps) => {
                 </SelectTrigger>
                 <SelectContent>
                   {defectTypes?.map((defect) => (
-                    <SelectItem key={defect.id} value={defect.name}>
-                      {defect.name}
+                    <SelectItem key={defect.id} value={defect.value}>
+                      {defect.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -338,7 +341,7 @@ export const NewBudgetForm = ({ onBack }: NewBudgetFormProps) => {
 
         <Card>
           <CardHeader>
-            <CardTitle>Preços</CardTitle>
+            <CardTitle>Preços e Condições</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
@@ -397,6 +400,25 @@ export const NewBudgetForm = ({ onBack }: NewBudgetFormProps) => {
                 </div>
               </>
             )}
+
+            <div>
+              <Label htmlFor="paymentCondition">Condição de Pagamento</Label>
+              <Select 
+                value={formData.paymentCondition} 
+                onValueChange={(value) => setFormData({...formData, paymentCondition: value})}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="À Vista">À Vista</SelectItem>
+                  <SelectItem value="Cartão de Crédito">Cartão de Crédito</SelectItem>
+                  <SelectItem value="Cartão de Débito">Cartão de Débito</SelectItem>
+                  <SelectItem value="PIX">PIX</SelectItem>
+                  <SelectItem value="Dinheiro">Dinheiro</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </CardContent>
         </Card>
 
