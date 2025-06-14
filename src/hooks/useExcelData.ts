@@ -1,6 +1,5 @@
-
 import * as XLSX from 'xlsx';
-import { saveAs } from 'file-saver';
+import * as FileSaver from 'file-saver';
 import { supabase } from '@/integrations/supabase/client';
 import { useEnhancedToast } from '@/hooks/useEnhancedToast';
 import { useState } from 'react';
@@ -55,7 +54,7 @@ export const useExcelData = () => {
 
         const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
         const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
-        saveAs(blob, `orçamentos_exportados_${new Date().toISOString().slice(0,10)}.xlsx`);
+        FileSaver.saveAs(blob, `orçamentos_exportados_${new Date().toISOString().slice(0,10)}.xlsx`);
         resolve('success');
       } catch (err) {
         reject(err);
@@ -93,7 +92,7 @@ export const useExcelData = () => {
 
         const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
         const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
-        saveAs(blob, 'modelo_importacao.xlsx');
+        FileSaver.saveAs(blob, 'modelo_importacao.xlsx');
         
         showSuccess({ title: 'Modelo Gerado', description: 'O download do modelo foi iniciado.' });
     } catch (error) {
