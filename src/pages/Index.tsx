@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Navigate } from 'react-router-dom';
@@ -67,44 +66,46 @@ const Index = () => {
             Funcionalidades Principais
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[{
-            icon: FileText,
-            title: "Orçamentos Detalhados",
-            description: "Crie orçamentos profissionais com peças, serviços e condições de pagamento personalizadas."
-          }, {
-            icon: Smartphone,
-            title: "Gestão de Dispositivos",
-            description: "Cadastre diferentes tipos de dispositivos, marcas e defeitos para agilizar o atendimento."
-          }, {
-            icon: Users,
-            title: "Controle de Clientes",
-            description: "Mantenha um histórico completo dos seus clientes e todos os serviços realizados."
-          }, {
-            icon: TrendingUp,
-            title: "Relatórios e Analytics",
-            description: "Acompanhe o desempenho do seu negócio com gráficos e métricas detalhadas."
-          }, {
-            icon: Shield,
-            title: "Segurança Avançada",
-            description: "Controle de acesso por usuário com diferentes níveis de permissão e auditoria completa."
-          }, {
-            icon: Calculator,
-            title: "Cálculos Automáticos",
-            description: "Cálculo automático de totais, impostos e condições de pagamento personalizadas."
-          }].map((feature, index) => {
-            const Icon = feature.icon;
-            return <Card key={index} className="hover:shadow-lg transition-shadow duration-200 border-0 shadow-md">
-                  <CardHeader className="bg-neutral-900">
-                    <div className="w-12 h-12 rounded-lg flex items-center justify-center mb-4 bg-primary/10">
-                      <Icon className="h-6 w-6 text-primary" />
-                    </div>
-                    <CardTitle className="text-xl text-white">{feature.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="bg-zinc-900">
-                    <p className="text-white">{feature.description}</p>
-                  </CardContent>
-                </Card>;
-          })}
+            {[
+              {
+                icon: FileText,
+                title: "Orçamentos Detalhados",
+                description: "Crie orçamentos profissionais com peças, serviços e condições de pagamento personalizadas."
+              }, {
+                icon: Smartphone,
+                title: "Gestão de Dispositivos",
+                description: "Cadastre diferentes tipos de dispositivos, marcas e defeitos para agilizar o atendimento."
+              }, {
+                icon: Users,
+                title: "Controle de Clientes",
+                description: "Mantenha um histórico completo dos seus clientes e todos os serviços realizados."
+              }, {
+                icon: TrendingUp,
+                title: "Relatórios e Analytics",
+                description: "Acompanhe o desempenho do seu negócio com gráficos e métricas detalhadas."
+              }, {
+                icon: Shield,
+                title: "Segurança Avançada",
+                description: "Controle de acesso por usuário com diferentes níveis de permissão e auditoria completa."
+              }, {
+                icon: Calculator,
+                title: "Cálculos Automáticos",
+                description: "Cálculo automático de totais, impostos e condições de pagamento personalizadas."
+              }
+            ].map((feature, index) => {
+              const Icon = feature.icon;
+              return <Card key={index} className="border-0 shadow-md card-hover">
+                    <CardHeader className="bg-neutral-900">
+                      <div className="w-12 h-12 rounded-lg flex items-center justify-center mb-4 bg-primary/10">
+                        <Icon className="h-6 w-6 text-primary" />
+                      </div>
+                      <CardTitle className="text-xl text-white">{feature.title}</CardTitle>
+                    </CardHeader>
+                    <CardContent className="bg-zinc-900">
+                      <p className="text-white">{feature.description}</p>
+                    </CardContent>
+                  </Card>;
+            })}
           </div>
         </div>
       </section>

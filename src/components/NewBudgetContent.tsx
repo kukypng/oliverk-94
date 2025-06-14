@@ -21,7 +21,7 @@ export const NewBudgetContent = () => {
         </div>
       </div>
 
-      <Card className="glass-card animate-slide-up">
+      <Card className="glass-card animate-slide-up card-hover">
         <CardHeader>
           <CardTitle className="text-xl">Criar Novo Orçamento</CardTitle>
         </CardHeader>

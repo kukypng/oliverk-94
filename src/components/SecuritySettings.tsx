@@ -10,7 +10,7 @@ export const SecuritySettings = () => {
   };
 
   return (
-    <Card className="glass-card animate-scale-in" style={{ animationDelay: '100ms' }}>
+    <Card className="glass-card animate-scale-in card-hover" style={{ animationDelay: '100ms' }}>
       <CardHeader>
         <CardTitle className="flex items-center text-lg">
           <Shield className="h-5 w-5 mr-2 text-primary" />
