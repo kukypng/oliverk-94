@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,7 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useEnhancedToast } from '@/hooks/useEnhancedToast';
 import { UserEditModal } from '@/components/UserEditModal';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { Search, Edit, Trash2, Calendar } from 'lucide-react';
+import { Search, Edit, Trash2, Calendar, AlertTriangle, RefreshCw } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
@@ -24,59 +23,108 @@ interface User {
   last_sign_in_at: string | null;
 }
 
+interface DebugInfo {
+  user_id: string;
+  user_email: string;
+  user_role: string;
+  is_active: boolean;
+  is_admin: boolean;
+}
+
 export const UserManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [showDebugInfo, setShowDebugInfo] = useState(false);
   const { showSuccess, showError } = useEnhancedToast();
   const queryClient = useQueryClient();
 
-  const { data: users, isLoading, error } = useQuery({
+  // Debug query para informações do usuário atual
+  const { data: debugInfo } = useQuery({
+    queryKey: ['debug-current-user'],
+    queryFn: async () => {
+      console.log('Fetching debug info for current user...');
+      const { data, error } = await supabase.rpc('debug_current_user');
+      
+      if (error) {
+        console.error('Error fetching debug info:', error);
+        return null;
+      }
+      
+      console.log('Debug info received:', data);
+      return data?.[0] as DebugInfo;
+    },
+  });
+
+  const { data: users, isLoading, error, refetch } = useQuery({
     queryKey: ['admin-users'],
     queryFn: async () => {
       console.log('Fetching users via admin_get_all_users...');
+      console.log('Current debug info:', debugInfo);
       
       try {
         const { data, error } = await supabase.rpc('admin_get_all_users');
         
         if (error) {
           console.error('Error fetching users:', error);
+          console.error('Error details:', {
+            message: error.message,
+            code: error.code,
+            details: error.details,
+            hint: error.hint
+          });
           throw error;
         }
         
-        console.log('Fetched users:', data);
+        console.log('Fetched users successfully:', data);
         return data as User[];
       } catch (err) {
         console.error('Failed to fetch users:', err);
         throw err;
       }
     },
+    retry: (failureCount, error: any) => {
+      console.log(`Query retry attempt ${failureCount}, error:`, error);
+      return failureCount < 2;
+    },
+    retryDelay: 1000,
   });
 
-  console.log('UserManagement render - users:', users, 'isLoading:', isLoading, 'error:', error);
+  console.log('UserManagement render - users:', users, 'isLoading:', isLoading, 'error:', error, 'debugInfo:', debugInfo);
 
   const deleteUserMutation = useMutation({
     mutationFn: async (userId: string) => {
+      console.log('Deleting user:', userId);
       const { data, error } = await supabase.rpc('admin_delete_user', {
         p_user_id: userId
       });
-      if (error) throw error;
+      if (error) {
+        console.error('Delete user error:', error);
+        throw error;
+      }
       return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-users'] });
+      queryClient.invalidateQueries({ queryKey: ['debug-current-user'] });
       showSuccess({
         title: 'Usuário deletado',
         description: 'O usuário foi removido permanentemente do sistema.',
       });
     },
     onError: (error: any) => {
+      console.error('Delete user mutation error:', error);
       showError({
         title: 'Erro ao deletar usuário',
         description: error.message || 'Ocorreu um erro ao deletar o usuário.',
       });
     },
   });
+
+  const handleRetry = () => {
+    console.log('Retrying user fetch...');
+    refetch();
+  };
 
   const filteredUsers = users?.filter(user =>
     user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -106,17 +154,67 @@ export const UserManagement = () => {
     return <Badge className="bg-green-100 text-green-800">Ativo</Badge>;
   };
 
+  // Renderizar informações de debug se houver erro
+  const renderDebugSection = () => {
+    if (!error && !showDebugInfo) return null;
+
+    return (
+      <Card className="mb-4 border-yellow-200 bg-yellow-50">
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2 text-yellow-800">
+            <AlertTriangle className="h-5 w-5" />
+            <span>Informações de Debug</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="text-sm">
+          {debugInfo ? (
+            <div className="space-y-2">
+              <p><strong>ID do Usuário:</strong> {debugInfo.user_id || 'N/A'}</p>
+              <p><strong>Email:</strong> {debugInfo.user_email || 'N/A'}</p>
+              <p><strong>Role:</strong> {debugInfo.user_role || 'N/A'}</p>
+              <p><strong>Ativo:</strong> {debugInfo.is_active ? 'Sim' : 'Não'}</p>
+              <p><strong>É Admin:</strong> {debugInfo.is_admin ? 'Sim' : 'Não'}</p>
+            </div>
+          ) : (
+            <p>Carregando informações de debug...</p>
+          )}
+          {error && (
+            <div className="mt-3 p-3 bg-red-50 rounded border border-red-200">
+              <p className="text-red-800"><strong>Erro:</strong> {error.message}</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    );
+  };
+
   if (error) {
     console.error('UserManagement error:', error);
     return (
-      <Card>
-        <CardContent className="p-6">
-          <div className="text-center py-8">
-            <p className="text-red-600 mb-2">Erro ao carregar usuários</p>
-            <p className="text-sm text-muted-foreground">{error.message}</p>
-          </div>
-        </CardContent>
-      </Card>
+      <>
+        {renderDebugSection()}
+        <Card>
+          <CardContent className="p-6">
+            <div className="text-center py-8">
+              <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+              <p className="text-red-600 mb-2 font-semibold">Erro ao carregar usuários</p>
+              <p className="text-sm text-muted-foreground mb-4">{error.message}</p>
+              <div className="space-y-2">
+                <Button onClick={handleRetry} className="mr-2">
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  Tentar Novamente
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onClick={() => setShowDebugInfo(!showDebugInfo)}
+                >
+                  {showDebugInfo ? 'Ocultar' : 'Mostrar'} Debug
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </>
     );
   }
 
@@ -136,11 +234,22 @@ export const UserManagement = () => {
 
   return (
     <>
+      {renderDebugSection()}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
             <span>Gerenciar Usuários</span>
             <div className="flex items-center space-x-2">
+              {debugInfo && (
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={() => setShowDebugInfo(!showDebugInfo)}
+                  className="text-xs"
+                >
+                  Debug
+                </Button>
+              )}
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
@@ -247,6 +356,7 @@ export const UserManagement = () => {
         }}
         onSuccess={() => {
           queryClient.invalidateQueries({ queryKey: ['admin-users'] });
+          queryClient.invalidateQueries({ queryKey: ['debug-current-user'] });
         }}
       />
     </>

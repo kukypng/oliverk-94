@@ -487,6 +487,16 @@ export type Database = {
         Args: { p_user_id: string }
         Returns: number
       }
+      debug_current_user: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          user_id: string
+          user_email: string
+          user_role: string
+          is_active: boolean
+          is_admin: boolean
+        }[]
+      }
       get_shop_profile: {
         Args: { p_user_id: string }
         Returns: Json

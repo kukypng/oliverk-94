@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { UserManagement } from '@/components/UserManagement';
 import { AdminLogs } from '@/components/AdminLogs';
+import { AdminDebugPanel } from '@/components/AdminDebugPanel';
 import { Users, FileText, Shield } from 'lucide-react';
 
 export const AdminPanel = () => {
@@ -16,6 +17,8 @@ export const AdminPanel = () => {
           <p className="text-muted-foreground">Gerencie usuários e monitore atividades do sistema</p>
         </div>
       </div>
+
+      <AdminDebugPanel />
 
       <Tabs defaultValue="users" className="space-y-6">
         <TabsList className="grid w-full grid-cols-2">
