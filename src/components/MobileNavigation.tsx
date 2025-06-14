@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { 
   Home, 
@@ -17,6 +17,31 @@ interface MobileNavigationProps {
 }
 
 export const MobileNavigation = ({ activeTab, onTabChange, onMenuToggle }: MobileNavigationProps) => {
+  const [isHeaderVisible, setIsHeaderVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      
+      if (currentScrollY < 10) {
+        // Always show header at top
+        setIsHeaderVisible(true);
+      } else if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        // Scrolling down - hide header
+        setIsHeaderVisible(false);
+      } else if (currentScrollY < lastScrollY) {
+        // Scrolling up - show header
+        setIsHeaderVisible(true);
+      }
+      
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [lastScrollY]);
+
   const navItems = [
     { id: 'dashboard', label: 'Início', icon: Home },
     { id: 'budgets', label: 'Orçamentos', icon: FileText },
@@ -72,19 +97,24 @@ export const MobileNavigation = ({ activeTab, onTabChange, onMenuToggle }: Mobil
         </div>
       </div>
 
-      {/* Mobile Header - Fixed and Improved */}
-      <div className="lg:hidden sticky top-0 z-40 bg-white/98 dark:bg-black/98 backdrop-blur-xl border-b border-border/10">
+      {/* Mobile Header - Auto-Hide on Scroll */}
+      <div className={cn(
+        "lg:hidden fixed top-0 left-0 right-0 z-40 transition-all duration-500 ease-out",
+        "bg-white/98 dark:bg-black/98 backdrop-blur-xl border-b border-border/10",
+        isHeaderVisible 
+          ? "translate-y-0 opacity-100" 
+          : "-translate-y-full opacity-0"
+      )}>
         <div className="flex items-center justify-between px-4 py-3 min-h-[60px]">
-          {/* Logo and Title - Simplified */}
+          {/* Logo and Title - Minimal */}
           <div className="flex items-center space-x-3 flex-1 min-w-0">
             <div className="flex-shrink-0">
-              <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-[#fec832] to-[#fec832]/80 rounded-xl shadow-md">
-                <FileText className="h-5 w-5 text-black" />
+              <div className="flex items-center justify-center w-9 h-9 bg-gradient-to-br from-[#fec832] to-[#fec832]/80 rounded-xl shadow-sm">
+                <FileText className="h-4 w-4 text-black" />
               </div>
             </div>
             <div className="min-w-0 flex-1">
-              <h1 className="text-lg font-bold text-foreground truncate">Oliver</h1>
-              <p className="text-xs text-muted-foreground truncate">Gestão Premium</p>
+              <h1 className="text-base font-bold text-foreground truncate">Oliver</h1>
             </div>
           </div>
           
@@ -93,12 +123,15 @@ export const MobileNavigation = ({ activeTab, onTabChange, onMenuToggle }: Mobil
             variant="ghost" 
             size="sm" 
             onClick={onMenuToggle}
-            className="flex-shrink-0 h-10 w-10 rounded-xl hover:bg-muted/20 transition-all duration-300 hover:scale-110"
+            className="flex-shrink-0 h-9 w-9 rounded-xl hover:bg-muted/20 transition-all duration-300 hover:scale-110"
           >
-            <Menu className="h-5 w-5" />
+            <Menu className="h-4 w-4" />
           </Button>
         </div>
       </div>
+
+      {/* Spacer to prevent content jump */}
+      <div className="lg:hidden h-[60px]" />
     </>
   );
 };
