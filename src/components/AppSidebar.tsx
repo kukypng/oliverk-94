@@ -22,6 +22,7 @@ import {
   Star,
   Users
 } from 'lucide-react';
+import { ThemeToggle } from './ui/theme-toggle';
 
 interface AppSidebarProps {
   activeTab: string;
@@ -86,6 +87,7 @@ export const AppSidebar = ({ activeTab, onTabChange }: AppSidebarProps) => {
 
       <SidebarFooter className="p-4">
         <div className="space-y-3">
+          <ThemeToggle />
           <Button
             variant="ghost"
             className="w-full justify-start text-muted-foreground hover:text-foreground"

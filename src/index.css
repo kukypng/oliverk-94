@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -174,16 +175,16 @@
 @layer components {
   /* Premium Glass morphism effect */
   .glass {
-    @apply backdrop-blur-xl bg-white/80;
+    @apply backdrop-blur-xl bg-white/80 dark:bg-black/50;
     backdrop-filter: var(--blur-glass);
     -webkit-backdrop-filter: var(--blur-glass);
   }
 
   .glass-card {
-    @apply glass border border-white/20 shadow-xl;
+    @apply glass border border-white/20;
     background: linear-gradient(135deg, 
-      rgba(255, 255, 255, 0.1) 0%, 
-      rgba(255, 255, 255, 0.05) 100%);
+      hsla(var(--background) / 0.1) 0%, 
+      hsla(var(--background) / 0.05) 100%);
   }
 
   /* Premium Apple-style buttons */
