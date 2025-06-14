@@ -264,7 +264,7 @@ export const NewBudgetForm = ({
             </div>
 
             <div>
-              <Label htmlFor="deviceModel">Modelo do Aparelho *</Label>
+              <Label htmlFor="deviceModel">Modelo do Aparelho*</Label>
               <Input id="deviceModel" value={formData.deviceModel} onChange={e => setFormData({
               ...formData,
               deviceModel: e.target.value
@@ -297,7 +297,7 @@ export const NewBudgetForm = ({
             </div>
 
             <div>
-              <Label htmlFor="partType">Qual serviço será realizado? *</Label>
+              <Label htmlFor="partType">Qual serviço será realizado?*</Label>
               <Input id="partType" value={formData.partType} onChange={e => setFormData({
               ...formData,
               partType: e.target.value
@@ -337,7 +337,7 @@ export const NewBudgetForm = ({
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label htmlFor="cashPrice">Valor à Vista (R$) *</Label>
+              <Label htmlFor="cashPrice">Valor à Vista (R$)*</Label>
               <Input id="cashPrice" type="number" step="0.01" value={formData.cashPrice} onChange={e => setFormData({
               ...formData,
               cashPrice: parseFloat(e.target.value) || 0
