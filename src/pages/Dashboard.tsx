@@ -11,7 +11,8 @@ import { SettingsContent } from '@/components/SettingsContent';
 import { AdminPanel } from '@/components/AdminPanel';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { Menu } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+// Button import not explicitly needed here if only SidebarTrigger is used for buttons.
+// If other Buttons are used, ensure they get the new style.
 
 export const Dashboard = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -43,14 +44,14 @@ export const Dashboard = () => {
         <div className="min-h-screen flex w-full bg-background">
           <AppSidebar activeTab={activeTab} onTabChange={setActiveTab} />
           
-          <SidebarInset className="flex-1">
+          <SidebarInset className="flex-1 flex flex-col"> {/* Added flex flex-col */}
             {/* Header with menu button */}
-            <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
+            <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center gap-2 border-b border-border bg-background/90 backdrop-blur-md shadow-sm px-4">
               <SidebarTrigger className="flex items-center justify-center">
                 <Menu className="h-5 w-5" />
               </SidebarTrigger>
               <div className="flex items-center gap-2">
-                <div className="flex items-center justify-center w-8 h-8 bg-primary rounded-lg">
+                <div className="flex items-center justify-center w-8 h-8 bg-primary rounded-lg"> {/* Used rounded-lg */}
                   <span className="text-primary-foreground font-bold text-sm">O</span>
                 </div>
                 <h1 className="text-xl font-bold">Oliver</h1>
@@ -69,3 +70,4 @@ export const Dashboard = () => {
     </AuthGuard>
   );
 };
+
