@@ -5,7 +5,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { UserManagement } from '@/components/UserManagement';
 import { AdminLogs } from '@/components/AdminLogs';
 import { AdminDebugPanel } from '@/components/AdminDebugPanel';
-import { Users, FileText, Shield } from 'lucide-react';
+import { AdminTestPanel } from '@/components/AdminTestPanel';
+import { Users, FileText, Shield, TestTube } from 'lucide-react';
 
 export const AdminPanel = () => {
   return (
@@ -18,19 +19,29 @@ export const AdminPanel = () => {
         </div>
       </div>
 
-      <AdminDebugPanel />
-
-      <Tabs defaultValue="users" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2">
+      <Tabs defaultValue="test" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="test" className="flex items-center space-x-2">
+            <TestTube className="h-4 w-4" />
+            <span>Testes</span>
+          </TabsTrigger>
           <TabsTrigger value="users" className="flex items-center space-x-2">
             <Users className="h-4 w-4" />
-            <span>Gerenciar Usuários</span>
+            <span>Usuários</span>
           </TabsTrigger>
           <TabsTrigger value="logs" className="flex items-center space-x-2">
             <FileText className="h-4 w-4" />
-            <span>Logs de Atividade</span>
+            <span>Logs</span>
+          </TabsTrigger>
+          <TabsTrigger value="debug" className="flex items-center space-x-2">
+            <Shield className="h-4 w-4" />
+            <span>Debug</span>
           </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="test">
+          <AdminTestPanel />
+        </TabsContent>
 
         <TabsContent value="users">
           <UserManagement />
@@ -38,6 +49,10 @@ export const AdminPanel = () => {
 
         <TabsContent value="logs">
           <AdminLogs />
+        </TabsContent>
+
+        <TabsContent value="debug">
+          <AdminDebugPanel />
         </TabsContent>
       </Tabs>
     </div>
