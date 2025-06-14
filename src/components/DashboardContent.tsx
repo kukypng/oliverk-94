@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { FileText, DollarSign, TrendingUp, Smartphone, Eye, Edit, Copy, Calendar, Target, Clock, Users, LifeBuoy, MessageCircle } from 'lucide-react';
+import { FileText, Eye, Edit, Copy, TrendingUp, LifeBuoy, MessageCircle, PlusCircle, List, Users, Settings, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DashboardSkeleton } from '@/components/ui/loading-states';
 import { EmptyState } from '@/components/EmptyState';
@@ -12,57 +12,32 @@ import { useEnhancedToast } from '@/hooks/useEnhancedToast';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { HelpDialog } from '@/components/HelpDialog';
 
-export const DashboardContent = () => {
+interface DashboardContentProps {
+  onTabChange: (tab: string) => void;
+}
+
+export const DashboardContent = ({ onTabChange }: DashboardContentProps) => {
   const { profile, hasPermission, user } = useAuth();
   const { showError } = useEnhancedToast();
   const [isHelpDialogOpen, setHelpDialogOpen] = useState(false);
 
   const { data: stats, isLoading, error } = useQuery({
-    queryKey: ['dashboard-stats', user?.id],
+    queryKey: ['dashboard-stats-simplified', user?.id],
     queryFn: async () => {
-      if (!user) {
-        console.log('No user found for dashboard stats');
-        return {
-          totalBudgets: 0,
-          monthlyRevenue: 0,
-          weeklyRevenue: 0,
-          averageTicket: 0,
-          monthlyGrowth: 0,
-          weeklyGrowth: 0,
-          topDevice: 'N/A',
-          pendingBudgets: 0,
-          approvedBudgets: 0,
-          rejectedBudgets: 0,
-          recentBudgets: []
-        };
-      }
+      if (!user) return { weeklyGrowth: 0, recentBudgets: [] };
 
       try {
-        console.log('Fetching dashboard stats for user:', user.id);
-        
         const { data: budgets, error } = await supabase
           .from('budgets')
-          .select('id, total_price, device_model, created_at, client_name, status')
-          .eq('owner_id', user.id);
+          .select('id, total_price, created_at, client_name, device_model, status')
+          .eq('owner_id', user.id)
+          .order('created_at', { ascending: false });
 
         if (error) {
           console.error('Error fetching budgets for dashboard:', error);
           throw error;
         }
-
-        console.log('Dashboard budgets fetched:', budgets?.length || 0);
-
-        const total = budgets?.length || 0;
-        const totalRevenue = budgets?.reduce((sum, budget) => sum + Number(budget.total_price), 0) || 0;
         
-        // Cálculos para este mês
-        const thisMonth = new Date();
-        const monthlyBudgets = budgets?.filter(b => {
-          const date = new Date(b.created_at);
-          return date.getMonth() === thisMonth.getMonth() && date.getFullYear() === thisMonth.getFullYear();
-        }) || [];
-        
-        // Cálculos para esta semana
         const today = new Date();
         const weekStart = new Date(today.setDate(today.getDate() - today.getDay()));
         const weeklyBudgets = budgets?.filter(b => {
@@ -70,49 +45,9 @@ export const DashboardContent = () => {
           return date >= weekStart;
         }) || [];
 
-        // Cálculos para mês anterior (para comparação)
-        const lastMonth = new Date();
-        lastMonth.setMonth(lastMonth.getMonth() - 1);
-        const lastMonthBudgets = budgets?.filter(b => {
-          const date = new Date(b.created_at);
-          return date.getMonth() === lastMonth.getMonth() && date.getFullYear() === lastMonth.getFullYear();
-        }) || [];
-
-        const monthlyRevenue = monthlyBudgets.reduce((sum, budget) => sum + Number(budget.total_price), 0);
-        const weeklyRevenue = weeklyBudgets.reduce((sum, budget) => sum + Number(budget.total_price), 0);
-        const lastMonthRevenue = lastMonthBudgets.reduce((sum, budget) => sum + Number(budget.total_price), 0);
-        
-        const averageTicket = total > 0 ? totalRevenue / total : 0;
-        const monthlyGrowthPercent = lastMonthRevenue > 0 
-          ? ((monthlyRevenue - lastMonthRevenue) / lastMonthRevenue) * 100 
-          : monthlyRevenue > 0 ? 100 : 0;
-
-        const deviceCount = budgets?.reduce((acc, budget) => {
-          if (budget.device_model) {
-            acc[budget.device_model] = (acc[budget.device_model] || 0) + 1;
-          }
-          return acc;
-        }, {} as Record<string, number>) || {};
-
-        const topDevice = Object.entries(deviceCount).sort(([,a], [,b]) => b - a)[0];
-
-        // Status dos orçamentos
-        const pendingBudgets = budgets?.filter(b => b.status === 'pending').length || 0;
-        const approvedBudgets = budgets?.filter(b => b.status === 'approved').length || 0;
-        const rejectedBudgets = budgets?.filter(b => b.status === 'rejected').length || 0;
-
         return {
-          totalBudgets: total,
-          monthlyRevenue,
-          weeklyRevenue,
-          averageTicket,
-          monthlyGrowth: monthlyGrowthPercent,
           weeklyGrowth: weeklyBudgets.length,
-          topDevice: topDevice ? topDevice[0] : 'N/A',
-          pendingBudgets,
-          approvedBudgets,
-          rejectedBudgets,
-          recentBudgets: budgets?.slice(-5).reverse() || []
+          recentBudgets: budgets?.slice(0, 5) || []
         };
       } catch (error: any) {
         console.error('Dashboard stats error:', error);
@@ -124,8 +59,6 @@ export const DashboardContent = () => {
       }
     },
     enabled: !!user,
-    retry: 3,
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 
   const getGreeting = () => {
@@ -168,69 +101,24 @@ export const DashboardContent = () => {
     );
   }
 
-  const cards = [
-    {
-      title: 'Faturamento Mensal',
-      value: `R$ ${((stats?.monthlyRevenue || 0) / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
-      icon: DollarSign,
-      color: 'text-green-600',
-      bgColor: 'bg-green-50 dark:bg-green-950',
-      change: `${stats?.monthlyGrowth > 0 ? '+' : ''}${stats?.monthlyGrowth.toFixed(1)}%`,
-      changeType: stats?.monthlyGrowth >= 0 ? 'positive' : 'negative'
-    },
-    {
-      title: 'Faturamento Semanal',
-      value: `R$ ${((stats?.weeklyRevenue || 0) / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
-      icon: Calendar,
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-50 dark:bg-blue-950',
-      change: `${stats?.weeklyGrowth || 0} esta semana`,
-      changeType: 'positive'
-    },
-    {
-      title: 'Ticket Médio',
-      value: `R$ ${((stats?.averageTicket || 0) / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
-      icon: TrendingUp,
-      color: 'text-purple-600',
-      bgColor: 'bg-purple-50 dark:bg-purple-950',
-      subtitle: `${stats?.totalBudgets || 0} orçamentos`
-    },
-    {
-      title: 'Dispositivo Popular',
-      value: stats?.topDevice || 'N/A',
-      icon: Smartphone,
-      color: 'text-[#fec832]',
-      bgColor: 'bg-[#fec832]/10',
-      subtitle: 'Mais reparado'
-    },
-    {
-      title: 'Orçamentos Pendentes',
-      value: stats?.pendingBudgets || 0,
-      icon: Clock,
-      color: 'text-yellow-600',
-      bgColor: 'bg-yellow-50 dark:bg-yellow-950',
-      subtitle: 'Aguardando aprovação'
-    },
-    {
-      title: 'Taxa de Aprovação',
-      value: `${stats?.totalBudgets > 0 ? ((stats?.approvedBudgets / stats?.totalBudgets) * 100).toFixed(1) : 0}%`,
-      icon: Target,
-      color: 'text-emerald-600',
-      bgColor: 'bg-emerald-50 dark:bg-emerald-950',
-      subtitle: `${stats?.approvedBudgets}/${stats?.totalBudgets} aprovados`
-    }
+  const quickAccessButtons = [
+    { label: 'Novo Orçamento', icon: PlusCircle, tab: 'new-budget', permission: 'create_budgets' },
+    { label: 'Ver Orçamentos', icon: List, tab: 'budgets', permission: 'view_own_budgets' },
+    { label: 'Clientes', icon: Users, tab: 'clients', permission: 'view_clients' }, // Assuming a 'view_clients' permission
+    { label: 'Configurações', icon: Settings, tab: 'settings', permission: null },
+    { label: 'Painel Admin', icon: Shield, tab: 'admin', permission: 'access_admin_panel' },
   ];
 
   return (
     <ErrorBoundary>
       <div className="p-4 lg:p-8 space-y-6 lg:space-y-8 animate-fade-in pb-24 lg:pb-0">
-        {/* Header - Premium Mobile Design */}
+        {/* Header */}
         <div className="flex flex-col space-y-3 lg:flex-row lg:items-center lg:justify-between lg:space-y-0">
           <div className="animate-slide-up">
             <h1 className="text-2xl lg:text-3xl font-bold text-foreground">{getGreeting()}, {profile?.name || 'usuário'}!</h1>
             <div className="flex items-center space-x-2 mt-2">
               <p className="text-sm lg:text-base text-muted-foreground">
-                Visão geral dos seus orçamentos
+                Seja bem-vindo(a) de volta!
               </p>
               {profile && (
                 <Badge variant="secondary" className="bg-[#fec832]/10 text-[#fec832] border-[#fec832]/20 text-xs">
@@ -244,52 +132,6 @@ export const DashboardContent = () => {
             <span>{stats?.weeklyGrowth || 0} orçamentos esta semana</span>
           </div>
         </div>
-
-        {/* Stats Cards - Improved Mobile Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
-          {cards.map((card, index) => {
-            const Icon = card.icon;
-            return (
-              <Card 
-                key={index} 
-                className="glass-card hover:shadow-xl transition-all duration-300 hover:scale-[1.02] animate-scale-in border-0 bg-white/50 dark:bg-black/50 backdrop-blur-xl" 
-                style={{ animationDelay: `${index * 100}ms` }}
-              >
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 p-4 lg:p-6">
-                  <CardTitle className="text-sm lg:text-sm font-medium text-muted-foreground">
-                    {card.title}
-                  </CardTitle>
-                  <div className={`p-2.5 lg:p-3 rounded-2xl ${card.bgColor} shadow-lg`}>
-                    <Icon className={`h-4 w-4 lg:h-5 lg:w-5 ${card.color}`} />
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-2 p-4 lg:p-6 pt-0">
-                  <div className="text-lg lg:text-2xl font-bold text-foreground break-words">
-                    {card.value}
-                  </div>
-                  {card.change && (
-                    <div className="flex items-center space-x-1">
-                      <Badge 
-                        variant="secondary" 
-                        className={`text-xs ${
-                          card.changeType === 'positive' 
-                            ? 'bg-green-50 text-green-700 border-green-200 dark:bg-green-950 dark:text-green-400' 
-                            : 'bg-red-50 text-red-700 border-red-200 dark:bg-red-950 dark:text-red-400'
-                        }`}
-                      >
-                        {card.change}
-                      </Badge>
-                      <span className="text-xs text-muted-foreground hidden lg:inline">vs anterior</span>
-                    </div>
-                  )}
-                  {card.subtitle && (
-                    <p className="text-xs text-muted-foreground">{card.subtitle}</p>
-                  )}
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
         
         {/* Quick Access */}
         <Card className="glass-card border-0 shadow-lg animate-slide-up bg-white/50 dark:bg-black/50 backdrop-blur-xl">
@@ -298,10 +140,31 @@ export const DashboardContent = () => {
                   Acesso Rápido
               </CardTitle>
           </CardHeader>
+          <CardContent className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 p-4 lg:p-6 pt-0">
+              {quickAccessButtons.map(btn => {
+                if (btn.permission && !hasPermission(btn.permission)) return null;
+                const Icon = btn.icon;
+                return (
+                  <Button key={btn.tab} variant="outline" onClick={() => onTabChange(btn.tab)} className="flex-col h-24 text-center">
+                    <Icon className="h-6 w-6 mb-2" />
+                    <span>{btn.label}</span>
+                  </Button>
+                )
+              })}
+          </CardContent>
+        </Card>
+        
+        {/* Help and Support */}
+        <Card className="glass-card border-0 shadow-lg animate-slide-up bg-white/50 dark:bg-black/50 backdrop-blur-xl">
+          <CardHeader className="p-4 lg:p-6 pb-3">
+              <CardTitle className="text-lg lg:text-xl font-semibold text-foreground">
+                  Precisa de ajuda?
+              </CardTitle>
+          </CardHeader>
           <CardContent className="flex flex-col sm:flex-row gap-4 p-4 lg:p-6 pt-0">
               <Button onClick={() => setHelpDialogOpen(true)} className="w-full sm:w-auto">
                   <LifeBuoy className="mr-2" />
-                  Ajuda
+                  Ajuda & Dicas
               </Button>
               <Button 
                   variant="outline" 
@@ -314,7 +177,7 @@ export const DashboardContent = () => {
           </CardContent>
         </Card>
 
-        {/* Recent Budgets - Premium Mobile Design */}
+        {/* Recent Budgets */}
         <Card className="glass-card border-0 shadow-lg animate-slide-up bg-white/50 dark:bg-black/50 backdrop-blur-xl">
           <CardHeader className="flex flex-row items-center justify-between pb-4 p-4 lg:p-6">
             <div>
@@ -326,7 +189,7 @@ export const DashboardContent = () => {
               </p>
             </div>
             {hasPermission('view_all_budgets') && (
-              <Button size="sm" variant="outline" className="hidden lg:flex rounded-xl border-[#fec832]/20 text-[#fec832] hover:bg-[#fec832]/10">
+              <Button size="sm" variant="outline" onClick={() => onTabChange('budgets')} className="hidden lg:flex rounded-xl border-[#fec832]/20 text-[#fec832] hover:bg-[#fec832]/10">
                 Ver todos
               </Button>
             )}

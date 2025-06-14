@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { AuthGuard } from '@/components/AuthGuard';
@@ -9,6 +10,7 @@ import { NewBudgetContent } from '@/components/NewBudgetContent';
 import { SettingsContent } from '@/components/SettingsContent';
 import { AdminPanel } from '@/components/AdminPanel';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
+import { ClientsContent } from '@/components/ClientsContent';
 import { Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -18,11 +20,13 @@ export const Dashboard = () => {
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard':
-        return <DashboardContent />;
+        return <DashboardContent onTabChange={setActiveTab} />;
       case 'budgets':
         return <BudgetsContent />;
       case 'new-budget':
         return <NewBudgetContent />;
+      case 'clients':
+        return <ClientsContent />;
       case 'admin':
         return (
           <ProtectedRoute requiredRole="admin">
@@ -32,7 +36,7 @@ export const Dashboard = () => {
       case 'settings':
         return <SettingsContent />;
       default:
-        return <DashboardContent />;
+        return <DashboardContent onTabChange={setActiveTab} />;
     }
   };
 
