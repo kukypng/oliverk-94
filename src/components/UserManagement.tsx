@@ -9,7 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useEnhancedToast } from '@/hooks/useEnhancedToast';
 import { UserEditModal } from '@/components/UserEditModal';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { Search, Edit, Trash2, UserPlus, Calendar, Shield } from 'lucide-react';
+import { Search, Edit, Trash2, Calendar } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
@@ -31,14 +31,29 @@ export const UserManagement = () => {
   const { showSuccess, showError } = useEnhancedToast();
   const queryClient = useQueryClient();
 
-  const { data: users, isLoading } = useQuery({
+  const { data: users, isLoading, error } = useQuery({
     queryKey: ['admin-users'],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc('admin_get_all_users');
-      if (error) throw error;
-      return data as User[];
+      console.log('Fetching users via admin_get_all_users...');
+      
+      try {
+        const { data, error } = await supabase.rpc('admin_get_all_users');
+        
+        if (error) {
+          console.error('Error fetching users:', error);
+          throw error;
+        }
+        
+        console.log('Fetched users:', data);
+        return data as User[];
+      } catch (err) {
+        console.error('Failed to fetch users:', err);
+        throw err;
+      }
     },
   });
+
+  console.log('UserManagement render - users:', users, 'isLoading:', isLoading, 'error:', error);
 
   const deleteUserMutation = useMutation({
     mutationFn: async (userId: string) => {
@@ -90,6 +105,20 @@ export const UserManagement = () => {
     }
     return <Badge className="bg-green-100 text-green-800">Ativo</Badge>;
   };
+
+  if (error) {
+    console.error('UserManagement error:', error);
+    return (
+      <Card>
+        <CardContent className="p-6">
+          <div className="text-center py-8">
+            <p className="text-red-600 mb-2">Erro ao carregar usuários</p>
+            <p className="text-sm text-muted-foreground">{error.message}</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -195,7 +224,14 @@ export const UserManagement = () => {
             
             {filteredUsers?.length === 0 && (
               <div className="text-center py-8 text-muted-foreground">
-                Nenhum usuário encontrado
+                <p>Nenhum usuário encontrado</p>
+                <p className="text-xs mt-1">Total de usuários: {users?.length || 0}</p>
+              </div>
+            )}
+            
+            {!users || users.length === 0 && (
+              <div className="text-center py-8 text-muted-foreground">
+                <p>Nenhum usuário cadastrado no sistema</p>
               </div>
             )}
           </div>
