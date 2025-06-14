@@ -101,7 +101,7 @@ export const AdminDebugPanel = ({
               </div>
             </div>
             <div className="space-y-2">
-              <h4 className="font-semibold text-yellow-900">Status de Permissões</h4>
+              <h4 className="font-semibold text-[#fec832]">Status de Permissões</h4>
               <div className="space-y-1">
                 <p><strong>Usuário Ativo:</strong> 
                   <Badge className="">
