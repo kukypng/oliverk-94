@@ -596,6 +596,10 @@ export type Database = {
         Args: { p_user_id: string }
         Returns: boolean
       }
+      cleanup_expired_users: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       count_user_budgets: {
         Args: { p_user_id: string }
         Returns: number
@@ -662,6 +666,10 @@ export type Database = {
       set_user_budget_limit: {
         Args: { p_user_id: string; p_budget_limit: number }
         Returns: boolean
+      }
+      update_expired_users: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
       }
       update_shop_profile: {
         Args: {

@@ -8,6 +8,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useEnhancedToast } from '@/hooks/useEnhancedToast';
 import { UserEditModal } from '@/components/UserEditModal';
+import { UsersTable } from '@/components/UsersTable';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Search, Edit, Trash2, Calendar, AlertTriangle, RefreshCw } from 'lucide-react';
 import { format } from 'date-fns';
@@ -37,6 +38,7 @@ export const UserManagement = () => {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [showDebugInfo, setShowDebugInfo] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<User | null>(null);
   const { showSuccess, showError } = useEnhancedToast();
   const queryClient = useQueryClient();
 
@@ -55,7 +57,6 @@ export const UserManagement = () => {
         
         console.log('Debug info received:', data);
         
-        // Garantir que temos dados válidos
         if (!data || !Array.isArray(data) || data.length === 0) {
           console.warn('No debug data returned');
           return null;
@@ -93,13 +94,11 @@ export const UserManagement = () => {
         
         console.log('Fetched users successfully:', data);
         
-        // Garantir que temos um array válido
         if (!data || !Array.isArray(data)) {
           console.warn('Invalid users data received:', data);
           return [];
         }
         
-        // Mapear e validar cada usuário
         return data.map((user: any) => ({
           id: user.id || '',
           name: user.name || 'Nome não disponível',
@@ -120,7 +119,7 @@ export const UserManagement = () => {
       return failureCount < 2;
     },
     retryDelay: 1000,
-    enabled: !!debugInfo?.is_admin, // Só executar se for admin
+    enabled: !!debugInfo?.is_admin,
   });
 
   console.log('UserManagement render - users:', users, 'isLoading:', isLoading, 'error:', error, 'debugInfo:', debugInfo);
@@ -144,6 +143,7 @@ export const UserManagement = () => {
         title: 'Usuário deletado',
         description: 'O usuário foi removido permanentemente do sistema.',
       });
+      setUserToDelete(null);
     },
     onError: (error: any) => {
       console.error('Delete user mutation error:', error);
@@ -164,27 +164,19 @@ export const UserManagement = () => {
     user.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const getRoleBadge = (role: string) => {
-    const colors = {
-      admin: 'bg-red-100 text-red-800',
-      manager: 'bg-blue-100 text-blue-800',
-      user: 'bg-green-100 text-green-800',
-    };
-    return colors[role as keyof typeof colors] || 'bg-gray-100 text-gray-800';
+  const handleEdit = (user: User) => {
+    setSelectedUser(user);
+    setIsEditModalOpen(true);
   };
 
-  const getStatusBadge = (user: User) => {
-    const now = new Date();
-    const expiration = new Date(user.expiration_date);
-    const isExpired = expiration < now;
-    
-    if (!user.is_active) {
-      return <Badge className="bg-gray-100 text-gray-800">Inativo</Badge>;
+  const handleDelete = (user: User) => {
+    setUserToDelete(user);
+  };
+
+  const confirmDelete = () => {
+    if (userToDelete) {
+      deleteUserMutation.mutate(userToDelete.id);
     }
-    if (isExpired) {
-      return <Badge className="bg-red-100 text-red-800">Expirado</Badge>;
-    }
-    return <Badge className="bg-green-100 text-green-800">Ativo</Badge>;
   };
 
   // Renderizar informações de debug se houver erro ou solicitado
@@ -322,87 +314,21 @@ export const UserManagement = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            {filteredUsers?.map((user) => (
-              <div key={user.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors">
-                <div className="flex-1 space-y-2">
-                  <div className="flex items-center space-x-3">
-                    <h3 className="font-semibold">{user.name}</h3>
-                    <Badge className={getRoleBadge(user.role)}>
-                      {user.role === 'admin' ? 'Administrador' : 
-                       user.role === 'manager' ? 'Gerente' : 'Usuário'}
-                    </Badge>
-                    {getStatusBadge(user)}
-                  </div>
-                  <div className="text-sm text-muted-foreground space-y-1">
-                    <p>Email: {user.email}</p>
-                    <div className="flex items-center space-x-4">
-                      <div className="flex items-center space-x-1">
-                        <Calendar className="h-3 w-3" />
-                        <span>Expira: {format(new Date(user.expiration_date), 'dd/MM/yyyy', { locale: ptBR })}</span>
-                      </div>
-                      <span>Criado: {format(new Date(user.created_at), 'dd/MM/yyyy', { locale: ptBR })}</span>
-                      {user.last_sign_in_at && (
-                        <span>Último acesso: {format(new Date(user.last_sign_in_at), 'dd/MM/yyyy HH:mm', { locale: ptBR })}</span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      setSelectedUser(user);
-                      setIsEditModalOpen(true);
-                    }}
-                  >
-                    <Edit className="h-4 w-4 mr-1" />
-                    Editar
-                  </Button>
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700">
-                        <Trash2 className="h-4 w-4 mr-1" />
-                        Deletar
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          Tem certeza que deseja deletar o usuário <strong>{user.name}</strong>? 
-                          Esta ação é irreversível e todos os dados do usuário serão perdidos.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={() => deleteUserMutation.mutate(user.id)}
-                          className="bg-red-600 hover:bg-red-700"
-                        >
-                          Deletar
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                </div>
-              </div>
-            ))}
-            
-            {filteredUsers?.length === 0 && (
-              <div className="text-center py-8 text-muted-foreground">
-                <p>Nenhum usuário encontrado</p>
-                <p className="text-xs mt-1">Total de usuários: {users?.length || 0}</p>
-              </div>
-            )}
-            
-            {!users || users.length === 0 && (
-              <div className="text-center py-8 text-muted-foreground">
-                <p>Nenhum usuário cadastrado no sistema</p>
-              </div>
-            )}
-          </div>
+          {filteredUsers && filteredUsers.length > 0 ? (
+            <UsersTable 
+              users={filteredUsers} 
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+            />
+          ) : (
+            <div className="text-center py-8 text-muted-foreground">
+              {searchTerm ? (
+                <p>Nenhum usuário encontrado para "{searchTerm}"</p>
+              ) : (
+                <p>Nenhum usuário encontrado no sistema</p>
+              )}
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -418,6 +344,28 @@ export const UserManagement = () => {
           queryClient.invalidateQueries({ queryKey: ['debug-current-user'] });
         }}
       />
+
+      <AlertDialog open={!!userToDelete} onOpenChange={() => setUserToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja deletar o usuário <strong>{userToDelete?.name}</strong>? 
+              Esta ação é irreversível e todos os dados do usuário serão perdidos.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDelete}
+              className="bg-red-600 hover:bg-red-700"
+              disabled={deleteUserMutation.isPending}
+            >
+              {deleteUserMutation.isPending ? 'Deletando...' : 'Deletar'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 };

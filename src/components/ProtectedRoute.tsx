@@ -57,13 +57,7 @@ export const ProtectedRoute = ({
   }
 
   if (!profile.is_active) {
-    return (
-      <EmptyState
-        icon={Shield}
-        title="Conta Inativa"
-        description="Sua conta está inativa. Entre em contato com o administrador para reativar."
-      />
-    );
+    return <LicenseExpiredPage />;
   }
 
   if (requiredRole && !hasRole(requiredRole)) {
