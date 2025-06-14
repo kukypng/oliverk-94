@@ -8,43 +8,43 @@
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --foreground: 300 1% 15%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 300 1% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 300 1% 15%;
 
-    --primary: 44 100% 58%;
+    --primary: 143 62% 71%;
     --primary-foreground: 0 0% 0%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 0 0% 88%;
+    --secondary-foreground: 300 1% 15%;
 
-    --muted: 210 40% 96.1%;
+    --muted: 0 0% 88%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 44 100% 58%;
+    --accent: 143 62% 71%;
     --accent-foreground: 0 0% 0%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 44 100% 58%;
+    --border: 0 0% 88%;
+    --input: 0 0% 88%;
+    --ring: 143 62% 71%;
 
     --radius: 0.75rem;
 
     --sidebar-background: 0 0% 99%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 44 100% 58%;
+    --sidebar-foreground: 300 1% 15%;
+    --sidebar-primary: 143 62% 71%;
     --sidebar-primary-foreground: 0 0% 0%;
-    --sidebar-accent: 44 20% 95%;
+    --sidebar-accent: 143 62% 95%;
     --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 44 100% 58%;
+    --sidebar-border: 0 0% 88%;
+    --sidebar-ring: 143 62% 71%;
 
     /* Apple-style design tokens */
     --blur-glass: blur(20px);
@@ -56,42 +56,42 @@
   }
 
   .dark {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
+    --background: 300 1% 15%;
+    --foreground: 0 0% 88%;
 
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
+    --card: 300 1% 15%;
+    --card-foreground: 0 0% 88%;
 
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
+    --popover: 300 1% 15%;
+    --popover-foreground: 0 0% 88%;
 
-    --primary: 44 100% 58%;
+    --primary: 143 62% 71%;
     --primary-foreground: 0 0% 0%;
 
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
+    --secondary: 300 1% 20%;
+    --secondary-foreground: 0 0% 88%;
 
-    --muted: 240 3.7% 15.9%;
+    --muted: 300 1% 20%;
     --muted-foreground: 240 5% 64.9%;
 
-    --accent: 44 100% 58%;
+    --accent: 143 62% 71%;
     --accent-foreground: 0 0% 0%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 44 100% 58%;
+    --border: 300 1% 20%;
+    --input: 300 1% 20%;
+    --ring: 143 62% 71%;
 
-    --sidebar-background: 240 6% 6%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 44 100% 58%;
+    --sidebar-background: 300 1% 10%;
+    --sidebar-foreground: 0 0% 88%;
+    --sidebar-primary: 143 62% 71%;
     --sidebar-primary-foreground: 0 0% 0%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 44 100% 58%;
+    --sidebar-accent: 300 1% 20%;
+    --sidebar-accent-foreground: 0 0% 88%;
+    --sidebar-border: 300 1% 20%;
+    --sidebar-ring: 143 62% 71%;
 
     /* Dark mode adjustments */
     --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.3);
@@ -205,11 +205,11 @@
   /* Premium Floating action button */
   .fab {
     @apply fixed bottom-24 right-6 z-40 lg:bottom-6;
-    @apply w-16 h-16 rounded-3xl bg-gradient-to-br from-[#fec832] to-[#fec832]/80;
+    @apply w-16 h-16 rounded-3xl bg-gradient-to-br from-primary to-primary/80;
     @apply flex items-center justify-center shadow-2xl;
     @apply transform transition-all duration-500 ease-out;
     @apply hover:scale-110 active:scale-95;
-    @apply text-black;
+    @apply text-primary-foreground;
   }
 
   /* Premium Card animations */
@@ -222,7 +222,7 @@
   /* Premium Input focus animations */
   .input-focus {
     @apply transition-all duration-300 ease-out;
-    @apply focus:ring-4 focus:ring-[#fec832]/20 focus:border-[#fec832];
+    @apply focus:ring-4 focus:ring-ring/20 focus:border-primary;
     @apply focus:scale-[1.01];
   }
 

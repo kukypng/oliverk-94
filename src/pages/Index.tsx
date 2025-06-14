@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Navigate } from 'react-router-dom';
@@ -20,16 +21,16 @@ const Index = () => {
   }
 
   // Landing page para usuários não logados
-  return <div className="min-h-screen bg-gradient-to-br from-amber-50 via-yellow-50 to-orange-50">
+  return <div className="min-h-screen">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b shadow-sm">
+      <header className="bg-white/80 backdrop-blur-sm border-b shadow-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 bg-black">
           <div className="flex justify-between items-center py-4 bg-black">
             <div className="flex items-center space-x-2">
-              <Calculator className="h-8 w-8 text-[#fec832]" />
+              <img src="/icone.png" alt="Oliver Logo" className="h-8 w-8" />
               <h1 className="text-2xl font-bold text-white">Oliver</h1>
             </div>
-            <Button onClick={() => window.location.href = '/auth'} className="bg-[#fec832] hover:bg-[#e6b42e] text-black">
+            <Button onClick={() => window.location.href = '/auth'} className="bg-primary hover:bg-primary/90 text-primary-foreground">
               Login
             </Button>
           </div>
@@ -40,7 +41,7 @@ const Index = () => {
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-black">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl lg:text-6xl font-bold mb-6 text-white">
-            Gerencie seus <span className="text-[#fec832]">Orçamentos</span>
+            Gerencie seus <span className="text-primary">Orçamentos</span>
             <br />
             de forma profissional
           </h2>
@@ -49,10 +50,10 @@ const Index = () => {
             clientes e relatórios de forma eficiente e organizada.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" onClick={() => window.location.href = '/auth'} className="text-lg px-8 py-3 bg-[#fec832] hover:bg-[#e6b42e] text-black">
+            <Button size="lg" onClick={() => window.location.href = '/auth'} className="text-lg px-8 py-3 bg-primary hover:bg-primary/90 text-primary-foreground">
               Começar Agora
             </Button>
-            <Button size="lg" variant="outline" className="text-lg px-8 py-3 border-[#fec832] text-[#fec832] hover:bg-[#fec832] hover:text-black">
+            <Button size="lg" variant="outline" className="text-lg px-8 py-3 border-primary text-primary hover:bg-primary hover:text-primary-foreground">
               Entre em contato
             </Button>
           </div>
@@ -94,8 +95,8 @@ const Index = () => {
             const Icon = feature.icon;
             return <Card key={index} className="hover:shadow-lg transition-shadow duration-200 border-0 shadow-md">
                   <CardHeader className="bg-neutral-900">
-                    <div className="w-12 h-12 rounded-lg flex items-center justify-center mb-4 bg-[#fec832]/20">
-                      <Icon className="h-6 w-6 text-[#fec832]" />
+                    <div className="w-12 h-12 rounded-lg flex items-center justify-center mb-4 bg-primary/10">
+                      <Icon className="h-6 w-6 text-primary" />
                     </div>
                     <CardTitle className="text-xl text-white">{feature.title}</CardTitle>
                   </CardHeader>
@@ -118,7 +119,7 @@ const Index = () => {
             Junte-se a centenas de profissionais que já utilizam o Oliver 
             para gerenciar seus negócios de forma mais eficiente.
           </p>
-          <Button size="lg" onClick={() => window.location.href = '/auth'} className="text-lg px-8 py-3 bg-[#fec832] hover:bg-[#e6b42e] text-black">
+          <Button size="lg" onClick={() => window.location.href = '/auth'} className="text-lg px-8 py-3 bg-primary hover:bg-primary/90 text-primary-foreground">
             Criar Conta Gratuita
           </Button>
         </div>
@@ -128,7 +129,7 @@ const Index = () => {
       <footer className="py-8 px-4 sm:px-6 lg:px-8 bg-[#0b0000]">
         <div className="max-w-6xl mx-auto text-center">
           <div className="flex items-center justify-center space-x-2 mb-4">
-            <Calculator className="h-6 w-6 text-[#fec832]" />
+            <img src="/icone.png" alt="Oliver Logo" className="h-6 w-6" />
             <span className="text-xl font-bold text-white">Oliver</span>
           </div>
           <p className="text-gray-600">© 2025 Oliver. Sistema profissional para gestão de orçamentos.</p>

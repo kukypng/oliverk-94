@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { AuthGuard } from '@/components/AuthGuard';
@@ -50,9 +49,7 @@ export const Dashboard = () => {
                 <Menu className="h-5 w-5" />
               </SidebarTrigger>
               <div className="flex items-center gap-2">
-                <div className="flex items-center justify-center w-8 h-8 bg-primary rounded-lg">
-                  <span className="text-primary-foreground font-bold text-sm">O</span>
-                </div>
+                <img src="/icone.png" alt="Oliver Logo" className="h-8 w-8" />
                 <h1 className="text-xl font-bold">Oliver</h1>
               </div>
             </header>
