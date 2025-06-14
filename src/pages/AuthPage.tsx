@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -6,7 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { useAuth } from '@/hooks/useAuth';
-import { Loader2, Smartphone, Wrench, Eye, EyeOff } from 'lucide-react';
+import { Loader2, Eye, EyeOff } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export const AuthPage = () => {
@@ -62,12 +61,7 @@ export const AuthPage = () => {
       <div className="w-full max-w-md relative z-10">
         {/* Logo/Brand */}
         <div className="text-center mb-8 animate-fade-in">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-primary to-primary/80 rounded-3xl mb-6 shadow-xl animate-bounce-subtle">
-            <div className="flex items-center space-x-1">
-              <Smartphone className="h-8 w-8 text-primary-foreground" />
-              <Wrench className="h-7 w-7 text-primary-foreground" />
-            </div>
-          </div>
+          <img src="/icone.png" alt="Oliver Logo" className="w-24 h-24 mx-auto mb-6 animate-bounce-subtle" />
           <h1 className="text-4xl font-bold text-foreground mb-3 tracking-tight">Oliver</h1>
           <p className="text-muted-foreground text-lg">Sistema de Gestão de Orçamentos</p>
         </div>
