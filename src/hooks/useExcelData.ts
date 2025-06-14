@@ -16,63 +16,51 @@ export const useExcelData = () => {
     setIsProcessing(true);
     const toastId = toast.loading('Exportando orçamentos...');
 
-    const exportPromise = new Promise<string>(async (resolve, reject) => {
-      try {
-        const { data: budgets, error } = await supabase
-          .from('budgets')
-          .select('*')
-          .order('created_at', { ascending: false });
+    try {
+      const { data: budgets, error } = await supabase
+        .from('budgets')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-        if (error) throw new Error('Não foi possível buscar os orçamentos.');
+      if (error) throw new Error('Não foi possível buscar os orçamentos.');
 
-        if (!budgets || budgets.length === 0) {
-            showWarning({ title: 'Nenhum Orçamento', description: 'Não há dados para exportar.' });
-            resolve('no-data'); // Não é um erro, apenas não há dados
-            return;
-        }
-
-        const formattedData = budgets.map(b => ({
-          'ID': b.id,
-          'Nome do Cliente': b.client_name,
-          'Telefone': b.client_phone,
-          'Tipo de Aparelho': b.device_type,
-          'Modelo': b.device_model,
-          'Problema': b.issue,
-          'Preço Total': b.total_price,
-          'Status': b.status,
-          'Condição de Pagamento': b.payment_condition,
-          'Data de Criação': new Date(b.created_at).toLocaleDateString('pt-BR'),
-          'Observações': b.notes,
-        }));
-
-        const worksheet = XLSX.utils.json_to_sheet(formattedData);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, 'Orçamentos');
-        
-        const columnWidths = Object.keys(formattedData[0] || {}).map(key => ({ wch: Math.max(key.length, 20) }));
-        worksheet['!cols'] = columnWidths;
-
-        const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-        const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
-        FileSaver.saveAs(blob, `orçamentos_exportados_${new Date().toISOString().slice(0,10)}.xlsx`);
-        resolve('success');
-      } catch (err) {
-        reject(err);
+      if (!budgets || budgets.length === 0) {
+        toast.dismiss(toastId);
+        showWarning({ title: 'Nenhum Orçamento', description: 'Não há dados para exportar.' });
+        setIsProcessing(false);
+        return;
       }
-    });
 
-    exportPromise
-      .then((status) => {
-        toast.dismiss(toastId);
-        if (status === 'success') {
-          showSuccess({ title: 'Exportação Concluída', description: 'O arquivo foi baixado com sucesso.' });
-        }
-      })
-      .catch((err: any) => {
-        toast.dismiss(toastId);
-        showError({ title: 'Erro na Exportação', description: err.message });
-      })
-      .finally(() => setIsProcessing(false));
+      const formattedData = budgets.map(b => ({
+        'Tipo de Aparelho': b.device_type,
+        'Modelo': b.device_model,
+        'Problema': b.issue,
+        'Preço Total': Number(b.total_price).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+        'Status': b.status,
+        'Condição de Pagamento': b.payment_condition,
+        'Data de Criação': new Date(b.created_at).toLocaleDateString('pt-BR'),
+        'Observações': b.notes,
+      }));
+
+      const worksheet = XLSX.utils.json_to_sheet(formattedData);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Orçamentos');
+      
+      const columnWidths = Object.keys(formattedData[0] || {}).map(key => ({ wch: Math.max(key.length, 20) }));
+      worksheet['!cols'] = columnWidths;
+
+      const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+      const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
+      FileSaver.saveAs(blob, `orçamentos_exportados_${new Date().toISOString().slice(0,10)}.xlsx`);
+      
+      toast.dismiss(toastId);
+      showSuccess({ title: 'Exportação Concluída', description: 'O arquivo foi baixado com sucesso.' });
+    } catch (err: any) {
+      toast.dismiss(toastId);
+      showError({ title: 'Erro na Exportação', description: err.message });
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const downloadImportTemplate = () => {
