@@ -9,6 +9,54 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      admin_audit_log: {
+        Row: {
+          action_details: Json | null
+          action_type: string
+          admin_user_id: string | null
+          created_at: string | null
+          id: string
+          ip_address: unknown | null
+          target_user_id: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          action_details?: Json | null
+          action_type: string
+          admin_user_id?: string | null
+          created_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          target_user_id?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          action_details?: Json | null
+          action_type?: string
+          admin_user_id?: string | null
+          created_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          target_user_id?: string | null
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_audit_log_admin_user_id_fkey"
+            columns: ["admin_user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "admin_audit_log_target_user_id_fkey"
+            columns: ["target_user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       admin_logs: {
         Row: {
           action: string
@@ -377,6 +425,47 @@ export type Database = {
         }
         Relationships: []
       }
+      user_activity_metrics: {
+        Row: {
+          avg_session_duration: unknown | null
+          created_at: string | null
+          id: string
+          last_activity_at: string | null
+          login_count: number | null
+          total_budgets_created: number | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          avg_session_duration?: unknown | null
+          created_at?: string | null
+          id?: string
+          last_activity_at?: string | null
+          login_count?: number | null
+          total_budgets_created?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          avg_session_duration?: unknown | null
+          created_at?: string | null
+          id?: string
+          last_activity_at?: string | null
+          login_count?: number | null
+          total_budgets_created?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_activity_metrics_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_profiles: {
         Row: {
           budget_limit: number | null
@@ -456,6 +545,10 @@ export type Database = {
           last_sign_in_at: string
         }[]
       }
+      admin_get_dashboard_stats: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
+      }
       admin_get_logs: {
         Args: Record<PropertyKey, never>
         Returns: {
@@ -468,6 +561,26 @@ export type Database = {
           details: Json
           created_at: string
         }[]
+      }
+      admin_get_users_paginated: {
+        Args: {
+          p_page?: number
+          p_limit?: number
+          p_search?: string
+          p_role_filter?: string
+          p_status_filter?: string
+          p_sort_by?: string
+          p_sort_order?: string
+        }
+        Returns: Json
+      }
+      admin_log_audit_action: {
+        Args: {
+          p_target_user_id: string
+          p_action_type: string
+          p_action_details?: Json
+        }
+        Returns: undefined
       }
       admin_update_user: {
         Args: {
