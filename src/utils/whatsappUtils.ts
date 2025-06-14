@@ -70,3 +70,44 @@ export const shareViaWhatsApp = (message: string) => {
   const whatsappUrl = `https://wa.me/?text=${encodedMessage}`;
   window.open(whatsappUrl, '_blank');
 };
+
+export const sharePDFViaWhatsApp = async (pdfBlob: Blob, message: string) => {
+  try {
+    // Verificar se a Web Share API está disponível
+    if (navigator.share && navigator.canShare) {
+      const file = new File([pdfBlob], 'orcamento.pdf', { type: 'application/pdf' });
+      
+      if (navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          title: 'Orçamento',
+          text: message,
+          files: [file]
+        });
+        return;
+      }
+    }
+
+    // Fallback: criar URL temporária para download e abrir WhatsApp
+    const pdfUrl = URL.createObjectURL(pdfBlob);
+    const downloadLink = document.createElement('a');
+    downloadLink.href = pdfUrl;
+    downloadLink.download = `orcamento-${new Date().toISOString().split('T')[0]}.pdf`;
+    downloadLink.style.display = 'none';
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+    
+    // Aguardar um pouco e abrir WhatsApp
+    setTimeout(() => {
+      const encodedMessage = encodeURIComponent(`${message}\n\n📎 PDF anexado (baixado automaticamente)`);
+      const whatsappUrl = `https://wa.me/?text=${encodedMessage}`;
+      window.open(whatsappUrl, '_blank');
+      URL.revokeObjectURL(pdfUrl);
+    }, 1000);
+    
+  } catch (error) {
+    console.error('Erro ao compartilhar PDF:', error);
+    // Fallback para o método tradicional
+    shareViaWhatsApp(message);
+  }
+};

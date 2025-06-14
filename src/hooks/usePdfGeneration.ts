@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { generateBudgetPDF, generatePDFImage } from '@/utils/pdfGenerator';
 import { useEnhancedToast } from '@/hooks/useEnhancedToast';
 import { useShopProfile } from '@/hooks/useShopProfile';
+import { sharePDFViaWhatsApp, generateWhatsAppMessage } from '@/utils/whatsappUtils';
 
 interface BudgetData {
   id: string;
@@ -61,48 +62,28 @@ export const usePdfGeneration = () => {
       // Gerar PDF usando o template
       const pdfBlob = await generateBudgetPDF(pdfData);
       
-      // Criar URL temporária para o PDF
-      const pdfUrl = URL.createObjectURL(pdfBlob);
-      
-      // Preparar mensagem para WhatsApp
-      const message = `Segue o orçamento para ${budget.device_model}. 
-      
-Valor à vista: R$ ${(budget.cash_price / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-${budget.installment_price && budget.installments ? 
-  `Parcelado: R$ ${(budget.installment_price / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })} em ${budget.installments}x` : ''}
+      // Criar mensagem para WhatsApp
+      const whatsappMessage = generateWhatsAppMessage({
+        id: budget.id,
+        device_model: budget.device_model,
+        part_type: budget.device_type,
+        brand: 'Compatível',
+        cash_price: budget.cash_price,
+        installment_price: budget.installment_price,
+        installments: budget.installments || 1,
+        warranty_months: budget.warranty_months,
+        includes_delivery: false,
+        includes_screen_protector: false,
+        created_at: budget.created_at,
+        valid_until: budget.valid_until
+      });
 
-Clique no link para baixar o PDF: ${window.location.origin}
-
-*Para enviar o PDF pelo WhatsApp:*
-1. Baixe o PDF clicando no botão abaixo
-2. Escolha o contato no WhatsApp
-3. Anexe o PDF baixado`;
-      
-      // Criar link de download do PDF
-      const downloadLink = document.createElement('a');
-      downloadLink.href = pdfUrl;
-      downloadLink.download = `orcamento-${budget.device_model.replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.pdf`;
-      downloadLink.style.display = 'none';
-      document.body.appendChild(downloadLink);
-      
-      // Fazer download do PDF
-      downloadLink.click();
-      document.body.removeChild(downloadLink);
-      
-      // Aguardar um pouco para o download iniciar
-      setTimeout(() => {
-        // Abrir WhatsApp Web para seleção de contato
-        const encodedMessage = encodeURIComponent(message);
-        const whatsappUrl = `https://web.whatsapp.com/send?text=${encodedMessage}`;
-        window.open(whatsappUrl, '_blank');
-        
-        // Limpar URL temporária
-        URL.revokeObjectURL(pdfUrl);
-      }, 1000);
+      // Compartilhar PDF via WhatsApp usando a nova API
+      await sharePDFViaWhatsApp(pdfBlob, whatsappMessage);
       
       showSuccess({
-        title: 'PDF gerado com sucesso!',
-        description: 'O PDF foi baixado. Agora selecione o contato no WhatsApp para enviar.',
+        title: 'PDF compartilhado com sucesso!',
+        description: 'O PDF foi gerado e está sendo compartilhado via WhatsApp.',
       });
       
     } catch (error) {

@@ -1,8 +1,9 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { FileText, DollarSign, TrendingUp, Smartphone, Eye, Edit, Copy } from 'lucide-react';
+import { FileText, DollarSign, TrendingUp, Smartphone, Eye, Edit, Copy, Calendar, Target, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DashboardSkeleton } from '@/components/ui/loading-states';
 import { EmptyState } from '@/components/EmptyState';
@@ -23,9 +24,14 @@ export const DashboardContent = () => {
         return {
           totalBudgets: 0,
           monthlyRevenue: 0,
+          weeklyRevenue: 0,
           averageTicket: 0,
           monthlyGrowth: 0,
+          weeklyGrowth: 0,
           topDevice: 'N/A',
+          pendingBudgets: 0,
+          approvedBudgets: 0,
+          rejectedBudgets: 0,
           recentBudgets: []
         };
       }
@@ -48,14 +54,37 @@ export const DashboardContent = () => {
         const total = budgets?.length || 0;
         const totalRevenue = budgets?.reduce((sum, budget) => sum + Number(budget.total_price), 0) || 0;
         
+        // Cálculos para este mês
         const thisMonth = new Date();
         const monthlyBudgets = budgets?.filter(b => {
           const date = new Date(b.created_at);
           return date.getMonth() === thisMonth.getMonth() && date.getFullYear() === thisMonth.getFullYear();
         }) || [];
         
+        // Cálculos para esta semana
+        const today = new Date();
+        const weekStart = new Date(today.setDate(today.getDate() - today.getDay()));
+        const weeklyBudgets = budgets?.filter(b => {
+          const date = new Date(b.created_at);
+          return date >= weekStart;
+        }) || [];
+
+        // Cálculos para mês anterior (para comparação)
+        const lastMonth = new Date();
+        lastMonth.setMonth(lastMonth.getMonth() - 1);
+        const lastMonthBudgets = budgets?.filter(b => {
+          const date = new Date(b.created_at);
+          return date.getMonth() === lastMonth.getMonth() && date.getFullYear() === lastMonth.getFullYear();
+        }) || [];
+
         const monthlyRevenue = monthlyBudgets.reduce((sum, budget) => sum + Number(budget.total_price), 0);
+        const weeklyRevenue = weeklyBudgets.reduce((sum, budget) => sum + Number(budget.total_price), 0);
+        const lastMonthRevenue = lastMonthBudgets.reduce((sum, budget) => sum + Number(budget.total_price), 0);
+        
         const averageTicket = total > 0 ? totalRevenue / total : 0;
+        const monthlyGrowthPercent = lastMonthRevenue > 0 
+          ? ((monthlyRevenue - lastMonthRevenue) / lastMonthRevenue) * 100 
+          : monthlyRevenue > 0 ? 100 : 0;
 
         const deviceCount = budgets?.reduce((acc, budget) => {
           if (budget.device_model) {
@@ -66,12 +95,22 @@ export const DashboardContent = () => {
 
         const topDevice = Object.entries(deviceCount).sort(([,a], [,b]) => b - a)[0];
 
+        // Status dos orçamentos
+        const pendingBudgets = budgets?.filter(b => b.status === 'pending').length || 0;
+        const approvedBudgets = budgets?.filter(b => b.status === 'approved').length || 0;
+        const rejectedBudgets = budgets?.filter(b => b.status === 'rejected').length || 0;
+
         return {
           totalBudgets: total,
           monthlyRevenue,
+          weeklyRevenue,
           averageTicket,
-          monthlyGrowth: monthlyBudgets.length,
+          monthlyGrowth: monthlyGrowthPercent,
+          weeklyGrowth: weeklyBudgets.length,
           topDevice: topDevice ? topDevice[0] : 'N/A',
+          pendingBudgets,
+          approvedBudgets,
+          rejectedBudgets,
           recentBudgets: budgets?.slice(-5).reverse() || []
         };
       } catch (error: any) {
@@ -128,16 +167,16 @@ export const DashboardContent = () => {
       icon: DollarSign,
       color: 'text-green-600',
       bgColor: 'bg-green-50',
-      change: '+12.5%',
-      changeType: 'positive'
+      change: `${stats?.monthlyGrowth > 0 ? '+' : ''}${stats?.monthlyGrowth.toFixed(1)}%`,
+      changeType: stats?.monthlyGrowth >= 0 ? 'positive' : 'negative'
     },
     {
-      title: 'Total de Orçamentos',
-      value: stats?.totalBudgets || 0,
-      icon: FileText,
+      title: 'Faturamento Semanal',
+      value: `R$ ${((stats?.weeklyRevenue || 0) / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+      icon: Calendar,
       color: 'text-blue-600',
       bgColor: 'bg-blue-50',
-      change: `+${stats?.monthlyGrowth || 0}`,
+      change: `${stats?.weeklyGrowth || 0} esta semana`,
       changeType: 'positive'
     },
     {
@@ -146,16 +185,31 @@ export const DashboardContent = () => {
       icon: TrendingUp,
       color: 'text-purple-600',
       bgColor: 'bg-purple-50',
-      change: '+8.2%',
-      changeType: 'positive'
+      subtitle: `${stats?.totalBudgets || 0} orçamentos`
     },
     {
       title: 'Dispositivo Popular',
       value: stats?.topDevice || 'N/A',
       icon: Smartphone,
-      color: 'text-orange-600',
-      bgColor: 'bg-orange-50',
+      color: 'text-[#fec832]',
+      bgColor: 'bg-[#fec832]/10',
       subtitle: 'Mais reparado'
+    },
+    {
+      title: 'Orçamentos Pendentes',
+      value: stats?.pendingBudgets || 0,
+      icon: Clock,
+      color: 'text-yellow-600',
+      bgColor: 'bg-yellow-50',
+      subtitle: 'Aguardando aprovação'
+    },
+    {
+      title: 'Taxa de Aprovação',
+      value: `${stats?.totalBudgets > 0 ? ((stats?.approvedBudgets / stats?.totalBudgets) * 100).toFixed(1) : 0}%`,
+      icon: Target,
+      color: 'text-emerald-600',
+      bgColor: 'bg-emerald-50',
+      subtitle: `${stats?.approvedBudgets}/${stats?.totalBudgets} aprovados`
     }
   ];
 
@@ -177,12 +231,12 @@ export const DashboardContent = () => {
           </div>
           <div className="flex items-center space-x-2 text-xs lg:text-sm text-muted-foreground bg-muted/50 px-3 py-2 rounded-lg">
             <TrendingUp className="h-4 w-4 text-green-600" />
-            <span>{stats?.monthlyGrowth || 0} orçamentos este mês</span>
+            <span>{stats?.weeklyGrowth || 0} orçamentos esta semana</span>
           </div>
         </div>
 
         {/* Stats Cards - Mobile Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-6">
           {cards.map((card, index) => {
             const Icon = card.icon;
             return (
@@ -191,7 +245,7 @@ export const DashboardContent = () => {
                 className="glass-card hover:shadow-lg transition-all duration-200 hover:scale-[1.02] animate-scale-in border-0" 
                 style={{ animationDelay: `${index * 100}ms` }}
               >
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 lg:pb-3">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 lg:pb-3 p-3 lg:p-6">
                   <CardTitle className="text-xs lg:text-sm font-medium text-muted-foreground line-clamp-2">
                     {card.title}
                   </CardTitle>
@@ -200,7 +254,7 @@ export const DashboardContent = () => {
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-1 p-3 lg:p-6 pt-0">
-                  <div className="text-lg lg:text-2xl font-bold text-foreground break-words">
+                  <div className="text-sm lg:text-2xl font-bold text-foreground break-words">
                     {card.value}
                   </div>
                   {card.change && (
@@ -215,7 +269,7 @@ export const DashboardContent = () => {
                       >
                         {card.change}
                       </Badge>
-                      <span className="text-xs text-muted-foreground hidden lg:inline">vs mês anterior</span>
+                      <span className="text-xs text-muted-foreground hidden lg:inline">vs anterior</span>
                     </div>
                   )}
                   {card.subtitle && (
@@ -229,7 +283,7 @@ export const DashboardContent = () => {
 
         {/* Recent Budgets - Mobile Optimized */}
         <Card className="glass-card border-0 shadow-sm animate-slide-up">
-          <CardHeader className="flex flex-row items-center justify-between pb-3">
+          <CardHeader className="flex flex-row items-center justify-between pb-3 p-3 lg:p-6">
             <div>
               <CardTitle className="text-base lg:text-lg font-semibold text-foreground">
                 Orçamentos Recentes

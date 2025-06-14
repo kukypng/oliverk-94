@@ -108,12 +108,13 @@
   body {
     @apply bg-background text-foreground antialiased;
     font-feature-settings: "rlig" 1, "calt" 1;
+    overscroll-behavior: none;
   }
 
   /* Apple-style scrollbars */
   ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
   }
 
   ::-webkit-scrollbar-track {
@@ -132,11 +133,13 @@
   html {
     height: 100vh;
     height: -webkit-fill-available;
+    overscroll-behavior: none;
   }
 
   body {
     min-height: 100vh;
     min-height: -webkit-fill-available;
+    overscroll-behavior: none;
   }
 
   /* Prevent zoom on iOS */
@@ -147,6 +150,18 @@
   @media screen and (max-width: 768px) {
     input, select, textarea {
       font-size: 16px;
+    }
+    
+    /* Mobile touch improvements */
+    * {
+      -webkit-tap-highlight-color: transparent;
+    }
+  }
+
+  /* Safe area support */
+  @supports (padding: env(safe-area-inset-bottom)) {
+    .pb-safe {
+      padding-bottom: env(safe-area-inset-bottom);
     }
   }
 }
@@ -206,6 +221,7 @@
 
   .mobile-touch {
     @apply min-h-[44px] min-w-[44px];
+    touch-action: manipulation;
   }
 
   /* Mobile spacing */
@@ -240,6 +256,27 @@
 
   .animate-bounce-subtle {
     animation: bounceSubtle 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+
+  /* Color replacements - Orange to #fec832 */
+  .text-orange-600 {
+    color: #fec832 !important;
+  }
+  
+  .bg-orange-50 {
+    background-color: rgba(254, 200, 50, 0.1) !important;
+  }
+  
+  .border-orange-600 {
+    border-color: #fec832 !important;
+  }
+  
+  .hover\\:text-orange-700:hover {
+    color: #e6b42e !important;
+  }
+  
+  .hover\\:bg-orange-50:hover {
+    background-color: rgba(254, 200, 50, 0.1) !important;
   }
 }
 
@@ -309,12 +346,41 @@
 
   /* Better touch targets */
   button {
-    @apply min-h-[44px];
+    @apply min-h-[44px] mobile-touch;
   }
 
   /* Improved card spacing */
   .card {
     @apply m-2;
+  }
+  
+  /* Mobile table improvements */
+  table {
+    font-size: 14px;
+  }
+  
+  /* Mobile navigation */
+  .mobile-nav {
+    @apply fixed bottom-0 left-0 right-0 z-50;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Extra small devices */
+  .container {
+    @apply px-2;
+  }
+  
+  h1 {
+    @apply text-lg;
+  }
+  
+  h2 {
+    @apply text-base;
+  }
+  
+  .card {
+    @apply m-1;
   }
 }
 
@@ -327,5 +393,23 @@
 @supports (padding-bottom: env(safe-area-inset-bottom)) {
   .pb-safe-bottom {
     padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* Landscape mobile improvements */
+@media (max-height: 500px) and (orientation: landscape) {
+  .mobile-nav {
+    display: none;
+  }
+  
+  .pb-16 {
+    padding-bottom: 0;
+  }
+}
+
+/* PWA Support */
+@media (display-mode: standalone) {
+  .pwa-safe {
+    padding-top: env(safe-area-inset-top);
   }
 }
