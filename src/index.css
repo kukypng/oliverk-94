@@ -226,7 +226,7 @@
 
   /* Premium Inputs */
   .input {
-    @apply border border-gold-200 rounded-xxl px-4 py-2 focus:(border-gold-400 ring-2 ring-gold-400) bg-white/80 text-zinc-900 placeholder:text-gold-900/50 shadow-soft;
+    @apply border border-gold-200 rounded-xxl px-4 py-2 focus:border-gold-400 focus:ring-2 focus:ring-gold-400 bg-white/80 text-zinc-900 placeholder:text-gold-900/50 shadow-soft;
     font-family: 'Inter', sans-serif;
   }
   .input:focus, .input:active {
