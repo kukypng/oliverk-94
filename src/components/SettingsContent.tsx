@@ -3,6 +3,7 @@ import React from 'react';
 import { ProfileSettings } from '@/components/ProfileSettings';
 import { CompanySettings } from '@/components/CompanySettings';
 import { SecuritySettings } from '@/components/SecuritySettings';
+import { DataManagementSettings } from './DataManagementSettings';
 
 export const SettingsContent = () => {
   return (
@@ -19,9 +20,10 @@ export const SettingsContent = () => {
           <ProfileSettings />
           <SecuritySettings />
         </div>
-        <div>
+        <div className="space-y-6">
           <CompanySettings />
         </div>
+        <DataManagementSettings />
       </div>
     </div>
   );
