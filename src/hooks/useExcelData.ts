@@ -1,3 +1,4 @@
+
 import * as XLSX from 'xlsx';
 import * as FileSaver from 'file-saver';
 import { supabase } from '@/integrations/supabase/client';
@@ -45,7 +46,7 @@ export const useExcelData = () => {
         'Tipo de Aparelho': b.device_type,
         'Modelo': b.device_model,
         'Problema': b.issue,
-        'Preço Total': Number(b.total_price),
+        'Preço Total': Number(b.total_price) / 100, // Corrigido para dividir por 100
         'Condição de Pagamento': b.payment_condition,
         'Data de Criação': new Date(b.created_at).toLocaleDateString('pt-BR'),
         'Observações': b.notes,
@@ -154,7 +155,7 @@ export const useExcelData = () => {
                     device_model: row['Modelo do Aparelho'],
                     issue: row['Defeito/Problema'],
                     notes: row['Observações'] || '',
-                    total_price: price,
+                    total_price: Math.round(price * 100), // Corrigido para salvar em centavos
                     status: 'pending'
                   };
                 });
