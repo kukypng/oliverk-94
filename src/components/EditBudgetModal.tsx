@@ -22,8 +22,6 @@ export const EditBudgetModal = ({ budget, open, onOpenChange }: EditBudgetModalP
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [formData, setFormData] = useState({
-    client_name: '',
-    client_phone: '',
     device_type: '',
     device_model: '',
     device_brand: '',
@@ -32,14 +30,23 @@ export const EditBudgetModal = ({ budget, open, onOpenChange }: EditBudgetModalP
     payment_condition: '',
     installments: 1,
     notes: '',
+    validity_period_days: 15,
   });
 
   // Carregar dados do orçamento quando o modal abrir ou budget mudar
   useEffect(() => {
     if (budget && open) {
+      let days = 15; // Fallback
+      if (budget.created_at && budget.valid_until) {
+        const createdAt = new Date(budget.created_at);
+        const validUntil = new Date(budget.valid_until);
+        if (!isNaN(createdAt.getTime()) && !isNaN(validUntil.getTime())) {
+          const diffTime = validUntil.getTime() - createdAt.getTime();
+          days = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
+        }
+      }
+
       setFormData({
-        client_name: budget.client_name || '',
-        client_phone: budget.client_phone || '',
         device_type: budget.device_type || '',
         device_model: budget.device_model || '',
         device_brand: budget.device_brand || '',
@@ -48,15 +55,27 @@ export const EditBudgetModal = ({ budget, open, onOpenChange }: EditBudgetModalP
         payment_condition: budget.payment_condition || 'À Vista',
         installments: budget.installments || 1,
         notes: budget.notes || '',
+        validity_period_days: days,
       });
     }
   }, [budget, open]);
 
   const updateBudgetMutation = useMutation({
     mutationFn: async (data: any) => {
+      const createdAt = new Date(budget.created_at);
+      const validUntilDate = new Date(createdAt);
+      validUntilDate.setDate(validUntilDate.getDate() + Number(data.validity_period_days));
+
       const updateData = {
-        ...data,
-        total_price: parseFloat(data.total_price) * 100, // Converter para centavos
+        device_type: data.device_type,
+        device_model: data.device_model,
+        device_brand: data.device_brand,
+        issue: data.issue,
+        total_price: parseFloat(data.total_price) * 100,
+        payment_condition: data.payment_condition,
+        installments: data.installments,
+        notes: data.notes,
+        valid_until: validUntilDate.toISOString(),
       };
       
       const { error } = await supabase
@@ -124,31 +143,6 @@ export const EditBudgetModal = ({ budget, open, onOpenChange }: EditBudgetModalP
           <DialogTitle>Editar Orçamento</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Informações do Cliente */}
-          <div className="space-y-4">
-            <h3 className="font-semibold text-lg">Informações do Cliente</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="client_name">Nome do Cliente</Label>
-                <Input
-                  id="client_name"
-                  value={formData.client_name}
-                  onChange={(e) => handleInputChange('client_name', e.target.value)}
-                  placeholder="Nome completo do cliente"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="client_phone">Telefone</Label>
-                <Input
-                  id="client_phone"
-                  value={formData.client_phone}
-                  onChange={(e) => handleInputChange('client_phone', e.target.value)}
-                  placeholder="(11) 99999-9999"
-                />
-              </div>
-            </div>
-          </div>
-
           {/* Informações do Dispositivo */}
           <div className="space-y-4">
             <h3 className="font-semibold text-lg">Informações do Dispositivo</h3>
@@ -234,20 +228,33 @@ export const EditBudgetModal = ({ budget, open, onOpenChange }: EditBudgetModalP
                 </Select>
               </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="payment_condition">Condição de Pagamento</Label>
-              <Select value={formData.payment_condition} onValueChange={(value) => handleInputChange('payment_condition', value)}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="À Vista">À Vista</SelectItem>
-                  <SelectItem value="Cartão de Crédito">Cartão de Crédito</SelectItem>
-                  <SelectItem value="PIX">PIX</SelectItem>
-                  <SelectItem value="Dinheiro">Dinheiro</SelectItem>
-                  <SelectItem value="Transferência">Transferência</SelectItem>
-                </SelectContent>
-              </Select>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="payment_condition">Condição de Pagamento</Label>
+                <Select value={formData.payment_condition} onValueChange={(value) => handleInputChange('payment_condition', value)}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="À Vista">À Vista</SelectItem>
+                    <SelectItem value="Cartão de Crédito">Cartão de Crédito</SelectItem>
+                    <SelectItem value="PIX">PIX</SelectItem>
+                    <SelectItem value="Dinheiro">Dinheiro</SelectItem>
+                    <SelectItem value="Transferência">Transferência</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="validity_period_days">Validade (dias) *</Label>
+                <Input
+                  id="validity_period_days"
+                  type="number"
+                  min="1"
+                  value={formData.validity_period_days}
+                  onChange={(e) => handleInputChange('validity_period_days', parseInt(e.target.value, 10) || 1)}
+                  required
+                />
+              </div>
             </div>
           </div>
 
