@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { 
@@ -11,7 +10,6 @@ import {
   SidebarMenuItem,
   SidebarSeparator,
 } from '@/components/ui/sidebar';
-import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { 
@@ -88,9 +86,6 @@ export const AppSidebar = ({ activeTab, onTabChange }: AppSidebarProps) => {
 
       <SidebarFooter className="p-4">
         <div className="space-y-3">
-          <div className="flex justify-center">
-            <ThemeToggle />
-          </div>
           <Button
             variant="ghost"
             className="w-full justify-start text-muted-foreground hover:text-foreground"
