@@ -147,14 +147,8 @@ export const BudgetsContent = () => {
         </div>
         
         <div className="flex items-center space-x-2 lg:space-x-3">
-          <Button variant="outline" size="sm" className="rounded-xl border-white/20 hover:bg-muted/20">
-            <Download className="mr-2 h-4 w-4" />
-            <span className="hidden sm:inline">Exportar</span>
-          </Button>
-          <Button variant="outline" size="sm" className="rounded-xl border-white/20 hover:bg-muted/20">
-            <Filter className="mr-2 h-4 w-4" />
-            <span className="hidden sm:inline">Filtros</span>
-          </Button>
+          
+          
         </div>
       </div>
 
@@ -320,17 +314,11 @@ export const BudgetsContent = () => {
 
       <DeleteBudgetConfirm budget={deletingBudget} open={!!deletingBudget} onOpenChange={open => !open && setDeletingBudget(null)} />
 
-      <ConfirmationDialog
-        open={!!confirmation}
-        onOpenChange={() => setConfirmation(null)}
-        onConfirm={() => {
-          if (confirmation) {
-            confirmation.action();
-            setConfirmation(null);
-          }
-        }}
-        title={confirmation?.title || ''}
-        description={confirmation?.description || ''}
-      />
+      <ConfirmationDialog open={!!confirmation} onOpenChange={() => setConfirmation(null)} onConfirm={() => {
+      if (confirmation) {
+        confirmation.action();
+        setConfirmation(null);
+      }
+    }} title={confirmation?.title || ''} description={confirmation?.description || ''} />
     </div>;
 };
