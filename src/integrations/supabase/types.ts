@@ -456,6 +456,19 @@ export type Database = {
           last_sign_in_at: string
         }[]
       }
+      admin_get_logs: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          id: string
+          admin_user_id: string
+          admin_name: string
+          target_user_id: string
+          target_name: string
+          action: string
+          details: Json
+          created_at: string
+        }[]
+      }
       admin_update_user: {
         Args: {
           p_user_id: string

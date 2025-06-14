@@ -11,7 +11,9 @@ import { FileText, User, Shield } from 'lucide-react';
 interface AdminLog {
   id: string;
   admin_user_id: string;
+  admin_name: string;
   target_user_id: string;
+  target_name: string;
   action: string;
   details: any;
   created_at: string;
@@ -21,11 +23,7 @@ export const AdminLogs = () => {
   const { data: logs, isLoading } = useQuery({
     queryKey: ['admin-logs'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('admin_logs')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(100);
+      const { data, error } = await supabase.rpc('admin_get_logs');
       
       if (error) throw error;
       return data as AdminLog[];
@@ -92,10 +90,10 @@ export const AdminLogs = () => {
                 </div>
                 <div className="text-sm">
                   <p>
-                    <strong>Admin:</strong> {log.admin_user_id}
+                    <strong>Admin:</strong> {log.admin_name}
                   </p>
                   <p>
-                    <strong>Usuário alvo:</strong> {log.target_user_id}
+                    <strong>Usuário alvo:</strong> {log.target_name}
                   </p>
                   {log.details && (
                     <details className="mt-2">
