@@ -499,6 +499,30 @@ export type Database = {
         }
         Relationships: []
       }
+      temporary_credentials: {
+        Row: {
+          created_at: string
+          email: string
+          password: string
+          payment_id: string
+          retrieved_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          password: string
+          payment_id: string
+          retrieved_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          password?: string
+          payment_id?: string
+          retrieved_at?: string | null
+        }
+        Relationships: []
+      }
       user_activity_metrics: {
         Row: {
           avg_session_duration: unknown | null

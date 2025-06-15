@@ -1,14 +1,14 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/hooks/useAuth';
-import { Loader2, Eye, EyeOff } from 'lucide-react';
+import { Loader2, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
-import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 export const AuthPage = () => {
   const { signIn, user, loading: authLoading } = useAuth();
@@ -16,19 +16,44 @@ export const AuthPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [searchParams] = useSearchParams();
 
+  const [credentials, setCredentials] = useState<{email: string, password: string} | null>(null);
+  const [credentialError, setCredentialError] = useState<string | null>(null);
+  const [isFetchingCreds, setIsFetchingCreds] = useState(false);
+
   const [loginForm, setLoginForm] = useState({
     email: '',
     password: ''
   });
 
   useEffect(() => {
+    const fetchCredentials = async (paymentId: string) => {
+      setIsFetchingCreds(true);
+      setCredentialError(null);
+      try {
+        const { data, error } = await supabase.functions.invoke('get-temporary-credentials', {
+          body: { payment_id: paymentId },
+        });
+
+        if (error) {
+          const errorData = await (error as any).context.json();
+          throw new Error(errorData.error || 'Erro desconhecido');
+        }
+
+        setCredentials(data);
+      } catch (err: any) {
+        console.error("Failed to fetch credentials:", err);
+        setCredentialError(err.message || "Não foi possível carregar suas credenciais. Por favor, entre em contato com o suporte.");
+      } finally {
+        setIsFetchingCreds(false);
+        window.history.replaceState({}, document.title, "/auth");
+      }
+    };
+
     if (searchParams.get('signup_complete') === 'true') {
-      toast.success("Pagamento recebido!", {
-        description: "Verifique seu e-mail para confirmar sua conta e definir sua senha.",
-        duration: 10000,
-      });
-      // Navegue para o estado limpo para não mostrar o toast novamente no refresh
-      window.history.replaceState({}, document.title, "/auth");
+      const paymentId = searchParams.get('payment_id');
+      if (paymentId) {
+        fetchCredentials(paymentId);
+      }
     }
   }, [searchParams]);
 
@@ -39,11 +64,82 @@ export const AuthPage = () => {
     }
   }, [user, authLoading]);
 
-  // Mostrar loading se usuário já está logado
+  // Mostrar loading se usuário já está logado ou buscando credenciais
   if (authLoading || user) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-primary/5 to-primary/10">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (isFetchingCreds) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-primary/5 to-primary/10">
+        <div className="text-center p-4">
+          <Loader2 className="mx-auto h-12 w-12 animate-spin text-primary mb-4" />
+          <h1 className="text-2xl font-semibold text-foreground">Finalizando seu Cadastro</h1>
+          <p className="text-lg text-muted-foreground mt-2">Estamos gerando suas credenciais de acesso...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (credentials) {
+    return (
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-primary/5 to-primary/10 p-4 relative overflow-hidden">
+         <div className="absolute inset-0 overflow-hidden">
+            <div className="absolute -top-1/2 -right-1/2 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse"></div>
+            <div className="absolute -bottom-1/2 -left-1/2 w-96 h-96 bg-primary/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+          </div>
+        <div className="w-full max-w-md relative z-10">
+            <Card className="glass-card animate-scale-in border-0 shadow-2xl backdrop-blur-xl">
+                <CardHeader className="text-center pb-6">
+                    <CardTitle className="text-2xl text-foreground">Conta Criada com Sucesso!</CardTitle>
+                    <CardDescription className="text-base">
+                        Anote suas credenciais de acesso. Elas são exibidas apenas uma vez.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                    <div className="space-y-3">
+                        <Label>Email</Label>
+                        <Input readOnly value={credentials.email} className="h-12 text-base rounded-xl"/>
+                    </div>
+                    <div className="space-y-3">
+                        <Label>Senha Temporária</Label>
+                        <Input readOnly value={credentials.password} className="h-12 text-base rounded-xl font-mono tracking-wider"/>
+                    </div>
+                    <Alert variant="destructive">
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertTitle>Importante!</AlertTitle>
+                        <AlertDescription>
+                            Guarde esta senha em um local seguro. Você precisará dela para fazer o login.
+                        </AlertDescription>
+                    </Alert>
+                    <Button onClick={() => setCredentials(null)} className="w-full h-12 text-base">
+                        Ir para o Login
+                    </Button>
+                </CardContent>
+            </Card>
+        </div>
+      </div>
+    );
+  }
+
+  if (credentialError) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-primary/5 to-primary/10 p-4">
+        <Card className="w-full max-w-md glass-card animate-scale-in border-0 shadow-2xl backdrop-blur-xl">
+          <CardHeader className="text-center">
+            <CardTitle className="text-2xl text-destructive">Ocorreu um Erro</CardTitle>
+          </CardHeader>
+          <CardContent className="text-center space-y-4">
+            <p className="text-muted-foreground">{credentialError}</p>
+            <Button onClick={() => window.location.href = '/auth'} className="w-full">
+              Voltar para o Login
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     );
   }

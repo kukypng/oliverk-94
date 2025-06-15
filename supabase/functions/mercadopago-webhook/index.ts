@@ -96,21 +96,35 @@ serve(async (req) => {
           return new Response('Webhook processed: User already exists.', { status: 200 });
         }
 
-        // Usar o sistema de convite nativo do Supabase
-        const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
-            type: 'invite',
-            email: email,
-            data: { name: name }
+        // Create user directly with a random password instead of sending invite
+        const randomPassword = crypto.randomUUID().slice(0, 12);
+        
+        const { data: { user }, error: userError } = await supabaseAdmin.auth.admin.createUser({
+            email,
+            password: randomPassword,
+            email_confirm: true, // Auto-confirm email since payment is done
+            user_metadata: { name }
         });
 
-        if (linkError) {
-            console.error('Error generating invite link:', linkError);
-            throw linkError;
+        if (userError) {
+            console.error('Error creating user:', userError);
+            throw userError;
         }
         
-        const { user } = linkData;
         const userId = user.id;
-        console.log(`User invited via Supabase native email system with ID: ${userId}`);
+        console.log(`User created successfully with ID: ${userId}`);
+        
+        // Store credentials for one-time retrieval
+        const { error: credsError } = await supabaseAdmin.from('temporary_credentials').insert({
+            payment_id: paymentId,
+            email: email,
+            password: randomPassword
+        });
+
+        if (credsError) {
+            // This is not fatal, but should be logged for debugging.
+            console.error('Error saving temporary credentials:', credsError);
+        }
         
         const expirationDate = new Date();
         expirationDate.setMonth(expirationDate.getMonth() + 1);
@@ -130,7 +144,7 @@ serve(async (req) => {
         });
         
         console.log(`Profile updated and subscription created for user ${userId}. License valid until ${expirationDate.toISOString()}`);
-        console.log(`Supabase native invitation email sent to ${email} automatically.`);
+        console.log(`User created with temporary password. Credentials stored for one-time retrieval.`);
       }
     } else if (['cancelled', 'refunded', 'charged_back'].includes(paymentInfo.status ?? '')) {
         const externalReference = paymentInfo.external_reference;
