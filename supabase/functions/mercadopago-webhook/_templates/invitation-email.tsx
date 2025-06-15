@@ -10,7 +10,7 @@ interface InvitationEmailProps {
 export const InvitationEmail: React.FC<Readonly<InvitationEmailProps>> = ({ name, confirmationUrl }) => (
   <Html>
     <Head />
-    <Preview>Bem-vindo ao Oliver! Complete seu cadastro.</Preview>
+    <Preview>Bem-vindo ao Oliver! Defina sua senha.</Preview>
     <Tailwind>
       <Body className="bg-gray-100 font-sans">
         <Container className="bg-white border border-gray-200 rounded-lg my-10 mx-auto p-8 w-full max-w-[600px]">
@@ -19,12 +19,12 @@ export const InvitationEmail: React.FC<Readonly<InvitationEmailProps>> = ({ name
           <Heading className="text-2xl font-bold text-center mt-6 mb-4">Bem-vindo(a) ao Oliver, {name || 'novo usuário'}!</Heading>
           
           <Text className="text-gray-600 text-base leading-6 text-center">
-            Estamos muito felizes em ter você conosco. Para finalizar seu cadastro e começar a usar a plataforma, por favor, clique no botão abaixo.
+            Sua assinatura foi confirmada! Para acessar sua conta pela primeira vez, você precisa definir uma senha. Clique no botão abaixo para criar sua senha de forma segura.
           </Text>
           
           <div className="text-center my-8">
             <Button href={confirmationUrl} className="bg-blue-600 text-white font-semibold rounded-md py-3 px-6">
-              Completar Cadastro e Acessar
+              Definir Minha Senha e Acessar
             </Button>
           </div>
           
@@ -36,7 +36,7 @@ export const InvitationEmail: React.FC<Readonly<InvitationEmailProps>> = ({ name
           <Hr className="border-gray-300 my-6" />
           
           <Text className="text-gray-500 text-sm">
-            Este é um convite para criar uma conta na plataforma Oliver. Se você não solicitou isso, pode ignorar este e-mail com segurança.
+            Este é um convite para configurar sua conta na plataforma Oliver. Se você não realizou uma assinatura, pode ignorar este e-mail com segurança.
           </Text>
           
           <Text className="text-gray-500 text-sm text-center mt-8">
@@ -49,4 +49,3 @@ export const InvitationEmail: React.FC<Readonly<InvitationEmailProps>> = ({ name
 );
 
 export default InvitationEmail;
-

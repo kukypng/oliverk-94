@@ -1,11 +1,17 @@
 
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { Resend } from 'npm:resend@3.5.0'
+import React from 'npm:react@18.3.1'
+import { render } from 'npm:@react-email/render@0.0.13'
+import InvitationEmail from './_templates/invitation-email.tsx'
 
 const supabaseAdmin = createClient(
   Deno.env.get('SUPABASE_URL') ?? '',
   Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
 )
+
+const resend = new Resend(Deno.env.get('RESEND_API_KEY') ?? '');
 
 serve(async (req) => {
   if (req.method !== 'POST') {
@@ -96,8 +102,8 @@ serve(async (req) => {
           return new Response('Webhook processed: User already exists.', { status: 200 });
         }
 
-        // Create user directly with a random password instead of sending invite
-        const randomPassword = crypto.randomUUID().slice(0, 12);
+        // Create user with a random password that will be immediately reset by the user
+        const randomPassword = crypto.randomUUID();
         
         const { data: { user }, error: userError } = await supabaseAdmin.auth.admin.createUser({
             email,
@@ -114,16 +120,40 @@ serve(async (req) => {
         const userId = user.id;
         console.log(`User created successfully with ID: ${userId}`);
         
-        // Store credentials for one-time retrieval
-        const { error: credsError } = await supabaseAdmin.from('temporary_credentials').insert({
-            payment_id: paymentId,
+        // Generate password reset link for the new user to set their password
+        const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
+            type: 'recovery',
             email: email,
-            password: randomPassword
         });
 
-        if (credsError) {
-            // This is not fatal, but should be logged for debugging.
-            console.error('Error saving temporary credentials:', credsError);
+        if (linkError) {
+            console.error(`Error generating password recovery link for ${email}:`, linkError);
+            // Non-fatal, user can use "Forgot Password" flow.
+        }
+
+        if (linkData?.properties?.action_link) {
+            const confirmationUrl = linkData.properties.action_link;
+            const emailHtml = render(
+                React.createElement(InvitationEmail, {
+                    name: name,
+                    confirmationUrl: confirmationUrl,
+                })
+            );
+
+            try {
+                await resend.emails.send({
+                    from: 'Oliver <oliver@kuky.pro>',
+                    to: [email],
+                    subject: 'Bem-vindo ao Oliver! Sua conta está pronta.',
+                    html: emailHtml,
+                });
+                console.log(`Welcome email sent successfully to ${email}.`);
+            } catch (emailError) {
+                console.error(`Failed to send welcome email to ${email}:`, emailError);
+                // Not throwing error, as payment is processed and user is created.
+            }
+        } else {
+            console.error(`Could not get action_link for user ${email}. Welcome email not sent.`);
         }
         
         const expirationDate = new Date();
@@ -144,7 +174,7 @@ serve(async (req) => {
         });
         
         console.log(`Profile updated and subscription created for user ${userId}. License valid until ${expirationDate.toISOString()}`);
-        console.log(`User created with temporary password. Credentials stored for one-time retrieval.`);
+        console.log(`Welcome email sent to user. They will set their own password.`);
       }
     } else if (['cancelled', 'refunded', 'charged_back'].includes(paymentInfo.status ?? '')) {
         const externalReference = paymentInfo.external_reference;
