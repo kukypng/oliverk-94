@@ -28,7 +28,7 @@ export const SubscriptionButton: React.FC<SubscriptionButtonProps> = ({ children
 
     setIsLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke('create-mercadopago-subscription', {
+      const { data, error } = await supabase.functions.invoke('create-stripe-subscription', {
         body: { origin: window.location.origin }
       });
 
@@ -37,8 +37,8 @@ export const SubscriptionButton: React.FC<SubscriptionButtonProps> = ({ children
         throw new Error(errorMessage);
       }
 
-      if (data.init_point) {
-        window.location.href = data.init_point;
+      if (data.url) {
+        window.location.href = data.url;
       } else {
         throw new Error("Não foi possível iniciar o processo de assinatura.");
       }
