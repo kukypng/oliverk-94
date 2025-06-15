@@ -59,7 +59,7 @@ export const SignupAndPayButton: React.FC<SignupAndPayButtonProps> = ({ name, em
       disabled={isLoading || disabled}
     >
       <CreditCard className="w-5 h-5 mr-2" />
-      Pagar R$40 e Criar Conta
+      Pagar R$4 e Criar Conta
     </EnhancedButton>
   );
 };

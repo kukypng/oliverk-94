@@ -1,4 +1,3 @@
-
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
@@ -64,7 +63,7 @@ serve(async (req) => {
           title: 'Assinatura Oliver Mensal',
           description: 'Acesso completo à plataforma Oliver',
           quantity: 1,
-          unit_price: 40.00,
+          unit_price: 4.00,
           currency_id: 'BRL',
         },
       ],

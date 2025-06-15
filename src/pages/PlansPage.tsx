@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -58,7 +59,7 @@ const PlansPage = () => {
               <div className="inline-block bg-primary/10 text-primary px-4 py-1 rounded-full text-sm font-semibold mb-4">
                 Plano Profissional
               </div>
-              <CardTitle className="text-5xl font-bold">R$40<span className="text-lg font-medium text-gray-400">/mês</span></CardTitle>
+              <CardTitle className="text-5xl font-bold">R$4<span className="text-lg font-medium text-gray-400">/mês</span></CardTitle>
               <CardDescription className="text-gray-300 mt-2">Acesso completo por 30 dias.</CardDescription>
             </CardHeader>
             <CardContent className="p-8 pt-0">
