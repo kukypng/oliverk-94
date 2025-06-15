@@ -61,22 +61,22 @@ export const AuthPage = () => {
 
       <div className="w-full max-w-md relative z-10">
         {/* Logo/Brand */}
-        <div className="text-center mb-8 animate-fade-in">
-          <img src="/icone.png" alt="Oliver Logo" className="w-24 h-24 mx-auto mb-6 animate-bounce-subtle" />
-          <h1 className="text-4xl font-bold text-foreground mb-3 tracking-tight">Oliver</h1>
-          <p className="text-muted-foreground text-lg">Sistema de Gestão de Orçamentos</p>
+        <div className="text-center mb-6 sm:mb-8 animate-fade-in">
+          <img src="/icone.png" alt="Oliver Logo" className="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-4 sm:mb-6 animate-bounce-subtle invert dark:invert-0 dark:mix-blend-lighten" />
+          <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-2 sm:mb-3 tracking-tight">Oliver</h1>
+          <p className="text-base sm:text-lg text-muted-foreground">Sistema de Gestão de Orçamentos</p>
         </div>
 
         <Card className="glass-card animate-scale-in border-0 shadow-2xl backdrop-blur-xl">
-          <CardHeader className="text-center pb-6">
-            <CardTitle className="text-2xl text-foreground">Acesso Restrito</CardTitle>
-            <CardDescription className="text-base">
+          <CardHeader className="text-center pb-4 sm:pb-6">
+            <CardTitle className="text-xl sm:text-2xl text-foreground">Acesso Restrito</CardTitle>
+            <CardDescription className="text-sm sm:text-base">
               Faça login para continuar
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleLogin} className="space-y-6">
-              <div className="space-y-3">
+            <form onSubmit={handleLogin} className="space-y-4 sm:space-y-6">
+              <div className="space-y-2 sm:space-y-3">
                 <Label htmlFor="email" className="text-sm font-medium">Email</Label>
                 <Input
                   id="email"
@@ -88,7 +88,7 @@ export const AuthPage = () => {
                   className="h-12 text-base rounded-xl input-focus mobile-touch"
                 />
               </div>
-              <div className="space-y-3 relative">
+              <div className="space-y-2 sm:space-y-3 relative">
                 <div className="flex justify-between items-center">
                   <Label htmlFor="password" className="text-sm font-medium">Senha</Label>
                   <Link to="/reset-password" className="text-sm font-medium text-primary hover:underline">

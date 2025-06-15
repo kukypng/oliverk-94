@@ -356,11 +356,6 @@
   button {
     @apply min-h-[44px] mobile-touch;
   }
-
-  /* Improved card spacing */
-  .card {
-    @apply m-3;
-  }
   
   /* Mobile table improvements */
   table {
@@ -391,10 +386,6 @@
   
   h2 {
     @apply text-lg;
-  }
-  
-  .card {
-    @apply m-2;
   }
 }
 
