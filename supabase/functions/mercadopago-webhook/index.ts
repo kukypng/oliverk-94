@@ -1,4 +1,3 @@
-
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { Resend } from 'npm:resend@3.5.0'
@@ -19,16 +18,31 @@ serve(async (req) => {
   }
 
   const body = await req.json();
-  console.log('Mercado Pago Webhook Received:', body);
+  console.log('Mercado Pago Webhook Received:', JSON.stringify(body, null, 2));
 
-  if (body.type !== 'payment') {
-      console.log(`Unhandled event type ${body.type}`);
-      return new Response('Webhook received, but event type is not "payment".', { status: 200 });
+  let paymentId;
+  const eventType = body.type || body.topic;
+
+  if (eventType === 'payment') {
+    if (body.data && body.data.id) {
+      paymentId = body.data.id;
+      console.log(`Payment event received via 'type'. Payment ID: ${paymentId}`);
+    } else if (body.resource) {
+      // For notifications with a 'topic', the resource can be a URL or just the ID.
+      // We extract the last part, which should be the ID.
+      const resourceString = body.resource.toString();
+      const parts = resourceString.split('/');
+      paymentId = parts[parts.length - 1];
+      console.log(`Payment event received via 'topic'. Extracted Payment ID from resource: ${paymentId}`);
+    }
+  }
+
+  if (!paymentId) {
+    console.log(`Unhandled event type: '${eventType}'. Body: ${JSON.stringify(body)}`);
+    return new Response('Webhook received, but it is not a recognized payment event.', { status: 200 });
   }
 
   try {
-    const paymentId = body.data.id;
-    
     const accessToken = Deno.env.get('MERCADO_PAGO_ACCESS_TOKEN');
     if (!accessToken) {
         console.error('MERCADO_PAGO_ACCESS_TOKEN is not set.');
@@ -140,14 +154,22 @@ serve(async (req) => {
                 })
             );
 
+            console.log(`Attempting to send welcome email to ${email} from oliver@oliverr.kuky.pro`);
             try {
-                await resend.emails.send({
+                const { data: emailData, error: emailError } = await resend.emails.send({
                     from: 'Oliver <oliver@oliverr.kuky.pro>',
                     to: [email],
                     subject: 'Bem-vindo ao Oliver! Sua conta está pronta.',
                     html: emailHtml,
                 });
-                console.log(`Welcome email sent successfully to ${email}.`);
+
+                if (emailError) {
+                  // Log the error but don't block the process.
+                  // The outer catch will not receive this, but it will be logged.
+                  console.error(`Resend API error for ${email}:`, JSON.stringify(emailError));
+                } else {
+                  console.log(`Welcome email sent successfully to ${email}. Response:`, JSON.stringify(emailData));
+                }
             } catch (emailError) {
                 console.error(`Failed to send welcome email to ${email}:`, emailError);
                 // Not throwing error, as payment is processed and user is created.
@@ -177,21 +199,21 @@ serve(async (req) => {
         console.log(`Welcome email sent to user. They will set their own password.`);
       }
     } else if (['cancelled', 'refunded', 'charged_back'].includes(paymentInfo.status ?? '')) {
-        const externalReference = paymentInfo.external_reference;
-        if (!externalReference) {
-            console.error(`Cancelled/refunded payment ${paymentInfo.id} has no external_reference.`);
-            return new Response('Webhook processed, no action needed.', { status: 200 });
-        }
-        const metadata = JSON.parse(externalReference);
-        const userId = metadata.supabase_user_id;
+      const externalReference = paymentInfo.external_reference;
+      if (!externalReference) {
+        console.error(`Cancelled/refunded payment ${paymentInfo.id} has no external_reference.`);
+        return new Response('Webhook processed, no action needed.', { status: 200 });
+      }
+      const metadata = JSON.parse(externalReference);
+      const userId = metadata.supabase_user_id;
 
-        if(userId) {
-            await supabaseAdmin.from('user_profiles').update({ is_active: false }).eq('id', userId);
-            await supabaseAdmin.from('subscriptions').update({ status: 'cancelled' }).eq('user_id', userId);
-            console.log(`User ${userId} subscription is cancelled due to payment status: ${paymentInfo.status}. Deactivated user.`);
-        }
+      if(userId) {
+        await supabaseAdmin.from('user_profiles').update({ is_active: false }).eq('id', userId);
+        await supabaseAdmin.from('subscriptions').update({ status: 'cancelled' }).eq('user_id', userId);
+        console.log(`User ${userId} subscription is cancelled due to payment status: ${paymentInfo.status}. Deactivated user.`);
+      }
     } else {
-        console.log(`Payment status is "${paymentInfo.status}", no action taken.`);
+      console.log(`Payment status is "${paymentInfo.status}", no action taken.`);
     }
 
     return new Response(JSON.stringify({ received: true }), { status: 200 })
