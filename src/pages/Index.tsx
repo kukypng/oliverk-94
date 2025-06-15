@@ -96,7 +96,7 @@ const Index = () => {
               }
             ].map((feature, index) => {
               const Icon = feature.icon;
-              return <Card key={index} className="border-0 shadow-md card-hover">
+              return <Card key={index} className="border-0 shadow-md card-hover overflow-hidden">
                     <CardHeader className="bg-neutral-900">
                       <div className="w-12 h-12 rounded-lg flex items-center justify-center mb-4 bg-primary/10">
                         <Icon className="h-6 w-6 text-primary" />
