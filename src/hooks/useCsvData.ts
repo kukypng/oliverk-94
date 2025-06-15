@@ -1,4 +1,4 @@
-import * as XLSX from 'xlsx';
+
 import * as FileSaver from 'file-saver';
 import { supabase } from '@/integrations/supabase/client';
 import { useEnhancedToast } from '@/hooks/useEnhancedToast';
@@ -10,7 +10,7 @@ import { useQueryClient } from '@tanstack/react-query';
 // Usando 'any' pois o tipo completo do orçamento é extenso
 type Budget = any;
 
-export const useExcelData = () => {
+export const useCsvData = () => {
   const { showSuccess, showError, showWarning } = useEnhancedToast();
   const [isProcessing, setIsProcessing] = useState(false);
   const { user } = useAuth();
@@ -43,18 +43,26 @@ export const useExcelData = () => {
         return;
       }
 
+      const headers = [
+        'ID', 'Status', 'Nome do Cliente', 'Telefone do Cliente', 'Tipo de Aparelho',
+        'Marca do Aparelho', 'Modelo', 'Problema', 'Serviço Realizado', 'Preço Total',
+        'Preço Parcelado', 'Parcelas', 'Condição de Pagamento', 'Garantia (meses)',
+        'Inclui Entrega (sim/não)', 'Inclui Película (sim/não)', 'Data de Criação',
+        'Válido Até', 'Observações'
+      ];
+      
       const formattedData = budgets.map(b => ({
         'ID': b.id,
         'Status': b.status,
-        'Nome do Cliente': b.client_name,
-        'Telefone do Cliente': b.client_phone,
+        'Nome do Cliente': b.client_name || '',
+        'Telefone do Cliente': b.client_phone || '',
         'Tipo de Aparelho': b.device_type,
-        'Marca do Aparelho': b.device_brand,
+        'Marca do Aparelho': b.device_brand || '',
         'Modelo': b.device_model,
         'Problema': b.issue,
         'Serviço Realizado': b.part_type,
-        'Preço Total': Number(b.total_price) / 100,
-        'Preço Parcelado': b.installment_price ? Number(b.installment_price) / 100 : 0,
+        'Preço Total': (Number(b.total_price) / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
+        'Preço Parcelado': b.installment_price ? (Number(b.installment_price) / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) : '0,00',
         'Parcelas': b.installments,
         'Condição de Pagamento': b.payment_condition,
         'Garantia (meses)': b.warranty_months,
@@ -62,29 +70,27 @@ export const useExcelData = () => {
         'Inclui Película (sim/não)': b.includes_screen_protector ? 'sim' : 'não',
         'Data de Criação': new Date(b.created_at).toLocaleDateString('pt-BR'),
         'Válido Até': b.valid_until ? new Date(b.valid_until).toLocaleDateString('pt-BR') : '',
-        'Observações': b.notes,
+        'Observações': b.notes || '',
       }));
 
-      const worksheet = XLSX.utils.json_to_sheet(formattedData);
-      const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, 'Orçamentos');
+      const csvContent = [
+        headers.join(';'),
+        ...formattedData.map((row: any) => 
+            headers.map(header => {
+                let value = row[header] ?? '';
+                if (typeof value === 'string' && (value.includes(';') || value.includes('"') || value.includes('\n'))) {
+                    return `"${value.replace(/"/g, '""')}"`;
+                }
+                return value;
+            }).join(';')
+        )
+      ].join('\n');
       
-      const headers = Object.keys(formattedData[0] || {});
-      const columnFormats = headers.map(key => {
-        const style: { wch: number, z?: string } = { wch: Math.max(key.length, 20) };
-        if (key === 'Preço Total' || key === 'Preço Parcelado') {
-          style.z = '"R$" #,##0.00';
-        }
-        return style;
-      });
-      worksheet['!cols'] = columnFormats;
-
-      const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-      const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
-      FileSaver.saveAs(blob, `orçamentos_exportados_${new Date().toISOString().slice(0,10)}.xlsx`);
+      const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+      FileSaver.saveAs(blob, `orcamentos_exportados_${new Date().toISOString().slice(0,10)}.csv`);
       
       toast.dismiss(toastId);
-      showSuccess({ title: 'Exportação Concluída', description: 'O arquivo foi baixado com sucesso.' });
+      showSuccess({ title: 'Exportação Concluída', description: 'O arquivo CSV foi baixado com sucesso.' });
     } catch (err: any) {
       toast.dismiss(toastId);
       showError({ title: 'Erro na Exportação', description: err.message });
@@ -96,33 +102,31 @@ export const useExcelData = () => {
   const downloadImportTemplate = () => {
     setIsProcessing(true);
     try {
-        const templateData = [{'Tipo de Aparelho': '','Marca do Aparelho': '','Modelo do Aparelho': '','Defeito/Problema': '','Serviço Realizado': '','Observações': '','Preço Total': 0, 'Preço Parcelado': 0, 'Parcelas': 1, 'Condição de Pagamento': 'À Vista', 'Garantia (meses)': 3, 'Validade (dias)': 15, 'Inclui Entrega (sim/não)': 'não', 'Inclui Película (sim/não)': 'não', 'Nome do Cliente': '', 'Telefone do Cliente': ''}];
-        const instructions = [
-            ["Instruções:", "Preencha as colunas com os dados do orçamento. Não altere os nomes dos cabeçalhos."],
-            ["Campos Obrigatórios:", "'Tipo de Aparelho', 'Modelo do Aparelho', 'Defeito/Problema', 'Serviço Realizado', 'Preço Total'"],
-            ["", ""],
-            ["Coluna", "Descrição"],
-            ["Preço Total / Preço Parcelado", "Use números, com ponto ou vírgula como separador decimal (ex: 1500.50 ou 1500,50)."],
-            ["Parcelas", "Se não houver preço parcelado, deixe 'Preço Parcelado' com valor 0 e 'Parcelas' com 1."],
-            ["Condição de Pagamento", "Valores comuns: À Vista, Cartão de Crédito, PIX, Dinheiro. Se vazio, será preenchido automaticamente."],
-            ["Garantia (meses)", "Número de meses da garantia. Padrão: 3."],
-            ["Validade (dias)", "Por quantos dias o orçamento é válido. Padrão: 15."],
-            ["Inclui Entrega / Inclui Película", "Preencha com 'sim' ou 'não'. Padrão: 'não'."],
-            ["Nome do Cliente / Telefone do Cliente", "Informações do cliente. Opcional."],
+        const headers = [
+            'Tipo de Aparelho', 'Marca do Aparelho', 'Modelo do Aparelho', 'Defeito/Problema',
+            'Serviço Realizado', 'Observações', 'Preço Total', 'Preço Parcelado', 'Parcelas',
+            'Condição de Pagamento', 'Garantia (meses)', 'Validade (dias)', 'Inclui Entrega (sim/não)',
+            'Inclui Película (sim/não)', 'Nome do Cliente', 'Telefone do Cliente'
         ];
 
-        const wsTemplate = XLSX.utils.json_to_sheet(templateData);
-        const wsInstructions = XLSX.utils.aoa_to_sheet(instructions);
+        const instructions = [
+            '# Instruções: Preencha as colunas com os dados do orçamento. Não altere os nomes dos cabeçalhos.',
+            '# Campos Obrigatórios: \'Tipo de Aparelho\', \'Modelo do Aparelho\', \'Defeito/Problema\', \'Serviço Realizado\', \'Preço Total\'',
+            '#',
+            '# Coluna,Descrição',
+            '# "Preço Total / Preço Parcelado","Use números, com vírgula como separador decimal (ex: 1500,50). Não use separadores de milhar."',
+            '# "Parcelas","Se não houver preço parcelado, deixe \'Preço Parcelado\' com valor 0 e \'Parcelas\' com 1."',
+            '# "Condição de Pagamento","Valores comuns: À Vista, Cartão de Crédito, PIX, Dinheiro. Se vazio, será preenchido automaticamente."',
+            '# "Garantia (meses)","Número de meses da garantia. Padrão: 3."',
+            '# "Validade (dias)","Por quantos dias o orçamento é válido. Padrão: 15."',
+            '# "Inclui Entrega / Inclui Película","Preencha com \'sim\' ou \'não\'. Padrão: \'não\'."',
+            '# "Nome do Cliente / Telefone do Cliente","Informações do cliente. Opcional."',
+            ''
+        ];
 
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, wsTemplate, 'Modelo de Importação');
-        XLSX.utils.book_append_sheet(workbook, wsInstructions, 'Instruções');
-        
-        wsTemplate['!cols'] = Object.keys(templateData[0]).map(key => ({ wch: key.length + 5 }));
-
-        const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-        const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
-        FileSaver.saveAs(blob, 'modelo_importacao.xlsx');
+        const csvContent = instructions.join('\n') + headers.join(';');
+        const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+        FileSaver.saveAs(blob, 'modelo_importacao.csv');
         
         showSuccess({ title: 'Modelo Gerado', description: 'O download do modelo foi iniciado.' });
     } catch (error) {
@@ -148,18 +152,25 @@ export const useExcelData = () => {
         const reader = new FileReader();
         reader.onload = async (e) => {
             try {
-                const data = e.target?.result;
-                const workbook = XLSX.read(data, { type: 'binary' });
-                const sheetName = workbook.SheetNames.find(name => name.toLowerCase().includes('modelo'));
-                
-                if (!sheetName) {
-                    throw new Error("Aba 'Modelo de Importação' não encontrada na planilha.");
+                const text = e.target?.result as string;
+
+                const lines = text.split(/\r\n|\n/).filter(line => line.trim() !== '' && !line.trim().startsWith('#'));
+                if (lines.length < 2) {
+                    throw new Error("Arquivo CSV está vazio, em formato incorreto ou contém apenas cabeçalhos.");
                 }
-                const worksheet = workbook.Sheets[sheetName];
-                const json = XLSX.utils.sheet_to_json(worksheet) as any[];
+
+                const headers = lines[0].split(';').map(h => h.trim().replace(/^"|"$/g, ''));
+                const json = lines.slice(1).map(line => {
+                    const values = line.split(/;(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(v => v.trim().replace(/^"|"$/g, ''));
+                    const obj: { [key: string]: string } = {};
+                    headers.forEach((header, i) => {
+                        obj[header] = values[i] || '';
+                    });
+                    return obj;
+                });
                 
                 if (json.length === 0) {
-                  throw new Error("A planilha está vazia ou em formato incorreto.");
+                  throw new Error("Nenhum orçamento válido encontrado no arquivo. Verifique se os dados foram preenchidos corretamente.");
                 }
 
                 const newBudgets = json.filter(row => row['Modelo do Aparelho'] && row['Preço Total']).map((row, index) => {
@@ -175,11 +186,11 @@ export const useExcelData = () => {
                   validUntil.setDate(validUntil.getDate() + validityDays);
 
                   if (isNaN(price) || price <= 0) {
-                    throw new Error(`Preço inválido ou zerado na linha ${index + 2}. O preço deve ser um número maior que zero.`);
+                    throw new Error(`Preço inválido ou zerado na linha ${index + 2} do CSV. O preço deve ser um número maior que zero.`);
                   }
 
                   if (!row['Tipo de Aparelho'] || !row['Modelo do Aparelho'] || !row['Defeito/Problema'] || !row['Serviço Realizado']) {
-                    throw new Error(`Dados obrigatórios faltando na linha ${index + 2}. Verifique 'Tipo de Aparelho', 'Modelo do Aparelho', 'Defeito/Problema' e 'Serviço Realizado'.`);
+                    throw new Error(`Dados obrigatórios faltando na linha ${index + 2} do CSV. Verifique 'Tipo de Aparelho', 'Modelo do Aparelho', 'Defeito/Problema' e 'Serviço Realizado'.`);
                   }
                   
                   const paymentCondition = row['Condição de Pagamento'] || ((installments > 1 && installmentPrice > 0) ? 'Cartão de Crédito' : 'À Vista');
@@ -208,7 +219,7 @@ export const useExcelData = () => {
                 });
                 
                 if (newBudgets.length === 0) {
-                  throw new Error("Nenhum orçamento válido encontrado na planilha. Verifique se os dados obrigatórios foram preenchidos.");
+                  throw new Error("Nenhum orçamento válido encontrado no arquivo. Verifique se os dados obrigatórios foram preenchidos.");
                 }
 
                 const { data: insertedData, error } = await supabase
@@ -228,7 +239,7 @@ export const useExcelData = () => {
             }
         };
         reader.onerror = (err) => reject(new Error("Não foi possível ler o arquivo."));
-        reader.readAsBinaryString(file);
+        reader.readAsText(file, 'UTF-8');
     });
 
     importPromise

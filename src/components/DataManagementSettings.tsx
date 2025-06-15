@@ -2,10 +2,10 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { UploadCloud, Download, FileSpreadsheet, Loader2 } from 'lucide-react';
-import { useExcelData } from '@/hooks/useExcelData';
+import { useCsvData } from '@/hooks/useCsvData';
 
 export const DataManagementSettings = () => {
-  const { isProcessing, fetchAndExportBudgets, downloadImportTemplate, processImportedFile } = useExcelData();
+  const { isProcessing, fetchAndExportBudgets, downloadImportTemplate, processImportedFile } = useCsvData();
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -20,7 +20,7 @@ export const DataManagementSettings = () => {
       <CardHeader>
         <CardTitle>Gestão de Dados</CardTitle>
         <CardDescription>
-          Exporte seus dados de orçamentos ou importe novos dados usando uma planilha.
+          Exporte seus dados de orçamentos ou importe novos dados usando um arquivo CSV.
         </CardDescription>
       </CardHeader>
       <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -32,7 +32,7 @@ export const DataManagementSettings = () => {
               Exportar Dados
             </CardTitle>
             <CardDescription>
-              Baixe uma planilha com todos os seus orçamentos.
+              Baixe um arquivo CSV com todos os seus orçamentos.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -55,7 +55,7 @@ export const DataManagementSettings = () => {
               Importar Dados
             </CardTitle>
             <CardDescription>
-              Faça o upload de uma planilha para adicionar novos orçamentos.
+              Faça o upload de um arquivo CSV para adicionar novos orçamentos.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -67,7 +67,7 @@ export const DataManagementSettings = () => {
                   <UploadCloud className="mr-2 h-4 w-4" />
                 )}
                 {isProcessing ? 'Processando...' : 'Selecionar Arquivo'}
-                <input type="file" id="import-file" className="hidden" accept=".xlsx, .xls, .csv" onChange={handleFileSelect} disabled={isProcessing}/>
+                <input type="file" id="import-file" className="hidden" accept=".csv" onChange={handleFileSelect} disabled={isProcessing}/>
               </label>
             </Button>
             <Button variant="secondary" onClick={downloadImportTemplate} className="w-full" disabled={isProcessing}>
