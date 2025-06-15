@@ -1,3 +1,4 @@
+
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { Resend } from 'npm:resend@3.5.0'
@@ -11,6 +12,46 @@ const supabaseAdmin = createClient(
 )
 
 const resend = new Resend(Deno.env.get('RESEND_API_KEY') ?? '');
+
+// Helper function to process subscription updates (creation or renewal)
+async function processSubscriptionUpdate(userId: string, mercadoPagoPaymentId: string | undefined) {
+  console.log(`Processing subscription update for user ID: ${userId}`);
+
+  const { data: profile } = await supabaseAdmin.from('user_profiles').select('expiration_date').eq('id', userId).single();
+  
+  if (!profile) {
+    console.warn(`User profile not found for user ID: ${userId}. A new profile will be created with the subscription.`);
+  }
+
+  let newExpirationDate;
+  const now = new Date();
+  const currentExpiration = profile?.expiration_date ? new Date(profile.expiration_date) : now;
+
+  if (currentExpiration < now) {
+    const newNow = new Date();
+    newExpirationDate = new Date(newNow.setMonth(newNow.getMonth() + 1));
+  } else {
+    const newCurrentExpiration = new Date(currentExpiration);
+    newExpirationDate = new Date(newCurrentExpiration.setMonth(newCurrentExpiration.getMonth() + 1));
+  }
+
+  // Upsert user profile to handle both new and existing users, ensuring it is active
+  await supabaseAdmin.from('user_profiles').upsert({
+    id: userId,
+    expiration_date: newExpirationDate.toISOString(),
+    is_active: true
+  }, { onConflict: 'id' });
+
+  await supabaseAdmin.from('subscriptions').upsert({
+    user_id: userId,
+    status: 'active',
+    mercado_pago_subscription_id: mercadoPagoPaymentId,
+    current_period_end: newExpirationDate.toISOString(),
+    plan_id: 'monthly_brl_40'
+  }, { onConflict: 'user_id' });
+
+  console.log(`User ${userId} license processed. New expiration: ${newExpirationDate.toISOString()}`);
+}
 
 serve(async (req) => {
   if (req.method !== 'POST') {
@@ -78,125 +119,92 @@ serve(async (req) => {
       }
 
       const metadata = JSON.parse(externalReference);
-      const mercadoPagoSubscriptionId = paymentInfo.id?.toString();
+      const mercadoPagoPaymentId = paymentInfo.id?.toString();
 
       if (metadata.supabase_user_id) {
-        const userId = metadata.supabase_user_id;
-        console.log(`Renewing license for user ID: ${userId}`);
+        // Case 1: Renewal for a logged-in user
+        console.log(`Renewing license for user ID: ${metadata.supabase_user_id}`);
+        await processSubscriptionUpdate(metadata.supabase_user_id, mercadoPagoPaymentId);
+        console.log(`Renewal for user ${metadata.supabase_user_id} complete.`);
 
-        const { data: profile } = await supabaseAdmin.from('user_profiles').select('expiration_date').eq('id', userId).single();
-        let newExpirationDate;
-        const now = new Date();
-        const currentExpiration = profile?.expiration_date ? new Date(profile.expiration_date) : now;
-
-        if (currentExpiration < now) {
-          newExpirationDate = new Date(now.setMonth(now.getMonth() + 1));
-        } else {
-          newExpirationDate = new Date(currentExpiration.setMonth(currentExpiration.getMonth() + 1));
-        }
-        
-        await supabaseAdmin.from('user_profiles').update({ expiration_date: newExpirationDate.toISOString(), is_active: true }).eq('id', userId);
-        
-        await supabaseAdmin.from('subscriptions').upsert({
-            user_id: userId,
-            status: 'active',
-            mercado_pago_subscription_id: mercadoPagoSubscriptionId,
-            current_period_end: newExpirationDate.toISOString(),
-            plan_id: 'monthly_brl_40'
-        }, { onConflict: 'user_id' });
-        
-        console.log(`User ${userId} license renewed until ${newExpirationDate.toISOString()}`);
       } else if (metadata.user_name && metadata.user_email) {
+        // Case 2: New signup or renewal from signup page
         const { user_name: name, user_email: email } = metadata;
-        console.log(`New user signup process started for email: ${email}`);
+        console.log(`New user signup or renewal process started for email: ${email}`);
 
         const { data: { users: existingUsers } } = await supabaseAdmin.auth.admin.listUsers({ email });
-        if (existingUsers?.length > 0) {
-          console.warn(`User with email ${email} already exists. This should have been a renewal. Aborting new user creation.`);
-          return new Response('Webhook processed: User already exists.', { status: 200 });
-        }
-
-        // Create user with a random password that will be immediately reset by the user
-        const randomPassword = crypto.randomUUID();
         
-        const { data: { user }, error: userError } = await supabaseAdmin.auth.admin.createUser({
-            email,
-            password: randomPassword,
-            email_confirm: true, // Auto-confirm email since payment is done
-            user_metadata: { name }
-        });
+        if (existingUsers && existingUsers.length > 0) {
+          // Sub-case 2.1: User already exists, treat as renewal
+          const userId = existingUsers[0].id;
+          console.warn(`User with email ${email} already exists (ID: ${userId}). Treating as renewal.`);
+          await processSubscriptionUpdate(userId, mercadoPagoPaymentId);
+          console.log(`Renewal for existing user ${email} complete.`);
 
-        if (userError) {
-            console.error('Error creating user:', userError);
-            throw userError;
-        }
-        
-        const userId = user.id;
-        console.log(`User created successfully with ID: ${userId}`);
-        
-        // Generate password reset link for the new user to set their password
-        const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
-            type: 'recovery',
-            email: email,
-        });
-
-        if (linkError) {
-            console.error(`Error generating password recovery link for ${email}:`, linkError);
-            // Non-fatal, user can use "Forgot Password" flow.
-        }
-
-        if (linkData?.properties?.action_link) {
-            const confirmationUrl = linkData.properties.action_link;
-            const emailHtml = render(
-                React.createElement(InvitationEmail, {
-                    name: name,
-                    confirmationUrl: confirmationUrl,
-                })
-            );
-
-            console.log(`Attempting to send welcome email to ${email} from oliver@oliverr.kuky.pro`);
-            try {
-                const { data: emailData, error: emailError } = await resend.emails.send({
-                    from: 'Oliver <oliver@oliverr.kuky.pro>',
-                    to: [email],
-                    subject: 'Bem-vindo ao Oliver! Sua conta está pronta.',
-                    html: emailHtml,
-                });
-
-                if (emailError) {
-                  // Log the error but don't block the process.
-                  // The outer catch will not receive this, but it will be logged.
-                  console.error(`Resend API error for ${email}:`, JSON.stringify(emailError));
-                } else {
-                  console.log(`Welcome email sent successfully to ${email}. Response:`, JSON.stringify(emailData));
-                }
-            } catch (emailError) {
-                console.error(`Failed to send welcome email to ${email}:`, emailError);
-                // Not throwing error, as payment is processed and user is created.
-            }
         } else {
-            console.error(`Could not get action_link for user ${email}. Welcome email not sent.`);
-        }
-        
-        const expirationDate = new Date();
-        expirationDate.setMonth(expirationDate.getMonth() + 1);
+          // Sub-case 2.2: Brand new user creation
+          console.log(`Creating new user for email: ${email}`);
+          const randomPassword = crypto.randomUUID();
+          
+          const { data: { user }, error: userError } = await supabaseAdmin.auth.admin.createUser({
+              email,
+              password: randomPassword,
+              email_confirm: true,
+              user_metadata: { name }
+          });
 
-        // O trigger on_auth_user_created já cria o perfil. Aqui, atualizamos com os dados corretos da assinatura.
-        await supabaseAdmin.from('user_profiles').update({
-            expiration_date: expirationDate.toISOString(), 
-            is_active: true
-        }).eq('id', userId);
-        
-        await supabaseAdmin.from('subscriptions').insert({ 
-            user_id: userId, 
-            status: 'active', 
-            mercado_pago_subscription_id: mercadoPagoSubscriptionId, 
-            current_period_end: expirationDate.toISOString(), 
-            plan_id: 'monthly_brl_40' 
-        });
-        
-        console.log(`Profile updated and subscription created for user ${userId}. License valid until ${expirationDate.toISOString()}`);
-        console.log(`Welcome email sent to user. They will set their own password.`);
+          if (userError) {
+              console.error('Error creating user:', userError);
+              throw userError;
+          }
+          
+          const userId = user.id;
+          console.log(`User created successfully with ID: ${userId}`);
+          
+          // Set up subscription for the new user
+          await processSubscriptionUpdate(userId, mercadoPagoPaymentId);
+          
+          // Generate password reset link and send welcome email
+          const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
+              type: 'recovery',
+              email: email,
+          });
+
+          if (linkError) {
+              console.error(`Error generating password recovery link for ${email}:`, linkError);
+          }
+
+          if (linkData?.properties?.action_link) {
+              const confirmationUrl = linkData.properties.action_link;
+              const emailHtml = render(
+                  React.createElement(InvitationEmail, {
+                      name: name,
+                      confirmationUrl: confirmationUrl,
+                  })
+              );
+
+              console.log(`Attempting to send welcome email to ${email} from oliver@oliverr.kuky.pro`);
+              try {
+                  const { data: emailData, error: emailError } = await resend.emails.send({
+                      from: 'Oliver <oliver@oliverr.kuky.pro>',
+                      to: [email],
+                      subject: 'Bem-vindo ao Oliver! Sua conta está pronta.',
+                      html: emailHtml,
+                  });
+
+                  if (emailError) {
+                    console.error(`Resend API error for ${email}:`, JSON.stringify(emailError));
+                  } else {
+                    console.log(`Welcome email sent successfully to ${email}. Response:`, JSON.stringify(emailData));
+                  }
+              } catch (emailError) {
+                  console.error(`Failed to send welcome email to ${email}:`, emailError);
+              }
+          } else {
+              console.error(`Could not get action_link for user ${email}. Welcome email not sent.`);
+          }
+          console.log(`New user ${email} signup process complete.`);
+        }
       }
     } else if (['cancelled', 'refunded', 'charged_back'].includes(paymentInfo.status ?? '')) {
       const externalReference = paymentInfo.external_reference;
@@ -225,3 +233,4 @@ serve(async (req) => {
     })
   }
 })
+
