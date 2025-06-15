@@ -10,23 +10,48 @@ export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
 
   return (
-    <div className="grid grid-cols-2 gap-2 rounded-lg bg-muted p-1">
-      <Button
-        variant={theme === 'light' ? 'secondary' : 'ghost'}
-        size="sm"
-        onClick={() => setTheme("light")}
-        className="h-10 rounded-md"
-      >
-        <Sun className="h-5 w-5" />
-      </Button>
-      <Button
-        variant={theme === 'dark' ? 'secondary' : 'ghost'}
-        size="sm"
-        onClick={() => setTheme("dark")}
-        className="h-10 rounded-md"
-      >
-        <Moon className="h-5 w-5" />
-      </Button>
+    <div className="relative rounded-xl bg-muted/50 p-1 border border-border/50 shadow-soft backdrop-blur-sm">
+      {/* Background slider */}
+      <div 
+        className={`absolute top-1 h-10 w-[calc(50%-4px)] bg-background rounded-lg shadow-medium transition-all duration-500 ease-out ${
+          theme === 'dark' ? 'translate-x-[calc(100%+8px)]' : 'translate-x-0'
+        }`}
+      />
+      
+      <div className="relative grid grid-cols-2 gap-1">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setTheme("light")}
+          className={`h-10 rounded-lg transition-all duration-300 ease-out hover:scale-105 active:scale-95 ${
+            theme === 'light' 
+              ? 'text-foreground shadow-none' 
+              : 'text-muted-foreground hover:text-foreground'
+          }`}
+        >
+          <Sun className={`h-5 w-5 transition-all duration-500 ease-out ${
+            theme === 'light' 
+              ? 'rotate-0 scale-110' 
+              : 'rotate-90 scale-100'
+          }`} />
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setTheme("dark")}
+          className={`h-10 rounded-lg transition-all duration-300 ease-out hover:scale-105 active:scale-95 ${
+            theme === 'dark' 
+              ? 'text-foreground shadow-none' 
+              : 'text-muted-foreground hover:text-foreground'
+          }`}
+        >
+          <Moon className={`h-5 w-5 transition-all duration-500 ease-out ${
+            theme === 'dark' 
+              ? 'rotate-0 scale-110' 
+              : '-rotate-90 scale-100'
+          }`} />
+        </Button>
+      </div>
     </div>
   );
 }
