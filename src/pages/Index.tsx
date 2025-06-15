@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Link, Navigate } from 'react-router-dom';
@@ -6,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { FileText, Calculator, Smartphone, Shield, Star, Activity } from 'lucide-react';
 import { DashboardSkeleton } from '@/components/ui/loading-states';
-
 const Index = () => {
   const {
     user,
@@ -135,13 +133,13 @@ const Index = () => {
       </section>
 
       {/* Footer */}
-      <footer className="py-8 px-4 sm:px-6 lg:px-8 bg-[#0b0000]">
+      <footer className="py-8 px-4 sm:px-6 lg:px-8 bg-black">
         <div className="max-w-6xl mx-auto text-center">
           <div className="flex items-center justify-center space-x-2 mb-4">
             <img src="/icone.png" alt="Oliver Logo" className="h-6 w-6" />
             <span className="text-xl font-bold text-white">Oliver</span>
           </div>
-          <p className="text-gray-600">© 2025 Oliver. Sistema profissional para gestão de orçamentos.</p>
+          <p className="text-white">© 2025 Oliver. Sistema profissional para gestão de orçamentos.</p>
         </div>
       </footer>
     </div>;
