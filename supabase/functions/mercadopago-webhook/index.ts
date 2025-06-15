@@ -1,10 +1,6 @@
 
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-import { Resend } from 'npm:resend@3.4.0'
-import { renderAsync } from 'npm:@react-email/components@0.0.22'
-import React from 'npm:react@18.3.1'
-import { InvitationEmail } from './_templates/invitation-email.tsx'
 
 const supabaseAdmin = createClient(
   Deno.env.get('SUPABASE_URL') ?? '',
@@ -100,6 +96,7 @@ serve(async (req) => {
           return new Response('Webhook processed: User already exists.', { status: 200 });
         }
 
+        // Usar o sistema de convite nativo do Supabase
         const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
             type: 'invite',
             email: email,
@@ -111,39 +108,9 @@ serve(async (req) => {
             throw linkError;
         }
         
-        const { properties, user } = linkData;
-        const confirmationUrl = properties.action_link;
+        const { user } = linkData;
         const userId = user.id;
-        console.log(`User created via invite link generation with ID: ${userId}`);
-
-        const resendApiKey = Deno.env.get('RESEND_API_KEY');
-        if (!resendApiKey) {
-            console.error('RESEND_API_KEY is not set. Cannot send custom email. User will not be notified.');
-            throw new Error('RESEND_API_KEY is not configured. Cannot send invitation email.');
-        }
-        const resend = new Resend(resendApiKey);
-
-        const emailHtml = await renderAsync(
-            React.createElement(InvitationEmail, {
-                name: name,
-                confirmationUrl: confirmationUrl,
-            })
-        );
-        
-        // IMPORTANTE: O e-mail "from" deve ser de um domínio verificado no seu painel do Resend.
-        const { data: emailData, error: emailError } = await resend.emails.send({
-            from: 'Oliver <bemvindo@seu-dominio-verificado.com>',
-            to: [email],
-            subject: 'Bem-vindo ao Oliver! Complete seu cadastro.',
-            html: emailHtml,
-        });
-
-        if (emailError) {
-            console.error('Error sending email via Resend:', emailError);
-            throw new Error(`Failed to send invitation email: ${emailError.message}`);
-        }
-
-        console.log(`Custom invitation email sent to ${email} successfully. Message ID: ${emailData?.id}`);
+        console.log(`User invited via Supabase native email system with ID: ${userId}`);
         
         const expirationDate = new Date();
         expirationDate.setMonth(expirationDate.getMonth() + 1);
@@ -163,6 +130,7 @@ serve(async (req) => {
         });
         
         console.log(`Profile updated and subscription created for user ${userId}. License valid until ${expirationDate.toISOString()}`);
+        console.log(`Supabase native invitation email sent to ${email} automatically.`);
       }
     } else if (['cancelled', 'refunded', 'charged_back'].includes(paymentInfo.status ?? '')) {
         const externalReference = paymentInfo.external_reference;
@@ -191,4 +159,3 @@ serve(async (req) => {
     })
   }
 })
-
