@@ -46,6 +46,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const { showSuccess, showError, showLoading } = useEnhancedToast();
+  const navigate = useNavigate();
 
   const { data: profile } = useQuery({
     queryKey: ['user-profile', user?.id],
@@ -73,15 +74,45 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     console.log('Setting up auth state listener');
-    // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         console.log('Auth state changed:', event, session?.user?.email);
+
+        // Sempre atualiza o estado da sessão
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
 
-        // Create user profile if needed (with timeout to avoid blocking)
+        // Trata redirecionamentos e notificações com base no evento, especialmente da página /verify
+        if (window.location.pathname === '/verify') {
+          switch (event) {
+            case 'PASSWORD_RECOVERY':
+              console.log('Token de recuperação de senha processado. Redirecionando...');
+              // A sessão agora está ativa, então podemos redirecionar para o formulário de redefinição de senha.
+              navigate('/reset-password', { replace: true });
+              return; // Para o processamento posterior deste evento
+            case 'USER_UPDATED':
+              console.log('Confirmação de alteração de e-mail do usuário.');
+              showSuccess({
+                title: 'Email atualizado!',
+                description: 'Seu endereço de e-mail foi confirmado com sucesso.',
+              });
+              navigate('/dashboard', { replace: true });
+              return; // Para o processamento posterior deste evento
+            case 'SIGNED_IN':
+               console.log('Confirmação de cadastro bem-sucedida.');
+               showSuccess({
+                 title: 'Conta confirmada!',
+                 description: 'Bem-vindo! Seu cadastro foi concluído.',
+               });
+               navigate('/dashboard', { replace: true });
+               return; // Para o processamento posterior deste evento
+            default:
+              break;
+          }
+        }
+
+        // Esta parte é executada para logins iniciais ou se não vier da página /verify
         if (event === 'SIGNED_IN' && session?.user) {
           setTimeout(async () => {
             try {
@@ -124,7 +155,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [navigate, showSuccess]);
 
   const signIn = async (email: string, password: string) => {
     try {

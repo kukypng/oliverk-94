@@ -1,42 +1,45 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Loader2 } from 'lucide-react';
+import { Loader2, AlertCircle } from 'lucide-react';
 import { useEnhancedToast } from '@/hooks/useEnhancedToast';
+import { Button } from '@/components/ui/button';
 
 export const VerifyPage = () => {
   const navigate = useNavigate();
   const { showError } = useEnhancedToast();
+  const [timedOut, setTimedOut] = useState(false);
+
+  // A lógica principal agora está no onAuthStateChange do useAuth.tsx.
+  // Esta página apenas exibe um estado de carregamento e trata os timeouts.
 
   useEffect(() => {
-    const hash = window.location.hash;
-    
-    // Remove o '#' inicial para facilitar a análise
-    const params = new URLSearchParams(hash.substring(1));
-    const type = params.get('type');
-
-    let redirectPath = '';
-
-    if (type === 'recovery') {
-      console.log('Token de recuperação de senha detectado. Redirecionando...');
-      redirectPath = '/reset-password';
-    } else if (type === 'email_change') {
-      console.log('Token de alteração de e-mail detectado. Redirecionando...');
-      redirectPath = '/reset-email';
-    }
-
-    if (redirectPath) {
-      // O hash completo (incluindo o token) é necessário na página de destino
-      navigate(redirectPath + hash, { replace: true });
-    } else {
-      console.error('Tipo de token inválido ou ausente:', type);
+    const timer = setTimeout(() => {
+      console.error('A verificação expirou. O link pode ser inválido ou ter expirado.');
       showError({
-        title: 'Link Inválido',
+        title: 'Falha na Verificação',
         description: 'O link de verificação é inválido ou expirou. Por favor, tente novamente.',
       });
-      navigate('/auth', { replace: true });
-    }
-  }, [navigate, showError]);
+      setTimedOut(true);
+    }, 10000); // Timeout de 10 segundos
+
+    return () => clearTimeout(timer);
+  }, [showError]);
+
+  if (timedOut) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-background text-foreground p-4">
+        <AlertCircle className="h-12 w-12 text-destructive mb-4" />
+        <h1 className="text-2xl font-bold mb-2">Link Inválido</h1>
+        <p className="text-muted-foreground mb-6 text-center max-w-sm">
+          Não foi possível verificar seu link. Ele pode ter expirado ou já ter sido usado.
+        </p>
+        <Button onClick={() => navigate('/auth', { replace: true })}>
+          Voltar para o Login
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-background text-foreground">
