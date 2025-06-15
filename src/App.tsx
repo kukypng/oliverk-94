@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -86,11 +85,7 @@ const App = () => (
                 />
                 <Route
                   path="/signup"
-                  element={
-                    <ProtectedRoute requiredRole="admin">
-                      <SignUpPage />
-                    </ProtectedRoute>
-                  }
+                  element={<SignUpPage />}
                 />
                 <Route path="/dashboard/*" element={<Dashboard />} />
                 <Route path="*" element={<NotFound />} />

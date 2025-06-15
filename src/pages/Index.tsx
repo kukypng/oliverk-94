@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { FileText, Calculator, Smartphone, Shield, Star, Activity } from 'lucide-react';
 import { DashboardSkeleton } from '@/components/ui/loading-states';
+
 const Index = () => {
   const {
     user,
@@ -31,11 +32,14 @@ const Index = () => {
               <h1 className="text-2xl font-bold text-white">Oliver</h1>
             </Link>
             <div className="flex items-center space-x-2">
-              <Button asChild variant="link" className="text-white hover:text-primary">
+              <Button asChild variant="ghost" className="text-white hover:bg-primary/10">
                 <Link to="/planos">Planos</Link>
               </Button>
-              <Button asChild className="bg-primary hover:bg-primary/90 text-primary-foreground">
+              <Button asChild variant="outline" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground">
                 <Link to="/auth">Login</Link>
+              </Button>
+               <Button asChild className="bg-primary hover:bg-primary/90 text-primary-foreground">
+                <Link to="/signup">Criar Conta</Link>
               </Button>
             </div>
           </div>
@@ -56,7 +60,7 @@ const Index = () => {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button asChild size="lg" className="text-lg px-8 py-3 bg-primary hover:bg-primary/90 text-primary-foreground">
-              <Link to="/auth">Começar Agora</Link>
+              <Link to="/signup">Começar Agora</Link>
             </Button>
             <Button size="lg" variant="outline" className="text-lg px-8 py-3 border-primary text-primary hover:bg-primary hover:text-primary-foreground" onClick={() => window.open('https://wa.me/556496028022', '_blank')}>
               Entre em contato
@@ -125,7 +129,7 @@ const Index = () => {
             para gerenciar seus negócios de forma mais eficiente.
           </p>
           <Button asChild size="lg" className="text-lg px-8 py-3 bg-primary hover:bg-primary/90 text-primary-foreground">
-            <Link to="/auth">Criar Conta Gratuita</Link>
+            <Link to="/signup">Criar Conta Agora</Link>
           </Button>
         </div>
       </section>

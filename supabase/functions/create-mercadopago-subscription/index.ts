@@ -2,11 +2,7 @@
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { MercadoPagoConfig, PreApproval } from 'https://esm.sh/mercadopago@2.0.9'
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
+import { corsHeaders } from '../_shared/cors.ts'
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -20,16 +16,37 @@ serve(async (req) => {
       { global: { headers: { Authorization: req.headers.get('Authorization')! } } }
     )
 
+    const { origin, name, email } = await req.json();
+
+    let userId = null;
+    let payerEmail = email;
+    let externalReference;
+
     const { data: { user } } = await supabaseClient.auth.getUser()
 
-    if (!user) {
-      return new Response(JSON.stringify({ error: 'Usuário não autenticado.' }), {
+    if (user) {
+      // User is authenticated (renewal flow)
+      userId = user.id;
+      payerEmail = user.email;
+      externalReference = userId;
+      console.log(`Renewal flow for user: ${userId}`);
+    } else if (name && email) {
+      // New user signup flow
+      externalReference = JSON.stringify({ name, email });
+      console.log(`New signup flow for email: ${email}`);
+      if (externalReference.length > 256) {
+        return new Response(JSON.stringify({ error: 'Dados do usuário muito longos para referência.' }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            status: 400,
+        });
+      }
+    } else {
+       return new Response(JSON.stringify({ error: 'Usuário não autenticado e dados de cadastro incompletos.' }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 401,
       })
     }
     
-    const { origin } = await req.json();
     if (!origin) {
         return new Response(JSON.stringify({ error: 'Origin (URL base do site) é necessária.' }), {
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -57,9 +74,9 @@ serve(async (req) => {
         transaction_amount: 40,
         currency_id: 'BRL',
       },
-      back_url: `${origin}/dashboard?subscription=success`,
-      payer_email: user.email,
-      external_reference: user.id,
+      back_url: `${origin}/auth?signup_complete=true`,
+      payer_email: payerEmail,
+      external_reference: externalReference,
       notification_url: `https://oghjlypdnmqecaavekyr.supabase.co/functions/v1/mercadopago-webhook`,
     };
 

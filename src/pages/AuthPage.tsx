@@ -6,18 +6,31 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/hooks/useAuth';
 import { Loader2, Eye, EyeOff } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
+import { toast } from 'sonner';
 
 export const AuthPage = () => {
   const { signIn, user, loading: authLoading } = useAuth();
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [searchParams] = useSearchParams();
 
   const [loginForm, setLoginForm] = useState({
     email: '',
     password: ''
   });
+
+  useEffect(() => {
+    if (searchParams.get('signup_complete') === 'true') {
+      toast.success("Pagamento recebido!", {
+        description: "Verifique seu e-mail para confirmar sua conta e definir sua senha.",
+        duration: 10000,
+      });
+      // Navegue para o estado limpo para não mostrar o toast novamente no refresh
+      window.history.replaceState({}, document.title, "/auth");
+    }
+  }, [searchParams]);
 
   // Redirecionar usuários já logados
   useEffect(() => {
@@ -131,6 +144,15 @@ export const AuthPage = () => {
             </form>
           </CardContent>
         </Card>
+
+        <div className="text-center mt-8 text-sm text-muted-foreground animate-fade-in">
+          <p>
+            Não tem uma conta?{' '}
+            <Link to="/signup" className="font-semibold text-primary hover:underline">
+              Crie uma agora
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );
