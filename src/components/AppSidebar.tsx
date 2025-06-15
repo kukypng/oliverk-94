@@ -94,7 +94,6 @@ export const AppSidebar = ({ activeTab, onTabChange }: AppSidebarProps) => {
             <SidebarMenu className="w-full">
                 <SidebarMenuItem className="p-1">
                     <SidebarMenuButton
-                        variant="ghost"
                         className="w-full h-12 text-base font-medium rounded-lg text-muted-foreground hover:text-foreground"
                         onClick={signOut}
                         tooltip="Sair"
