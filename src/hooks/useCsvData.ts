@@ -1,4 +1,3 @@
-
 import * as FileSaver from 'file-saver';
 import { supabase } from '@/integrations/supabase/client';
 import { useEnhancedToast } from '@/hooks/useEnhancedToast';
@@ -6,7 +5,7 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import { useAuth } from './useAuth';
 import { useQueryClient } from '@tanstack/react-query';
-import { generateExportCsv, generateTemplateCsv, parseAndPrepareBudgets } from '@/utils/csvProcessor';
+import { generateExportCsv, generateTemplateCsv, parseAndPrepareBudgets } from '@/utils/csv';
 
 export const useCsvData = () => {
   const { showSuccess, showError, showWarning } = useEnhancedToast();
