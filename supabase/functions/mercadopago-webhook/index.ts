@@ -8,7 +8,7 @@ const supabaseAdmin = createClient(
 )
 
 // Helper function to process subscription updates (creation or renewal)
-async function processSubscriptionUpdate(userId: string, mercadoPagoPaymentId: string | undefined) {
+async function processSubscriptionUpdate(userId: string, mercadoPagoPaymentId: string | undefined, nameFromMetadata?: string) {
   console.log(`Processing subscription update for user ID: ${userId}`);
 
   const { data: profile } = await supabaseAdmin.from('user_profiles').select('expiration_date').eq('id', userId).single();
@@ -29,12 +29,47 @@ async function processSubscriptionUpdate(userId: string, mercadoPagoPaymentId: s
     newExpirationDate = new Date(newCurrentExpiration.setMonth(newCurrentExpiration.getMonth() + 1));
   }
 
-  // Upsert user profile to handle both new and existing users, ensuring it is active
-  await supabaseAdmin.from('user_profiles').upsert({
+  // Build the data object for upserting
+  const upsertData: { id: string, expiration_date: string, is_active: boolean, name?: string } = {
     id: userId,
     expiration_date: newExpirationDate.toISOString(),
-    is_active: true
-  }, { onConflict: 'id' });
+    is_active: true,
+  };
+
+  // If the profile doesn't exist, we're doing an INSERT, which requires a `name`.
+  if (!profile) {
+    let finalName = nameFromMetadata;
+
+    // If a name wasn't passed, we MUST fetch user details from Auth to get one.
+    if (!finalName) {
+      console.log(`Name not provided in metadata for ${userId}, fetching from Supabase Auth.`);
+      const { data: { user }, error: getUserError } = await supabaseAdmin.auth.admin.getUserById(userId);
+
+      if (getUserError || !user) {
+        console.error(`FATAL: Could not fetch user data for user ID: ${userId}`, getUserError);
+        throw new Error(`Could not fetch user data for user ID: ${userId}`);
+      }
+      
+      // Use name from user_metadata, or fall back to the email.
+      finalName = user.user_metadata?.name || user.email;
+      if (!finalName) {
+        console.error(`FATAL: User ${userId} has no name in metadata and no email.`);
+        throw new Error(`User ${userId} has no name or email that can be used for the profile.`);
+      }
+      console.log(`Successfully fetched name for user ${userId}: ${finalName}`);
+    }
+    
+    upsertData.name = finalName;
+  }
+
+  // Upsert user profile. This will either create a new profile (with a name) or update an existing one.
+  const { error: upsertError } = await supabaseAdmin.from('user_profiles').upsert(upsertData, { onConflict: 'id' });
+
+  if (upsertError) {
+      console.error('Error upserting user profile:', upsertError);
+      throw upsertError;
+  }
+
 
   await supabaseAdmin.from('subscriptions').upsert({
     user_id: userId,
@@ -142,7 +177,7 @@ serve(async (req) => {
           // Sub-case 2.1: User is confirmed and has logged in before. Treat as renewal.
           const userId = existingUser.id;
           console.log(`User with email ${email} already exists and has logged in (ID: ${userId}). Treating as renewal.`);
-          await processSubscriptionUpdate(userId, mercadoPagoPaymentId);
+          await processSubscriptionUpdate(userId, mercadoPagoPaymentId, name);
           console.log(`Renewal for existing user ${email} complete.`);
 
         } else {
@@ -171,7 +206,7 @@ serve(async (req) => {
           console.log(`User invited successfully with ID: ${userId}. An invitation email will be sent by Supabase.`);
           
           // Set up subscription for the new user
-          await processSubscriptionUpdate(userId, mercadoPagoPaymentId);
+          await processSubscriptionUpdate(userId, mercadoPagoPaymentId, name);
           
           console.log(`New user signup/invite process for ${email} complete.`);
         }
@@ -203,4 +238,3 @@ serve(async (req) => {
     })
   }
 })
-
