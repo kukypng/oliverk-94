@@ -28,7 +28,7 @@ export const SubscriptionButton: React.FC<SubscriptionButtonProps> = ({ children
 
     setIsLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke('create-stripe-subscription', {
+      const { data, error } = await supabase.functions.invoke('create-mercadopago-subscription', {
         body: { origin: window.location.origin }
       });
 
