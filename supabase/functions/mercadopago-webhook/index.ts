@@ -1,3 +1,4 @@
+
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
@@ -125,18 +126,32 @@ serve(async (req) => {
         const { user_name: name, user_email: email } = metadata;
         console.log(`New user signup or renewal process started for email: ${email}`);
 
-        const { data: { users: existingUsers } } = await supabaseAdmin.auth.admin.listUsers({ email });
+        const { data: { users: existingUsers }, error: listError } = await supabaseAdmin.auth.admin.listUsers({ email });
+
+        if (listError) {
+          console.error(`Error checking for existing user with email ${email}:`, listError);
+          throw listError;
+        }
         
-        if (existingUsers && existingUsers.length > 0) {
-          // Sub-case 2.1: User already exists, treat as renewal
-          const userId = existingUsers[0].id;
-          console.warn(`User with email ${email} already exists (ID: ${userId}). Treating as renewal.`);
+        const existingUser = existingUsers && existingUsers.length > 0 ? existingUsers[0] : null;
+        
+        // A user is only considered "existing" for renewal if they have actually signed in before.
+        // If last_sign_in_at is null, they are an invited user who hasn't completed signup.
+        // We should re-trigger the invitation for them.
+        if (existingUser && existingUser.last_sign_in_at) {
+          // Sub-case 2.1: User is confirmed and has logged in before. Treat as renewal.
+          const userId = existingUser.id;
+          console.log(`User with email ${email} already exists and has logged in (ID: ${userId}). Treating as renewal.`);
           await processSubscriptionUpdate(userId, mercadoPagoPaymentId);
           console.log(`Renewal for existing user ${email} complete.`);
 
         } else {
-          // Sub-case 2.2: Brand new user creation using Supabase Invite
-          console.log(`Inviting new user for email: ${email}`);
+          // Sub-case 2.2: Brand new user, or an invited user who hasn't logged in yet.
+          if (existingUser) {
+            console.log(`User with email ${email} exists but has never logged in. Re-initiating invitation.`);
+          } else {
+            console.log(`Inviting new user for email: ${email}`);
+          }
           
           const { data: { user }, error: inviteError } = await supabaseAdmin.auth.admin.inviteUserByEmail(
             email,
@@ -144,7 +159,7 @@ serve(async (req) => {
           );
 
           if (inviteError) {
-              console.error('Error inviting user:', inviteError);
+              console.error(`Error inviting user ${email}:`, inviteError);
               throw inviteError;
           }
 
@@ -158,7 +173,7 @@ serve(async (req) => {
           // Set up subscription for the new user
           await processSubscriptionUpdate(userId, mercadoPagoPaymentId);
           
-          console.log(`New user ${email} signup process complete.`);
+          console.log(`New user signup/invite process for ${email} complete.`);
         }
       }
     } else if (['cancelled', 'refunded', 'charged_back'].includes(paymentInfo.status ?? '')) {
@@ -188,3 +203,4 @@ serve(async (req) => {
     })
   }
 })
+
