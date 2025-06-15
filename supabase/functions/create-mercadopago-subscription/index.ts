@@ -1,16 +1,11 @@
 
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-import { MercadoPagoConfig, Preference } from 'https://esm.sh/mercadopago@2.0.9'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
-
-const accessToken = Deno.env.get('MERCADO_PAGO_ACCESS_TOKEN') ?? ''
-const client = new MercadoPagoConfig({ accessToken });
-const preference = new Preference(client);
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -45,12 +40,10 @@ serve(async (req) => {
     };
 
     if (user) {
-      // User is authenticated (renewal flow)
       console.log(`Renewal flow for user: ${user.id}`);
       payer = { email: user.email };
       external_reference = JSON.stringify({ supabase_user_id: user.id });
     } else if (name && email) {
-      // New user signup flow
       console.log(`New signup flow for email: ${email}`);
       payer = { name, email };
       external_reference = JSON.stringify({ user_name: name, user_email: email });
@@ -87,7 +80,38 @@ serve(async (req) => {
       },
     };
 
-    const createdPreference = await preference.create({ body: preferenceData });
+    const accessToken = Deno.env.get('MERCADO_PAGO_ACCESS_TOKEN');
+    if (!accessToken) {
+      console.error('MERCADO_PAGO_ACCESS_TOKEN is not set.');
+      return new Response(JSON.stringify({ error: 'Internal server configuration error.' }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 500,
+      });
+    }
+
+    console.log("Creating Mercado Pago preference with data:", JSON.stringify(preferenceData, null, 2));
+
+    const response = await fetch('https://api.mercadopago.com/checkout/preferences', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify(preferenceData),
+    });
+
+    if (!response.ok) {
+      const errorBody = await response.text();
+      console.error('Mercado Pago API error response:', errorBody);
+      try {
+        const jsonError = JSON.parse(errorBody);
+        throw new Error(`Error from Mercado Pago: ${jsonError.message || response.statusText}`);
+      } catch (e) {
+        throw new Error(`Error from Mercado Pago: ${response.statusText} - ${errorBody}`);
+      }
+    }
+
+    const createdPreference = await response.json();
     
     if (!createdPreference.init_point) {
         console.error("Failed to get checkout session URL from Mercado Pago", createdPreference);

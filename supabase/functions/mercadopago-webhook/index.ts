@@ -1,16 +1,11 @@
 
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-import { MercadoPagoConfig, Payment } from 'https://esm.sh/mercadopago@2.0.9'
 
 const supabaseAdmin = createClient(
   Deno.env.get('SUPABASE_URL') ?? '',
   Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
 )
-
-const accessToken = Deno.env.get('MERCADO_PAGO_ACCESS_TOKEN') ?? ''
-const client = new MercadoPagoConfig({ accessToken });
-const payment = new Payment(client);
 
 serve(async (req) => {
   if (req.method !== 'POST') {
@@ -27,7 +22,32 @@ serve(async (req) => {
 
   try {
     const paymentId = body.data.id;
-    const paymentInfo = await payment.get({ id: paymentId });
+    
+    const accessToken = Deno.env.get('MERCADO_PAGO_ACCESS_TOKEN');
+    if (!accessToken) {
+        console.error('MERCADO_PAGO_ACCESS_TOKEN is not set.');
+        throw new Error('Internal server configuration error.');
+    }
+
+    const paymentResponse = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${accessToken}`,
+        },
+    });
+
+    if (!paymentResponse.ok) {
+        const errorBody = await paymentResponse.text();
+        console.error(`Mercado Pago API error fetching payment ${paymentId}:`, errorBody);
+        try {
+          const jsonError = JSON.parse(errorBody);
+          throw new Error(`Error from Mercado Pago: ${jsonError.message || paymentResponse.statusText}`);
+        } catch(e) {
+          throw new Error(`Error from Mercado Pago: ${paymentResponse.statusText} - ${errorBody}`);
+        }
+    }
+
+    const paymentInfo = await paymentResponse.json();
     
     console.log(`Processing payment ${paymentId} with status ${paymentInfo.status}`);
 
@@ -38,7 +58,7 @@ serve(async (req) => {
       }
 
       const metadata = JSON.parse(externalReference);
-      const mercadoPagoSubscriptionId = paymentInfo.order?.id?.toString();
+      const mercadoPagoSubscriptionId = paymentInfo.id?.toString();
 
       if (metadata.supabase_user_id) {
         const userId = metadata.supabase_user_id;
