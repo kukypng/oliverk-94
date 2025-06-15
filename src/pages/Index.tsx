@@ -31,7 +31,7 @@ const Index = () => {
             </Link>
             <div className="flex items-center space-x-2">
               <Button asChild variant="ghost" className="text-white hover:bg-primary/10">
-                <Link to="/planos">Planos</Link>
+                
               </Button>
               <Button asChild variant="outline" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground">
                 <Link to="/auth">Login</Link>
