@@ -244,7 +244,7 @@ export const AuthPage = () => {
         <div className="text-center mt-8 text-sm text-muted-foreground animate-fade-in">
           <p>
             Não tem uma conta?{' '}
-            <Link to="/signup" className="font-semibold text-primary hover:underline">
+            <Link to="/plans" className="font-semibold text-primary hover:underline">
               Crie uma agora
             </Link>
           </p>

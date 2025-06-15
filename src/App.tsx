@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -8,6 +9,7 @@ import { AuthProvider } from "@/hooks/useAuth";
 import Index from "./pages/Index";
 import { AuthPage } from "./pages/AuthPage";
 import { SignUpPage } from "./pages/SignUpPage";
+import { PlansPage } from "./pages/PlansPage";
 import { Dashboard } from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 import { ThemeProvider } from "./components/ThemeProvider";
@@ -71,6 +73,7 @@ const App = () => (
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/auth" element={<AuthPage />} />
+                <Route path="/plans" element={<PlansPage />} />
                 <Route path="/reset-password" element={<ResetPasswordPage />} />
                 <Route path="/verify" element={<VerifyPage />} />
                 <Route
