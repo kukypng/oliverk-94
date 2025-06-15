@@ -1,3 +1,4 @@
+
 /**
  * Gera o conteúdo CSV para o modelo de importação com um layout amigável, semelhante a uma planilha.
  * @returns O conteúdo do arquivo de modelo CSV como uma string.
@@ -10,16 +11,17 @@ export const generateTemplateCsv = (): string => {
     'INSTRUCOES:',
     '1. Preencha uma linha para cada orcamento, seguindo as colunas definidas abaixo.',
     '2. NAO altere os nomes das colunas.',
-    '3. Campos com (*) sao obrigatorios.',
+    '3. Campos como "Tipo Aparelho", "Modelo Aparelho", "Defeito ou Problema", "Servico Realizado" e "Preco Total" são obrigatórios.',
     '4. Para precos, use virgula ou ponto como separador decimal (ex: 150.00 ou 150,00).',
     '5. Para colunas de sim/nao, digite exatamente "sim" ou "nao".',
+    '6. A linha de exemplo abaixo deve ser substituida pelos seus dados.',
     ''
   ];
 
-  // Cabeçalhos amigáveis para o usuário, compatíveis com a exportação
+  // Cabeçalhos alinhados com o formato de exportação para garantir compatibilidade.
   const headers = [
-    'Tipo Aparelho (*)', 'Marca Aparelho', 'Modelo Aparelho (*)', 'Defeito ou Problema (*)',
-    'Servico Realizado (*)', 'Observacoes', 'Preco Total (*)', 'Preco Parcelado', 'Parcelas',
+    'Tipo Aparelho', 'Marca Aparelho', 'Modelo Aparelho', 'Defeito ou Problema',
+    'Servico Realizado', 'Observacoes', 'Preco Total', 'Preco Parcelado', 'Parcelas',
     'Condicao Pagamento', 'Garantia (meses)', 'Validade (dias)', 'Inclui Entrega',
     'Inclui Pelicula'
   ];
