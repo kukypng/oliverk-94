@@ -1,10 +1,9 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { differenceInDays, parseISO } from 'date-fns';
-import { MessageCircle } from 'lucide-react';
+import { CreditCard } from 'lucide-react';
+import { SubscriptionButton } from '../SubscriptionButton';
 
 export const LicenseStatus = () => {
   const { profile } = useAuth();
@@ -16,10 +15,6 @@ export const LicenseStatus = () => {
   const expirationDate = parseISO(profile.expiration_date);
   const today = new Date();
   const remainingDays = differenceInDays(expirationDate, today);
-
-  const handleWhatsAppContact = () => {
-    window.open('https://wa.me/556496028022', '_blank');
-  };
 
   const getStatus = () => {
     if (remainingDays < 0) {
@@ -91,10 +86,10 @@ export const LicenseStatus = () => {
           {status.description}
         </p>
         {status.showRenew && (
-          <Button onClick={handleWhatsAppContact} className="w-full bg-green-600 hover:bg-green-700 text-white">
-            <MessageCircle className="w-4 h-4 mr-2" />
-            Renovar pelo WhatsApp
-          </Button>
+          <SubscriptionButton className="w-full bg-green-600 hover:bg-green-700 text-white">
+            <CreditCard className="w-4 h-4 mr-2" />
+            Renovar Assinatura
+          </SubscriptionButton>
         )}
       </CardContent>
     </Card>

@@ -1,12 +1,13 @@
-
 import { useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useEnhancedToast, EnhancedToastOptions } from '@/hooks/useEnhancedToast';
 import { differenceInDays, parseISO, format } from 'date-fns';
+import { useNavigate } from 'react-router-dom';
 
 export const useLicenseNotifications = () => {
   const { profile } = useAuth();
   const { showWarning, showError } = useEnhancedToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!profile?.expiration_date) {
@@ -17,8 +18,8 @@ export const useLicenseNotifications = () => {
     const today = new Date();
     const remainingDays = differenceInDays(expirationDate, today);
 
-    const handleWhatsAppContact = () => {
-      window.open('https://wa.me/556496028022', '_blank');
+    const handleGoToPlans = () => {
+      navigate('/plans');
     };
 
     const notify = (key: string, level: 'warn' | 'error', options: EnhancedToastOptions) => {
@@ -41,7 +42,7 @@ export const useLicenseNotifications = () => {
       duration: 10000,
       action: {
         label: "Renovar Agora",
-        onClick: handleWhatsAppContact,
+        onClick: handleGoToPlans,
       },
     };
 
@@ -70,5 +71,5 @@ export const useLicenseNotifications = () => {
         },
       });
     }
-  }, [profile, showWarning, showError]);
+  }, [profile, showWarning, showError, navigate]);
 };

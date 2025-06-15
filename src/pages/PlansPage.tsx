@@ -1,12 +1,10 @@
-
-import React, { useState } from 'react';
+import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Check, Star } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
+import { SubscriptionButton } from '@/components/SubscriptionButton';
 
 const PlansPage = () => {
   const features = [
@@ -20,45 +18,6 @@ const PlansPage = () => {
   ];
 
   const { user } = useAuth();
-  const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handleSubscription = async () => {
-    if (!user) {
-      toast.info("Você precisa fazer login para assinar.", {
-        action: {
-          label: 'Fazer Login',
-          onClick: () => navigate('/auth'),
-        },
-      });
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('create-mercadopago-subscription', {
-          body: { origin: window.location.origin }
-      });
-
-      if (error) {
-          const errorMessage = (error as any).context?.errorMessage || error.message;
-          throw new Error(errorMessage);
-      }
-
-      if (data.init_point) {
-        window.location.href = data.init_point;
-      } else {
-        throw new Error("Não foi possível iniciar o processo de assinatura.");
-      }
-    } catch (error: any) {
-      console.error("Subscription error:", error);
-      toast.error("Erro ao criar assinatura", {
-        description: error.message || "Por favor, tente novamente mais tarde."
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -113,27 +72,13 @@ const PlansPage = () => {
               </ul>
             </CardContent>
             <CardFooter className="p-8 pt-4">
-              <Button 
+              <SubscriptionButton 
                 size="lg" 
                 className="w-full text-lg bg-primary hover:bg-primary/90 text-primary-foreground"
-                onClick={handleSubscription}
-                disabled={isLoading}
               >
-                {isLoading ? (
-                  <div className="flex items-center justify-center">
-                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Processando...
-                  </div>
-                ) : (
-                  <>
-                    <Star className="mr-2 h-5 w-5" />
-                    Assinar Agora
-                  </>
-                )}
-              </Button>
+                <Star className="mr-2 h-5 w-5" />
+                Assinar Agora
+              </SubscriptionButton>
             </CardFooter>
           </Card>
         </div>

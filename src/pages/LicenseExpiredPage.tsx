@@ -1,12 +1,9 @@
-
 import React from 'react';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { MessageCircle, Clock } from 'lucide-react';
+import { Clock, CreditCard } from 'lucide-react';
+import { SubscriptionButton } from '@/components/SubscriptionButton';
+
 export const LicenseExpiredPage = () => {
-  const handleWhatsAppContact = () => {
-    window.open('https://wa.me/556496028022', '_blank');
-  };
   return <div className="min-h-screen flex items-center justify-center p-4">
       <Card className="w-full max-w-md shadow-xl">
         <CardHeader className="text-center">
@@ -33,12 +30,12 @@ export const LicenseExpiredPage = () => {
               Renove sua licença agora
             </h3>
             <p className="text-sm mb-4 text-slate-50">
-              Entre em contato conosco pelo WhatsApp para renovar sua licença e continuar aproveitando todos os recursos do sistema.
+              Clique no botão abaixo para renovar sua licença e continuar aproveitando todos os recursos do sistema.
             </p>
-            <Button onClick={handleWhatsAppContact} className="w-full bg-green-600 hover:bg-green-700 text-white">
-              <MessageCircle className="w-4 h-4 mr-2" />
-              Renovar pelo WhatsApp
-            </Button>
+            <SubscriptionButton className="w-full bg-green-600 hover:bg-green-700 text-white">
+              <CreditCard className="w-4 h-4 mr-2" />
+              Renovar Assinatura
+            </SubscriptionButton>
           </div>
 
           <div className="text-xs text-gray-500 border-t pt-4">
