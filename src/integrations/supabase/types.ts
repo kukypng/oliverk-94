@@ -368,6 +368,47 @@ export type Database = {
         }
         Relationships: []
       }
+      payments: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          id: string
+          mercado_pago_payment_id: string
+          status: Database["public"]["Enums"]["payment_status"]
+          subscription_id: string | null
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          currency: string
+          id?: string
+          mercado_pago_payment_id: string
+          status?: Database["public"]["Enums"]["payment_status"]
+          subscription_id?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          mercado_pago_payment_id?: string
+          status?: Database["public"]["Enums"]["payment_status"]
+          subscription_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
@@ -420,6 +461,39 @@ export type Database = {
           id?: string
           logo_url?: string | null
           shop_name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      subscriptions: {
+        Row: {
+          created_at: string
+          current_period_end: string | null
+          id: string
+          mercado_pago_subscription_id: string | null
+          plan_id: string | null
+          status: Database["public"]["Enums"]["subscription_status"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_period_end?: string | null
+          id?: string
+          mercado_pago_subscription_id?: string | null
+          plan_id?: string | null
+          status?: Database["public"]["Enums"]["subscription_status"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_period_end?: string | null
+          id?: string
+          mercado_pago_subscription_id?: string | null
+          plan_id?: string | null
+          status?: Database["public"]["Enums"]["subscription_status"]
           updated_at?: string
           user_id?: string
         }
@@ -705,7 +779,13 @@ export type Database = {
       }
     }
     Enums: {
-      [_ in never]: never
+      payment_status: "succeeded" | "failed" | "pending" | "refunded"
+      subscription_status:
+        | "active"
+        | "paused"
+        | "cancelled"
+        | "pending"
+        | "expired"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -820,6 +900,15 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      payment_status: ["succeeded", "failed", "pending", "refunded"],
+      subscription_status: [
+        "active",
+        "paused",
+        "cancelled",
+        "pending",
+        "expired",
+      ],
+    },
   },
 } as const
