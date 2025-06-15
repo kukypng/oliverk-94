@@ -10,6 +10,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarSeparator,
+  SidebarRail,
 } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -42,7 +43,8 @@ export const AppSidebar = ({ activeTab, onTabChange }: AppSidebarProps) => {
   ];
 
   return (
-    <Sidebar className="border-r-border/50">
+    <Sidebar className="border-r-border/50" collapsible="icon">
+      <SidebarRail />
       <SidebarHeader className="p-4 h-20 flex items-center">
         <div className="flex items-center space-x-4 w-full">
           <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center border border-primary/20 shrink-0">
@@ -72,6 +74,7 @@ export const AppSidebar = ({ activeTab, onTabChange }: AppSidebarProps) => {
                   onClick={() => onTabChange(item.id)}
                   isActive={activeTab === item.id}
                   className="w-full h-12 text-base font-medium rounded-lg"
+                  tooltip={item.label}
                 >
                   <Icon className="h-5 w-5" />
                   <span>{item.label}</span>
@@ -89,9 +92,11 @@ export const AppSidebar = ({ activeTab, onTabChange }: AppSidebarProps) => {
             variant="ghost"
             className="w-full justify-start text-muted-foreground hover:text-foreground h-12 text-base font-medium rounded-lg"
             onClick={signOut}
+            // @ts-ignore
+            tooltip="Sair"
           >
             <LogOut className="mr-3 h-5 w-5" />
-            Sair
+            <span>Sair</span>
           </Button>
         </div>
       </SidebarFooter>
