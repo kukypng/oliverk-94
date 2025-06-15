@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
@@ -17,12 +18,12 @@ interface UsersTableProps {
 
 export const UsersTable = ({ users, onEdit, onDelete, onRenew }: UsersTableProps) => {
   const getRoleBadge = (role: string) => {
-    const colors = {
-      admin: 'bg-red-100 text-red-800',
-      manager: 'bg-blue-100 text-blue-800',
-      user: 'bg-green-100 text-green-800',
+    const colors: { [key: string]: string } = {
+      admin: 'border-transparent bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300',
+      manager: 'border-transparent bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300',
+      user: 'border-transparent bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300',
     };
-    return colors[role as keyof typeof colors] || 'bg-gray-100 text-gray-800';
+    return colors[role as keyof typeof colors] || 'border-transparent bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
   };
 
   const getStatusBadge = (user: User) => {
@@ -31,12 +32,12 @@ export const UsersTable = ({ users, onEdit, onDelete, onRenew }: UsersTableProps
     const isExpired = expiration < now;
     
     if (!user.is_active) {
-      return <Badge className="bg-gray-100 text-gray-800">Inativo</Badge>;
+      return <Badge className="border-transparent bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">Inativo</Badge>;
     }
     if (isExpired) {
-      return <Badge className="bg-red-100 text-red-800">Expirado</Badge>;
+      return <Badge className="border-transparent bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300">Expirado</Badge>;
     }
-    return <Badge className="bg-green-100 text-green-800">Ativo</Badge>;
+    return <Badge className="border-transparent bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300">Ativo</Badge>;
   };
 
   return (
@@ -67,7 +68,7 @@ export const UsersTable = ({ users, onEdit, onDelete, onRenew }: UsersTableProps
                     <Settings className="h-4 w-4" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-80">
+                <PopoverContent className="w-[90vw] sm:w-80">
                   <div className="grid gap-4">
                     <div className="space-y-1">
                       <h4 className="font-medium leading-none">{user.name}</h4>

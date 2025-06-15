@@ -31,19 +31,21 @@ export const AdminLogs = () => {
   });
 
   const getActionBadge = (action: string) => {
-    const colors = {
-      user_profile_updated: 'bg-blue-100 text-blue-800',
-      user_deleted: 'bg-red-100 text-red-800',
-      user_created: 'bg-green-100 text-green-800',
+    const colors: { [key: string]: string } = {
+      user_profile_updated: 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300',
+      user_deleted: 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300',
+      user_created: 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300',
+      user_license_renewed: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300',
     };
-    return colors[action as keyof typeof colors] || 'bg-gray-100 text-gray-800';
+    return colors[action as keyof typeof colors] || 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
   };
 
   const getActionLabel = (action: string) => {
-    const labels = {
+    const labels: { [key: string]: string } = {
       user_profile_updated: 'Perfil Atualizado',
       user_deleted: 'Usuário Deletado',
       user_created: 'Usuário Criado',
+      user_license_renewed: 'Licença Renovada',
     };
     return labels[action as keyof typeof labels] || action;
   };
@@ -73,18 +75,18 @@ export const AdminLogs = () => {
       <CardContent>
         <div className="space-y-4">
           {logs?.map((log) => (
-            <div key={log.id} className="flex items-start space-x-4 p-4 border rounded-lg">
+            <div key={log.id} className="flex flex-col sm:flex-row items-start space-y-3 sm:space-y-0 sm:space-x-4 p-4 border rounded-lg bg-card hover:bg-muted/50 transition-colors">
               <div className="flex-shrink-0">
-                <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
-                  <Shield className="h-4 w-4 text-primary" />
+                <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                  <Shield className="h-5 w-5 text-primary" />
                 </div>
               </div>
               <div className="flex-1 space-y-2">
-                <div className="flex items-center space-x-3">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
                   <Badge className={getActionBadge(log.action)}>
                     {getActionLabel(log.action)}
                   </Badge>
-                  <span className="text-sm text-muted-foreground">
+                  <span className="text-xs text-muted-foreground">
                     {format(new Date(log.created_at), 'dd/MM/yyyy HH:mm:ss', { locale: ptBR })}
                   </span>
                 </div>
@@ -96,8 +98,8 @@ export const AdminLogs = () => {
                     <strong>Usuário alvo:</strong> {log.target_name}
                   </p>
                   {log.details && (
-                    <details className="mt-2">
-                      <summary className="cursor-pointer text-primary hover:text-primary/80">
+                    <details className="mt-2 text-xs">
+                      <summary className="cursor-pointer text-primary hover:text-primary/80 text-sm">
                         Ver detalhes
                       </summary>
                       <pre className="mt-2 p-2 bg-muted rounded text-xs overflow-auto">

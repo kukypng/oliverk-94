@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { AlertTriangle, Eye, EyeOff, RefreshCw } from 'lucide-react';
+
 interface DebugInfo {
   user_id: string | null;
   user_email: string | null;
@@ -65,63 +66,63 @@ export const AdminDebugPanel = ({
         </Button>
       </div>;
   }
-  return <Card className="mb-4 border-yellow-200 bg-black py-[17px]">
-      <CardHeader className="bg-black px-[83px] my-[28px] mx-[12px] py-0">
-        <CardTitle className="flex items-center justify-between text-yellow-800">
-          <div className="flex items-center space-x-2 px-[6px]">
-            <AlertTriangle className="h-5 w-5 bg-black/0" />
-            <span className="text-[#f6f7f6]">Painel de Debug</span>
-          </div>
+  return <Card className="mb-4 border-yellow-500/30 bg-yellow-500/10">
+      <CardHeader className="py-3 px-4">
+        <CardTitle className="flex items-center justify-between text-yellow-800 dark:text-yellow-300">
           <div className="flex items-center space-x-2">
-            <Button variant="ghost" size="sm" onClick={() => refetch()} disabled={isLoading} className="text-yellow-700 hover:text-yellow-800">
+            <AlertTriangle className="h-5 w-5" />
+            <span className="font-semibold">Painel de Debug</span>
+          </div>
+          <div className="flex items-center space-x-1">
+            <Button variant="ghost" size="icon" onClick={() => refetch()} disabled={isLoading} className="text-yellow-700 hover:text-yellow-600 dark:text-yellow-400 dark:hover:text-yellow-300 h-8 w-8">
               <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
             </Button>
-            <Button variant="ghost" size="sm" onClick={() => setIsVisible(false)} className="text-yellow-700 hover:text-yellow-800">
+            <Button variant="ghost" size="icon" onClick={() => setIsVisible(false)} className="text-yellow-700 hover:text-yellow-600 dark:text-yellow-400 dark:hover:text-yellow-300 h-8 w-8">
               <EyeOff className="h-4 w-4" />
             </Button>
           </div>
         </CardTitle>
       </CardHeader>
-      <CardContent className="text-sm bg-black py-0 px-[22px] mx-[22px]">
-        {isLoading ? <div className="animate-pulse">
-            <div className="h-4 bg-yellow-200 rounded mb-2"></div>
-            <div className="h-4 bg-yellow-200 rounded mb-2 w-3/4"></div>
-            <div className="h-4 bg-yellow-200 rounded w-1/2"></div>
-          </div> : debugInfo ? <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <CardContent className="text-sm px-4 pb-4">
+        {isLoading ? <div className="space-y-2 animate-pulse">
+            <div className="h-4 bg-yellow-300/30 rounded w-3/4"></div>
+            <div className="h-4 bg-yellow-300/30 rounded w-full"></div>
+            <div className="h-4 bg-yellow-300/30 rounded w-1/2"></div>
+          </div> : debugInfo ? <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
             <div className="space-y-2">
-              <h4 className="font-semibold text-[#fec832]">Informações do Usuário</h4>
-              <div className="space-y-1">
-                <p className="bg-black"><strong>ID:</strong> <code className="text-xs bg-yellow-100 px-1 rounded">{debugInfo.user_id || 'N/A'}</code></p>
+              <h4 className="font-semibold text-yellow-900 dark:text-yellow-200">Informações do Usuário</h4>
+              <div className="space-y-1 text-yellow-800 dark:text-yellow-300">
+                <p><strong>ID:</strong> <code className="text-xs bg-yellow-500/20 px-1 py-0.5 rounded">{debugInfo.user_id || 'N/A'}</code></p>
                 <p><strong>Email:</strong> {debugInfo.user_email || 'N/A'}</p>
                 <p><strong>Role:</strong> 
-                  <Badge className="">
+                  <Badge variant="secondary" className="bg-yellow-500/20 border-yellow-500/30 text-yellow-900 dark:text-yellow-200">
                     {debugInfo.user_role || 'N/A'}
                   </Badge>
                 </p>
               </div>
             </div>
             <div className="space-y-2">
-              <h4 className="font-semibold text-[#fec832]">Status de Permissões</h4>
-              <div className="space-y-1">
+              <h4 className="font-semibold text-yellow-900 dark:text-yellow-200">Status de Permissões</h4>
+              <div className="space-y-1 text-yellow-800 dark:text-yellow-300">
                 <p><strong>Usuário Ativo:</strong> 
-                  <Badge className="">
+                  <Badge className={`${debugInfo.is_active ? 'bg-green-500/20 text-green-900 dark:text-green-200' : 'bg-red-500/20 text-red-900 dark:text-red-200'} border-none`}>
                     {debugInfo.is_active ? 'Sim' : 'Não'}
                   </Badge>
                 </p>
                 <p><strong>Permissão Admin:</strong> 
-                  <Badge className="">
+                  <Badge className={`${debugInfo.is_admin ? 'bg-green-500/20 text-green-900 dark:text-green-200' : 'bg-red-500/20 text-red-900 dark:text-red-200'} border-none`}>
                     {debugInfo.is_admin ? 'Sim' : 'Não'}
                   </Badge>
                 </p>
               </div>
             </div>
-          </div> : <p className="text-yellow-700">Não foi possível carregar informações de debug</p>}
+          </div> : <p className="text-yellow-700 dark:text-yellow-400">Não foi possível carregar informações de debug</p>}
         
-        {error && <div className="mt-4 p-3 bg-red-50 rounded border border-red-200">
-            <h4 className="font-semibold text-red-800 mb-2">Erro Detectado:</h4>
-            <p className="text-red-800 text-sm">{error.message}</p>
-            {debugInfo && !debugInfo.is_admin && <div className="mt-2 p-2 bg-red-100 rounded">
-                <p className="text-red-800 text-xs">
+        {error && <div className="mt-4 p-3 bg-red-500/10 rounded border border-red-500/20">
+            <h4 className="font-semibold text-red-800 dark:text-red-300 mb-2">Erro Detectado:</h4>
+            <p className="text-red-800 dark:text-red-300 text-sm">{error.message}</p>
+            {debugInfo && !debugInfo.is_admin && <div className="mt-2 p-2 bg-red-500/20 rounded">
+                <p className="text-red-800 dark:text-red-300 text-xs">
                   <strong>Possível Causa:</strong> O usuário atual não possui permissões de administrador. 
                   Verifique se o role está correto e se o usuário está ativo.
                 </p>

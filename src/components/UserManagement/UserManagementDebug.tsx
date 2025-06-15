@@ -10,14 +10,14 @@ interface Props {
 }
 
 export const UserManagementDebug = ({ debugInfo, error }: Props) => (
-  <Card className="mb-4 border-yellow-200 bg-yellow-50">
-    <CardHeader>
-      <CardTitle className="flex items-center space-x-2 text-yellow-800">
+  <Card className="mb-4 border-yellow-500/30 bg-yellow-500/10">
+    <CardHeader className="py-3 px-4">
+      <CardTitle className="flex items-center space-x-2 text-yellow-800 dark:text-yellow-300 text-base font-semibold">
         <AlertTriangle className="h-5 w-5" />
         <span>Informações de Debug</span>
       </CardTitle>
     </CardHeader>
-    <CardContent className="text-sm">
+    <CardContent className="text-sm px-4 pb-4 text-yellow-900 dark:text-yellow-200">
       {debugInfo ? (
         <div className="space-y-2">
           <p><strong>ID do Usuário:</strong> {debugInfo.user_id || 'N/A'}</p>
@@ -30,8 +30,8 @@ export const UserManagementDebug = ({ debugInfo, error }: Props) => (
         <p>Carregando informações de debug...</p>
       )}
       {error && (
-        <div className="mt-3 p-3 bg-red-50 rounded border border-red-200">
-          <p className="text-red-800"><strong>Erro:</strong> {error.message}</p>
+        <div className="mt-3 p-3 bg-red-500/10 rounded border border-red-500/20">
+          <p className="text-red-800 dark:text-red-300 font-semibold"><strong>Erro:</strong> {error.message}</p>
         </div>
       )}
     </CardContent>

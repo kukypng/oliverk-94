@@ -5,6 +5,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useEnhancedToast } from '@/hooks/useEnhancedToast';
 import { CheckCircle, XCircle, AlertTriangle, RefreshCw } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+
 interface TestResult {
   test_name: string;
   result: boolean;
@@ -153,85 +155,81 @@ export const AdminTestPanel = () => {
       });
     }
   };
-  const getStatusIcon = (success: boolean | null) => {
-    if (success === null) return <AlertTriangle className="h-5 w-5 text-yellow-500" />;
+  const getStatusIcon = (success: boolean | null | undefined) => {
+    if (success === null || success === undefined) return <AlertTriangle className="h-5 w-5 text-yellow-500" />;
     return success ? <CheckCircle className="h-5 w-5 text-green-500" /> : <XCircle className="h-5 w-5 text-red-500" />;
-  };
-  const getStatusColor = (success: boolean | null) => {
-    if (success === null) return 'border-yellow-200 bg-yellow-50';
-    return success ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50';
   };
   return <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-            <span>Painel de Testes Administrativos</span>
+          <CardTitle className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <span>Painel de Testes</span>
             <Button onClick={refreshAllTests} variant="outline" size="sm" disabled={debugLoading || testLoading || usersLoading}>
-              <RefreshCw className="h-4 w-4 mr-2" />
+              <RefreshCw className={`h-4 w-4 mr-2 ${debugLoading || testLoading || usersLoading ? 'animate-spin' : ''}`} />
               Atualizar Testes
             </Button>
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-8">
           {/* Debug Info Section */}
-          <div className="">
-            <h3 className="font-semibold mb-3 flex items-center">
+          <div className="p-4 border rounded-lg">
+            <h3 className="font-semibold mb-3 flex items-center text-lg">
               {getStatusIcon(debugInfo?.is_admin)}
-              <span className="ml-2">Informações do Usuário Atual</span>
+              <span className="ml-2">Usuário Atual</span>
             </h3>
-            {debugLoading ? <p className="text-sm text-muted-foreground">Carregando...</p> : debugInfo ? <div className="grid grid-cols-2 gap-4 text-sm">
-                <div><strong>ID:</strong> {debugInfo.user_id || 'N/A'}</div>
+            {debugLoading ? <p className="text-sm text-muted-foreground">Carregando...</p> : debugInfo ? <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 text-sm">
+                <div><strong>ID:</strong> <code className="text-xs bg-muted px-1 rounded">{debugInfo.user_id || 'N/A'}</code></div>
                 <div><strong>Email:</strong> {debugInfo.user_email || 'N/A'}</div>
-                <div><strong>Role:</strong> {debugInfo.user_role || 'N/A'}</div>
-                <div><strong>Ativo:</strong> {debugInfo.is_active ? 'Sim' : 'Não'}</div>
-                <div><strong>É Admin:</strong> {debugInfo.is_admin ? 'Sim' : 'Não'}</div>
-                <div><strong>Status:</strong> {debugInfo.is_admin ? 'Administrador Ativo' : debugInfo.user_role === 'admin' ? 'Admin Inativo' : 'Usuário Regular'}</div>
-              </div> : <p className="text-sm text-red-600">Erro ao carregar informações do usuário</p>}
+                <div><strong>Role:</strong> <Badge variant="secondary">{debugInfo.user_role || 'N/A'}</Badge></div>
+                <div><strong>Ativo:</strong> {debugInfo.is_active ? <Badge className="border-transparent bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300">Sim</Badge> : <Badge variant="destructive">Não</Badge>}</div>
+                <div><strong>É Admin:</strong> {debugInfo.is_admin ? <Badge className="border-transparent bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300">Sim</Badge> : <Badge variant="destructive">Não</Badge>}</div>
+                <div><strong>Status:</strong> {debugInfo.is_admin ? <Badge className="border-transparent bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300">Admin Ativo</Badge> : (debugInfo.user_role === 'admin' ? <Badge className="border-transparent bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300">Admin Inativo</Badge> : <Badge variant="secondary">Usuário</Badge>)}</div>
+              </div> : <p className="text-sm text-destructive">Erro ao carregar informações do usuário.</p>}
           </div>
 
           {/* Permission Tests Section */}
           <div className="space-y-3">
-            <h3 className="font-semibold">Testes de Permissão</h3>
-            {testLoading ? <p className="text-sm text-muted-foreground">Executando testes...</p> : testResults && testResults.length > 0 ? <div className="space-y-2">
-                {testResults.map((test, index) => <div key={index} className="">
-                    <div className="flex items-center justify-between">
+            <h3 className="font-semibold text-lg">Testes de Permissão</h3>
+            {testLoading ? <p className="text-sm text-muted-foreground">Executando testes...</p> : testResults && testResults.length > 0 ? <div className="space-y-4">
+                {testResults.map((test, index) => <div key={index} className="p-3 border rounded-md bg-card">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1">
                       <div className="flex items-center">
                         {getStatusIcon(test.result)}
                         <span className="ml-2 font-medium">{test.test_name}</span>
                       </div>
-                      <span className={`text-sm ${test.result ? 'text-green-600' : 'text-red-600'}`}>
+                      <span className={`text-sm font-semibold ${test.result ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
                         {test.result ? 'Passou' : 'Falhou'}
                       </span>
                     </div>
-                    <p className="text-sm text-muted-foreground mt-1">{test.details}</p>
+                    <p className="text-sm text-muted-foreground mt-1 sm:pl-7">{test.details}</p>
                   </div>)}
-              </div> : <p className="text-sm text-yellow-600">Nenhum teste disponível</p>}
+              </div> : <p className="text-sm text-muted-foreground">Nenhum teste de permissão disponível.</p>}
           </div>
 
           {/* Users Access Test Section */}
-          <div className="">
-            <h3 className="font-semibold mb-3 flex items-center">
+          <div className="p-4 border rounded-lg">
+            <h3 className="font-semibold mb-3 flex items-center text-lg">
               {getStatusIcon(usersTest?.success)}
-              <span className="ml-2">Teste de Acesso aos Usuários</span>
+              <span className="ml-2">Acesso aos Usuários</span>
             </h3>
             {usersLoading ? <p className="text-sm text-muted-foreground">Testando acesso...</p> : usersTest ? <div className="text-sm">
                 {usersTest.success ? <div className="space-y-1">
-                    <p className="text-green-600">✅ Acesso concedido com sucesso</p>
+                    <p className="text-green-600 dark:text-green-400 flex items-center"><CheckCircle className="h-4 w-4 mr-2"/> Acesso concedido</p>
                     <p><strong>Usuários encontrados:</strong> {usersTest.count}</p>
                   </div> : <div className="space-y-1">
-                    <p className="text-red-600">❌ Acesso negado</p>
+                    <p className="text-red-600 dark:text-red-400 flex items-center"><XCircle className="h-4 w-4 mr-2"/> Acesso negado</p>
                     <p><strong>Erro:</strong> {usersTest.error}</p>
                   </div>}
-              </div> : <p className="text-sm text-muted-foreground">Teste não executado</p>}
+              </div> : <p className="text-sm text-muted-foreground">Teste não executado.</p>}
           </div>
 
           {/* Summary */}
-          <div className="p-4 rounded-lg bg-zinc-800">
-            <h3 className="font-semibold mb-2">Resumo do Sistema</h3>
-            <div className="text-sm space-y-1">
-              <p><strong>Status do Admin:</strong> {debugInfo?.is_admin ? <span className="text-green-600">Funcionando corretamente</span> : debugInfo?.user_role === 'admin' ? <span className="text-yellow-600">Usuário admin existe mas está inativo</span> : <span className="text-red-600">Usuário não é administrador</span>}</p>
-              <p><strong>Acesso aos Usuários:</strong> {usersTest?.success ? <span className="text-green-600">Funcionando ({usersTest.count} usuários)</span> : <span className="text-red-600">Bloqueado</span>}</p>
-              <p><strong>Testes de Permissão:</strong> {testResults ? <span className="text-green-600">{testResults.filter(t => t.result).length}/{testResults.length} passaram</span> : <span className="text-yellow-600">Não executados</span>}</p>
+          <div className="p-4 rounded-lg bg-muted">
+            <h3 className="font-semibold mb-2 text-lg">Resumo do Sistema</h3>
+            <div className="text-sm space-y-2">
+              <p><strong>Status Admin:</strong> {debugInfo?.is_admin ? <span className="text-green-600 dark:text-green-400">OK</span> : debugInfo?.user_role === 'admin' ? <span className="text-yellow-600 dark:text-yellow-400">Inativo</span> : <span className="text-red-600 dark:text-red-400">Não é admin</span>}</p>
+              <p><strong>Acesso a Usuários:</strong> {usersTest?.success ? <span className="text-green-600 dark:text-green-400">OK ({usersTest.count})</span> : <span className="text-red-600 dark:text-red-400">Bloqueado</span>}</p>
+              <p><strong>Testes de Permissão:</strong> {testResults ? <span className={`${testResults.filter(t => !t.result).length > 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}`}>{testResults.filter(t => t.result).length}/{testResults.length} passaram</span> : <span className="text-yellow-600 dark:text-yellow-400">Não executados</span>}</p>
             </div>
           </div>
         </CardContent>

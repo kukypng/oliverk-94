@@ -16,26 +16,26 @@ interface Props {
 
 export const UserManagementHeader = ({ searchTerm, setSearchTerm, debugInfo, showDebugInfo, setShowDebugInfo }: Props) => (
   <CardHeader>
-    <CardTitle className="flex items-center justify-between">
+    <CardTitle className="flex flex-col md:flex-row items-stretch md:items-center md:justify-between gap-4">
       <span>Gerenciar Usuários</span>
-      <div className="flex items-center space-x-2">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
         {debugInfo && (
           <Button 
-            variant="ghost" 
+            variant="outline" 
             size="sm"
             onClick={() => setShowDebugInfo(!showDebugInfo)}
             className="text-xs"
           >
-            Debug
+            {showDebugInfo ? 'Ocultar' : 'Mostrar'} Debug
           </Button>
         )}
-        <div className="relative">
+        <div className="relative flex-grow">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Buscar usuários..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 w-64"
+            className="pl-10 w-full"
           />
         </div>
       </div>
