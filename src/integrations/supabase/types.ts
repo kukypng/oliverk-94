@@ -469,6 +469,8 @@ export type Database = {
       user_profiles: {
         Row: {
           budget_limit: number | null
+          budget_warning_days: number
+          budget_warning_enabled: boolean
           created_at: string
           expiration_date: string
           id: string
@@ -480,6 +482,8 @@ export type Database = {
         }
         Insert: {
           budget_limit?: number | null
+          budget_warning_days?: number
+          budget_warning_enabled?: boolean
           created_at?: string
           expiration_date?: string
           id: string
@@ -491,6 +495,8 @@ export type Database = {
         }
         Update: {
           budget_limit?: number | null
+          budget_warning_days?: number
+          budget_warning_enabled?: boolean
           created_at?: string
           expiration_date?: string
           id?: string

@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Eye, Edit, Trash2, MessageCircle, Search, Filter, Download, Star } from 'lucide-react';
+import { Eye, Edit, Trash2, MessageCircle, Search, Filter, Download, Star, Clock } from 'lucide-react';
 import { generateWhatsAppMessage, shareViaWhatsApp } from '@/utils/whatsappUtils';
 import { useEnhancedToast } from '@/hooks/useEnhancedToast';
 import { EditBudgetModal } from '@/components/EditBudgetModal';
@@ -16,13 +16,25 @@ import { Input } from '@/components/ui/input';
 import { useAuth } from '@/hooks/useAuth';
 import { usePdfGeneration } from '@/hooks/usePdfGeneration';
 import { ConfirmationDialog } from './ConfirmationDialog';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+
+const isBudgetOld = (createdAt: string, warningDays: number | undefined | null): boolean => {
+    if (!createdAt || !warningDays) return false;
+    const now = new Date();
+    const budgetDate = new Date(createdAt);
+    const diffTime = now.getTime() - budgetDate.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays > warningDays;
+};
+
 export const BudgetsContent = () => {
   const {
     showSuccess,
     showError
   } = useEnhancedToast();
   const {
-    user
+    user,
+    profile
   } = useAuth();
   const {
     generateAndSharePDF,
@@ -202,9 +214,17 @@ export const BudgetsContent = () => {
                       minimumFractionDigits: 2
                     })}
                         </p>
-                        <p className="text-xs text-muted-foreground">
-                          {new Date(budget.created_at).toLocaleDateString('pt-BR')}
-                        </p>
+                        <div className="flex items-center">
+                          <p className="text-xs text-muted-foreground">
+                            {new Date(budget.created_at).toLocaleDateString('pt-BR')}
+                          </p>
+                          {profile?.budget_warning_enabled && isBudgetOld(budget.created_at, profile.budget_warning_days) && (
+                            <Badge variant="destructive" className="text-xs ml-2 animate-pulse p-1 h-auto">
+                              <Clock className="h-3 w-3 mr-1" />
+                              Antigo
+                            </Badge>
+                          )}
+                        </div>
                       </div>
                     </div>
                     
@@ -269,9 +289,23 @@ export const BudgetsContent = () => {
                           </div>
                         </TableCell>
                         <TableCell>
-                          <span className="text-sm text-muted-foreground">
-                            {new Date(budget.created_at).toLocaleDateString('pt-BR')}
-                          </span>
+                          <div className="flex items-center space-x-2">
+                            <span className="text-sm text-muted-foreground">
+                              {new Date(budget.created_at).toLocaleDateString('pt-BR')}
+                            </span>
+                            {profile?.budget_warning_enabled && isBudgetOld(budget.created_at, profile.budget_warning_days) && (
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger>
+                                    <Clock className="h-4 w-4 text-destructive animate-pulse" />
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>Este orçamento tem mais de {profile.budget_warning_days} dias.</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            )}
+                          </div>
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center justify-center space-x-1">

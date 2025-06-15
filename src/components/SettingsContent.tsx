@@ -4,6 +4,7 @@ import { ProfileSettings } from '@/components/ProfileSettings';
 import { CompanySettings } from '@/components/CompanySettings';
 import { SecuritySettings } from '@/components/SecuritySettings';
 import { DataManagementSettings } from './DataManagementSettings';
+import { BudgetWarningSettings } from './BudgetWarningSettings';
 
 export const SettingsContent = () => {
   return (
@@ -22,6 +23,7 @@ export const SettingsContent = () => {
         </div>
         <div className="space-y-6">
           <CompanySettings />
+          <BudgetWarningSettings />
         </div>
         <DataManagementSettings />
       </div>

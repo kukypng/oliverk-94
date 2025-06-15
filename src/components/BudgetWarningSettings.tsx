@@ -1,0 +1,126 @@
+
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
+import { useEnhancedToast } from '@/hooks/useEnhancedToast';
+import { Bell, Save } from 'lucide-react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+
+export const BudgetWarningSettings = () => {
+  const { user, profile } = useAuth();
+  const { showSuccess, showError } = useEnhancedToast();
+  const queryClient = useQueryClient();
+
+  const [isEnabled, setIsEnabled] = useState(true);
+  const [days, setDays] = useState(15);
+
+  useEffect(() => {
+    if (profile) {
+      setIsEnabled(profile.budget_warning_enabled ?? true);
+      setDays(profile.budget_warning_days ?? 15);
+    }
+  }, [profile]);
+
+  const updateWarningSettingsMutation = useMutation({
+    mutationFn: async (settings: { budget_warning_enabled: boolean; budget_warning_days: number }) => {
+      if (!user?.id) throw new Error('User not authenticated');
+
+      const { data, error } = await supabase
+        .from('user_profiles')
+        .update({
+          budget_warning_enabled: settings.budget_warning_enabled,
+          budget_warning_days: settings.budget_warning_days,
+        })
+        .eq('id', user.id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user-profile', user?.id] });
+      showSuccess({
+        title: 'Configurações salvas',
+        description: 'Suas preferências de aviso foram atualizadas.',
+      });
+    },
+    onError: (error) => {
+      console.error('Error updating warning settings:', error);
+      showError({
+        title: 'Erro ao salvar',
+        description: 'Não foi possível salvar suas configurações.',
+      });
+    },
+  });
+
+  const handleSave = () => {
+    const numericDays = Number(days);
+    if (isNaN(numericDays) || numericDays < 1 || numericDays > 365) {
+      showError({
+        title: 'Valor inválido',
+        description: 'O número de dias deve ser entre 1 e 365.',
+      });
+      return;
+    }
+    updateWarningSettingsMutation.mutate({ budget_warning_enabled: isEnabled, budget_warning_days: numericDays });
+  };
+
+  return (
+    <Card className="glass-card animate-scale-in">
+      <CardHeader>
+        <CardTitle className="flex items-center text-lg">
+          <Bell className="h-5 w-5 mr-2 text-primary" />
+          Aviso de Orçamentos Antigos
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <div className="flex items-center justify-between space-x-2">
+          <Label htmlFor="warning-enabled" className="flex flex-col space-y-1">
+            <span>Ativar avisos</span>
+            <span className="font-normal leading-snug text-muted-foreground">
+              Exibir um alerta para orçamentos antigos.
+            </span>
+          </Label>
+          <Switch
+            id="warning-enabled"
+            checked={isEnabled}
+            onCheckedChange={setIsEnabled}
+          />
+        </div>
+        
+        {isEnabled && (
+          <div className="space-y-2 animate-fade-in">
+            <Label htmlFor="warning-days">Avisar após (dias)</Label>
+            <Input
+              id="warning-days"
+              type="number"
+              value={days}
+              onChange={(e) => setDays(Number(e.target.value))}
+              placeholder="Ex: 15"
+              min="1"
+              max="365"
+            />
+             <p className="text-xs text-muted-foreground">
+              Defina o nº de dias para um orçamento ser "antigo".
+            </p>
+          </div>
+        )}
+
+        <Button
+          onClick={handleSave}
+          disabled={updateWarningSettingsMutation.isPending}
+          className="w-full"
+        >
+          <Save className="h-4 w-4 mr-2" />
+          {updateWarningSettingsMutation.isPending ? 'Salvando...' : 'Salvar Alterações'}
+        </Button>
+      </CardContent>
+    </Card>
+  );
+};
