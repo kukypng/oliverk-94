@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -13,6 +14,7 @@ import NotFound from "./pages/NotFound";
 import { ThemeProvider } from "./components/ThemeProvider";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { ResetPasswordPage } from "./pages/ResetPasswordPage";
+import { ResetEmailPage } from "./pages/ResetEmailPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -70,6 +72,14 @@ const App = () => (
                 <Route path="/" element={<Index />} />
                 <Route path="/auth" element={<AuthPage />} />
                 <Route path="/reset-password" element={<ResetPasswordPage />} />
+                <Route
+                  path="/reset-email"
+                  element={
+                    <ProtectedRoute>
+                      <ResetEmailPage />
+                    </ProtectedRoute>
+                  }
+                />
                 <Route
                   path="/signup"
                   element={

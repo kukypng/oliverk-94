@@ -1,3 +1,4 @@
+
 import { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -26,6 +27,7 @@ interface AuthContextType {
   signOut: () => Promise<void>;
   requestPasswordReset: (email: string) => Promise<{ error: any }>;
   updatePassword: (password: string) => Promise<{ error: any }>;
+  updateEmail: (email: string) => Promise<{ error: any }>;
   hasRole: (role: UserRole) => boolean;
   hasPermission: (permission: string) => boolean;
 }
@@ -299,6 +301,36 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const updateEmail = async (email: string) => {
+    try {
+      console.log('Attempting to update email to:', email);
+      const { error } = await supabase.auth.updateUser({ email });
+
+      if (error) {
+        const errorMessage = error.message === 'New email address should be different from the current one.'
+          ? 'O novo email deve ser diferente do atual.'
+          : error.message;
+        showError({
+          title: 'Erro ao atualizar email',
+          description: errorMessage,
+        });
+      } else {
+        showSuccess({
+          title: 'Confirmação enviada!',
+          description: 'Verifique seu novo email para confirmar a alteração.',
+        });
+      }
+      return { error };
+    } catch (error) {
+      console.error('Email update error:', error);
+      showError({
+        title: 'Erro inesperado',
+        description: 'Ocorreu um erro ao atualizar seu email. Tente novamente.',
+      });
+      return { error };
+    }
+  };
+
   const signOut = async () => {
     try {
       console.log('Signing out user');
@@ -360,6 +392,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     signOut,
     requestPasswordReset,
     updatePassword,
+    updateEmail,
     hasRole,
     hasPermission,
   };
