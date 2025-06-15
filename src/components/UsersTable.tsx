@@ -1,24 +1,12 @@
-
 import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Edit, Trash2, Calendar, Settings, FileText } from 'lucide-react';
+import { Edit, Trash2, Settings, FileText } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-  is_active: boolean;
-  expiration_date: string;
-  created_at: string;
-  last_sign_in_at: string | null;
-  budget_count: number;
-}
+import { User } from '@/types/user';
 
 interface UsersTableProps {
   users: User[];
