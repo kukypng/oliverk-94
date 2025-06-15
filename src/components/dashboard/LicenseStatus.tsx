@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { differenceInDays, parseISO } from 'date-fns';
-import { ShieldCheck, AlertTriangle, MessageCircle } from 'lucide-react';
+import { MessageCircle } from 'lucide-react';
 
 export const LicenseStatus = () => {
   const { profile } = useAuth();
@@ -26,7 +26,7 @@ export const LicenseStatus = () => {
       return {
         title: "Licença Ativa",
         description: `Sua licença expira em ${remainingDays} dias.`,
-        icon: <ShieldCheck className="h-8 w-8 text-green-500" />,
+        icon: <img src="/icones/limao.png" alt="Licença Ativa" className="h-8 w-8" />,
         cardClass: "border-green-500/20",
         showRenew: false
       };
@@ -34,7 +34,7 @@ export const LicenseStatus = () => {
       return {
         title: "Atenção: Licença Expirando",
         description: `Sua licença expira em ${remainingDays} ${remainingDays === 1 ? 'dia' : 'dias'}. Renove para não perder o acesso.`,
-        icon: <AlertTriangle className="h-8 w-8 text-yellow-500" />,
+        icon: <img src="/icones/laranja.png" alt="Licença Expirando" className="h-8 w-8" />,
         cardClass: "border-yellow-500/30",
         showRenew: true
       };
@@ -42,7 +42,7 @@ export const LicenseStatus = () => {
       return {
         title: "Licença Expirada",
         description: `Sua licença expirou. Renove para continuar usando o sistema.`,
-        icon: <span className="text-4xl" role="img" aria-label="Coração partido">💔</span>,
+        icon: <img src="/icones/coracao.png" alt="Licença Expirada" className="h-8 w-8" />,
         cardClass: "border-red-500/30",
         showRenew: true
       };

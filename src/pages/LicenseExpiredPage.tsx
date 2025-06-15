@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { AlertTriangle, MessageCircle, Clock } from 'lucide-react';
+import { MessageCircle, Clock } from 'lucide-react';
 export const LicenseExpiredPage = () => {
   const handleWhatsAppContact = () => {
     window.open('https://wa.me/556496028022', '_blank');
@@ -11,7 +11,7 @@ export const LicenseExpiredPage = () => {
       <Card className="w-full max-w-md shadow-xl">
         <CardHeader className="text-center">
           <div className="mx-auto w-16 h-16 rounded-full flex items-center justify-center mb-4">
-            <AlertTriangle className="w-8 h-8 text-red-600" />
+            <img src="/icones/coracao.png" alt="Licença Expirada" className="w-12 h-12" />
           </div>
           <CardTitle className="text-2xl font-bold text-[#ff0000]">
             Licença Expirada
