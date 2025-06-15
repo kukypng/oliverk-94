@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -10,7 +11,7 @@ import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { DashboardHeader } from './dashboard/DashboardHeader';
 import { QuickAccess } from './dashboard/QuickAccess';
 import { HelpAndSupport } from './dashboard/HelpAndSupport';
-import { RecentBudgets } from './dashboard/RecentBudgets';
+import { LicenseStatus } from './dashboard/LicenseStatus';
 import { UserProfile } from './dashboard/types';
 import { EnhancedDashboardSkeleton } from '@/components/ui/enhanced-loading';
 
@@ -23,32 +24,28 @@ export const DashboardContent = ({ onTabChange }: DashboardContentProps) => {
   const { showError } = useEnhancedToast();
 
   const { data: stats, isLoading, error } = useQuery({
-    queryKey: ['dashboard-stats-simplified', user?.id],
+    queryKey: ['dashboard-weekly-growth', user?.id],
     queryFn: async () => {
-      if (!user) return { weeklyGrowth: 0, recentBudgets: [] };
+      if (!user) return { weeklyGrowth: 0 };
 
       try {
-        const { data: budgets, error } = await supabase
+        const today = new Date();
+        const weekStart = new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay());
+        weekStart.setHours(0, 0, 0, 0);
+
+        const { error, count } = await supabase
           .from('budgets')
-          .select('id, total_price, created_at, client_name, device_model, status')
+          .select('*', { count: 'exact', head: true })
           .eq('owner_id', user.id)
-          .order('created_at', { ascending: false });
+          .gte('created_at', weekStart.toISOString());
 
         if (error) {
-          console.error('Error fetching budgets for dashboard:', error);
+          console.error('Error fetching weekly growth:', error);
           throw error;
         }
-        
-        const today = new Date();
-        const weekStart = new Date(today.setDate(today.getDate() - today.getDay()));
-        const weeklyBudgets = budgets?.filter(b => {
-          const date = new Date(b.created_at);
-          return date >= weekStart;
-        }) || [];
 
         return {
-          weeklyGrowth: weeklyBudgets.length,
-          recentBudgets: budgets?.slice(0, 5) || []
+          weeklyGrowth: count || 0,
         };
       } catch (error: any) {
         console.error('Dashboard stats error:', error);
@@ -102,11 +99,7 @@ export const DashboardContent = ({ onTabChange }: DashboardContentProps) => {
         
         <QuickAccess onTabChange={onTabChange} hasPermission={hasPermission} />
         
-        <RecentBudgets 
-          recentBudgets={stats?.recentBudgets || []} 
-          hasPermission={hasPermission} 
-          onTabChange={onTabChange} 
-        />
+        <LicenseStatus />
         
         <HelpAndSupport />
       </div>
