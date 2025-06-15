@@ -211,8 +211,8 @@
   /* Premium Card animations */
   .card-hover {
     @apply transition-all duration-300 ease-out; /* faster transition */
-    @apply hover:scale-[1.02] hover:shadow-strong; /* stronger shadow on hover */
-    @apply hover:-translate-y-1; /* less translation */
+    @apply hover:scale-[1.015] hover:shadow-strong; /* more subtle scale, stronger shadow on hover */
+    @apply hover:-translate-y-1;
   }
 
   /* Premium Input focus animations */
@@ -251,15 +251,15 @@
 
   /* Premium smooth animations */
   .animate-fade-in {
-    animation: fadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .animate-slide-up {
-    animation: slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: slideUp 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .animate-scale-in {
-    animation: scaleIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: scaleIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .animate-bounce-subtle {
@@ -291,7 +291,7 @@
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(10px);
   }
   to {
     opacity: 1;
@@ -302,7 +302,7 @@
 @keyframes slideUp {
   from {
     opacity: 0;
-    transform: translateY(30px);
+    transform: translateY(15px);
   }
   to {
     opacity: 1;
@@ -313,7 +313,7 @@
 @keyframes scaleIn {
   from {
     opacity: 0;
-    transform: scale(0.9);
+    transform: scale(0.95);
   }
   to {
     opacity: 1;

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { UserManagement } from '@/components/UserManagement';
@@ -9,7 +8,7 @@ import { Users, FileText, Shield, TestTube } from 'lucide-react';
 
 export const AdminPanel = () => {
   return (
-    <div className="container mx-auto p-2 sm:p-4 md:p-6 space-y-6">
+    <div className="container mx-auto p-2 sm:p-4 md:p-6 space-y-6 animate-fade-in">
       <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-3 sm:space-y-0 sm:space-x-4">
         <div className="bg-primary/10 p-3 rounded-xl">
           <Shield className="h-8 w-8 text-primary" />
@@ -42,19 +41,19 @@ export const AdminPanel = () => {
           </TabsList>
         </div>
 
-        <TabsContent value="test" className="mt-6">
+        <TabsContent value="test" className="mt-6 animate-fade-in">
           <AdminTestPanel />
         </TabsContent>
 
-        <TabsContent value="users" className="mt-6">
+        <TabsContent value="users" className="mt-6 animate-fade-in">
           <UserManagement />
         </TabsContent>
 
-        <TabsContent value="logs" className="mt-6">
+        <TabsContent value="logs" className="mt-6 animate-fade-in">
           <AdminLogs />
         </TabsContent>
 
-        <TabsContent value="debug" className="mt-6">
+        <TabsContent value="debug" className="mt-6 animate-fade-in">
           <AdminDebugPanel />
         </TabsContent>
       </Tabs>
