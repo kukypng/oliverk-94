@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -51,23 +52,23 @@ const App = () => (
     >
       <TooltipProvider>
         <ErrorBoundary>
-          <AuthProvider>
-            <Toaster />
-            <Sonner 
-              position="top-right"
-              expand={false}
-              richColors
-              closeButton
-              duration={4000}
-              toastOptions={{
-                style: {
-                  background: 'hsl(var(--background))',
-                  color: 'hsl(var(--foreground))',
-                  border: '1px solid hsl(var(--border))',
-                },
-              }}
-            />
-            <BrowserRouter>
+          <BrowserRouter>
+            <AuthProvider>
+              <Toaster />
+              <Sonner 
+                position="top-right"
+                expand={false}
+                richColors
+                closeButton
+                duration={4000}
+                toastOptions={{
+                  style: {
+                    background: 'hsl(var(--background))',
+                    color: 'hsl(var(--foreground))',
+                    border: '1px solid hsl(var(--border))',
+                  },
+                }}
+              />
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/auth" element={<AuthPage />} />
@@ -92,8 +93,8 @@ const App = () => (
                 <Route path="/dashboard/*" element={<Dashboard />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
-            </BrowserRouter>
-          </AuthProvider>
+            </AuthProvider>
+          </BrowserRouter>
         </ErrorBoundary>
       </TooltipProvider>
     </ThemeProvider>
