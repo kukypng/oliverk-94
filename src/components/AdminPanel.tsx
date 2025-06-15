@@ -1,22 +1,33 @@
+
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { UserManagement } from '@/components/UserManagement';
 import { AdminLogs } from '@/components/AdminLogs';
 import { AdminDebugPanel } from '@/components/AdminDebugPanel';
 import { AdminTestPanel } from '@/components/AdminTestPanel';
-import { Users, FileText, Shield, TestTube } from 'lucide-react';
+import { Users, FileText, Shield, TestTube, UserPlus } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
 
 export const AdminPanel = () => {
   return (
     <div className="container mx-auto p-2 sm:p-4 md:p-6 space-y-6 animate-fade-in">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-3 sm:space-y-0 sm:space-x-4">
-        <div className="bg-primary/10 p-3 rounded-xl">
-          <Shield className="h-8 w-8 text-primary" />
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-3 sm:space-y-0">
+        <div className="flex items-center space-x-4">
+          <div className="bg-primary/10 p-3 rounded-xl">
+            <Shield className="h-8 w-8 text-primary" />
+          </div>
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold">Painel Administrativo</h1>
+            <p className="text-muted-foreground">Gerencie usuários e monitore atividades do sistema</p>
+          </div>
         </div>
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold">Painel Administrativo</h1>
-          <p className="text-muted-foreground">Gerencie usuários e monitore atividades do sistema</p>
-        </div>
+        <Link to="/signup">
+          <Button>
+            <UserPlus className="mr-2 h-4 w-4" />
+            Criar Novo Usuário
+          </Button>
+        </Link>
       </div>
 
       <Tabs defaultValue="test" className="w-full">

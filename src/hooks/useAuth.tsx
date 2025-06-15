@@ -375,9 +375,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (error) {
         throw error;
       }
-      // Force a reload to clear all state and re-evaluate auth status.
-      // This ensures the user is properly redirected to the login page.
-      window.location.reload();
+      // Redirect to auth page instead of reloading
+      navigate('/auth', { replace: true });
     } catch (error) {
       console.error('Sign out error:', error);
       showError({
