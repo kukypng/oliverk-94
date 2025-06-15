@@ -142,7 +142,7 @@ serve(async (req) => {
 
             try {
                 await resend.emails.send({
-                    from: 'Oliver <oliver@oliverr.kuky.pro>',
+                    from: 'Oliver <oliver@kuky.pro>',
                     to: [email],
                     subject: 'Bem-vindo ao Oliver! Sua conta está pronta.',
                     html: emailHtml,
