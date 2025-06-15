@@ -15,7 +15,7 @@ import { useEnhancedToast } from '@/hooks/useEnhancedToast';
 
 const AdminUserCreationForm = () => {
   const { signUp } = useAuth();
-  const { showSuccess, showError, showLoading } = useEnhancedToast();
+  const { showSuccess, showError } = useEnhancedToast();
   
   const [userForm, setUserForm] = useState({
     name: '',
@@ -48,10 +48,6 @@ const AdminUserCreationForm = () => {
     if (!isFormValid) return;
 
     setIsCreating(true);
-    showLoading({
-      title: 'Criando usuário...',
-      description: 'Aguarde enquanto o usuário é criado no sistema.'
-    });
 
     try {
       const { error } = await signUp(userForm.email, userForm.password, {
