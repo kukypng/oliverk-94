@@ -1,17 +1,10 @@
-
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-import { Resend } from 'npm:resend@3.5.0'
-import React from 'npm:react@18.3.1'
-import { render } from 'npm:@react-email/render@0.0.13'
-import InvitationEmail from './_templates/invitation-email.tsx'
 
 const supabaseAdmin = createClient(
   Deno.env.get('SUPABASE_URL') ?? '',
   Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
 )
-
-const resend = new Resend(Deno.env.get('RESEND_API_KEY') ?? '');
 
 // Helper function to process subscription updates (creation or renewal)
 async function processSubscriptionUpdate(userId: string, mercadoPagoPaymentId: string | undefined) {
@@ -142,67 +135,29 @@ serve(async (req) => {
           console.log(`Renewal for existing user ${email} complete.`);
 
         } else {
-          // Sub-case 2.2: Brand new user creation
-          console.log(`Creating new user for email: ${email}`);
-          const randomPassword = crypto.randomUUID();
+          // Sub-case 2.2: Brand new user creation using Supabase Invite
+          console.log(`Inviting new user for email: ${email}`);
           
-          const { data: { user }, error: userError } = await supabaseAdmin.auth.admin.createUser({
-              email,
-              password: randomPassword,
-              email_confirm: true,
-              user_metadata: { name }
-          });
+          const { data: { user }, error: inviteError } = await supabaseAdmin.auth.admin.inviteUserByEmail(
+            email,
+            { data: { name } } // Pass user's name in metadata
+          );
 
-          if (userError) {
-              console.error('Error creating user:', userError);
-              throw userError;
+          if (inviteError) {
+              console.error('Error inviting user:', inviteError);
+              throw inviteError;
+          }
+
+          if (!user) {
+            throw new Error(`User invitation for ${email} did not return a user object.`);
           }
           
           const userId = user.id;
-          console.log(`User created successfully with ID: ${userId}`);
+          console.log(`User invited successfully with ID: ${userId}. An invitation email will be sent by Supabase.`);
           
           // Set up subscription for the new user
           await processSubscriptionUpdate(userId, mercadoPagoPaymentId);
           
-          // Generate password reset link and send welcome email
-          const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
-              type: 'recovery',
-              email: email,
-          });
-
-          if (linkError) {
-              console.error(`Error generating password recovery link for ${email}:`, linkError);
-          }
-
-          if (linkData?.properties?.action_link) {
-              const confirmationUrl = linkData.properties.action_link;
-              const emailHtml = render(
-                  React.createElement(InvitationEmail, {
-                      name: name,
-                      confirmationUrl: confirmationUrl,
-                  })
-              );
-
-              console.log(`Attempting to send welcome email to ${email} from oliver@oliverr.kuky.pro`);
-              try {
-                  const { data: emailData, error: emailError } = await resend.emails.send({
-                      from: 'Oliver <oliver@oliverr.kuky.pro>',
-                      to: [email],
-                      subject: 'Bem-vindo ao Oliver! Sua conta está pronta.',
-                      html: emailHtml,
-                  });
-
-                  if (emailError) {
-                    console.error(`Resend API error for ${email}:`, JSON.stringify(emailError));
-                  } else {
-                    console.log(`Welcome email sent successfully to ${email}. Response:`, JSON.stringify(emailData));
-                  }
-              } catch (emailError) {
-                  console.error(`Failed to send welcome email to ${email}:`, emailError);
-              }
-          } else {
-              console.error(`Could not get action_link for user ${email}. Welcome email not sent.`);
-          }
           console.log(`New user ${email} signup process complete.`);
         }
       }
@@ -233,4 +188,3 @@ serve(async (req) => {
     })
   }
 })
-
