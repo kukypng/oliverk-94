@@ -43,7 +43,7 @@ export const AppSidebar = ({ activeTab, onTabChange }: AppSidebarProps) => {
   ];
 
   return (
-    <Sidebar className="border-r-border/50" collapsible="icon">
+    <Sidebar className="border-r border-border dark:border-white/5" collapsible="icon">
       <SidebarRail />
       <SidebarHeader className="p-4 h-20 flex items-center">
         <div className="flex items-center space-x-4 w-full">
