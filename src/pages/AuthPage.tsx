@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -88,7 +89,12 @@ export const AuthPage = () => {
                 />
               </div>
               <div className="space-y-3 relative">
-                <Label htmlFor="password" className="text-sm font-medium">Senha</Label>
+                <div className="flex justify-between items-center">
+                  <Label htmlFor="password" className="text-sm font-medium">Senha</Label>
+                  <Link to="/reset-password" className="text-sm font-medium text-primary hover:underline">
+                    Esqueceu a senha?
+                  </Link>
+                </div>
                 <Input
                   id="password"
                   type={showPassword ? 'text' : 'password'}

@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -25,6 +24,8 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signUp: (email: string, password: string, userData: { name: string; role?: string }) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
+  requestPasswordReset: (email: string) => Promise<{ error: any }>;
+  updatePassword: (password: string) => Promise<{ error: any }>;
   hasRole: (role: UserRole) => boolean;
   hasPermission: (permission: string) => boolean;
 }
@@ -240,6 +241,64 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const requestPasswordReset = async (email: string) => {
+    try {
+      console.log('Requesting password reset for:', email);
+      // O URL de redirecionamento deve estar na lista de permissões nas configurações de autenticação do seu projeto Supabase.
+      const redirectUrl = `${window.location.origin}/reset-password`;
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: redirectUrl,
+      });
+
+      if (error) {
+        showError({
+          title: 'Erro ao solicitar',
+          description: "Não foi possível enviar o link. Verifique o e-mail e tente novamente.",
+        });
+      } else {
+        showSuccess({
+          title: 'Link enviado!',
+          description: 'Se o e-mail estiver cadastrado, um link de redefinição foi enviado.',
+        });
+      }
+      return { error };
+    } catch (error) {
+      console.error('Password reset request error:', error);
+      showError({
+        title: 'Erro inesperado',
+        description: 'Ocorreu um erro ao solicitar a redefinição. Tente novamente.',
+      });
+      return { error };
+    }
+  };
+
+  const updatePassword = async (password: string) => {
+    try {
+      console.log('Attempting to update password.');
+      const { error } = await supabase.auth.updateUser({ password });
+
+      if (error) {
+        showError({
+          title: 'Erro ao atualizar senha',
+          description: error.message,
+        });
+      } else {
+        showSuccess({
+          title: 'Senha atualizada!',
+          description: 'Sua senha foi alterada com sucesso.',
+        });
+      }
+      return { error };
+    } catch (error) {
+      console.error('Password update error:', error);
+      showError({
+        title: 'Erro inesperado',
+        description: 'Ocorreu um erro ao atualizar sua senha. Tente novamente.',
+      });
+      return { error };
+    }
+  };
+
   const signOut = async () => {
     try {
       console.log('Signing out user');
@@ -299,6 +358,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     signIn,
     signUp,
     signOut,
+    requestPasswordReset,
+    updatePassword,
     hasRole,
     hasPermission,
   };
