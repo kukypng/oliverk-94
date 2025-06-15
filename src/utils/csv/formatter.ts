@@ -1,3 +1,4 @@
+
 import { normalizeDataString } from './normalizer';
 
 /**
@@ -18,33 +19,47 @@ const formatCsvField = (value: any): string => {
 
 /**
  * Gera o conteúdo CSV para exportação a partir de uma lista de orçamentos.
- * Usa cabeçalhos limpos e apenas dados relevantes do orçamento.
+ * Usa cabeçalhos limpos e pode ser re-importado.
  * @param budgets - A lista de orçamentos a ser exportada.
  * @returns O conteúdo do arquivo CSV como uma string.
  */
 export const generateExportCsv = (budgets: any[]): string => {
   const headers = [
-    'Tipo Aparelho', 'Marca Aparelho', 'Modelo', 'Problema', 'Servico Realizado',
-    'Preco Total', 'Preco Parcelado', 'Parcelas', 'Condicao Pagamento', 'Garantia (meses)',
-    'Inclui Entrega', 'Inclui Pelicula', 'Valido Ate', 'Observacoes'
+    'Tipo Aparelho', 'Marca Aparelho', 'Modelo Aparelho', 'Defeito ou Problema',
+    'Servico Realizado', 'Observacoes', 'Preco Total', 'Preco Parcelado', 'Parcelas',
+    'Condicao Pagamento', 'Garantia (meses)', 'Validade (dias)', 'Inclui Entrega',
+    'Inclui Pelicula'
   ];
 
-  const formattedData = budgets.map(b => [
-    b.device_type,
-    b.device_brand || '',
-    b.device_model,
-    b.issue,
-    b.part_type,
-    (Number(b.total_price) / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
-    b.installment_price ? (Number(b.installment_price) / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) : '0,00',
-    b.installments,
-    b.payment_condition,
-    b.warranty_months,
-    b.includes_delivery ? 'sim' : 'nao',
-    b.includes_screen_protector ? 'sim' : 'nao',
-    b.valid_until ? new Date(b.valid_until).toLocaleDateString('pt-BR') : '',
-    b.notes || '',
-  ]);
+  const formattedData = budgets.map(b => {
+    const validUntilDate = b.valid_until ? new Date(b.valid_until) : null;
+    let validityDays = '';
+
+    if (validUntilDate) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      validUntilDate.setHours(0, 0, 0, 0);
+      const diffTime = validUntilDate.getTime() - today.getTime();
+      validityDays = String(Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24))));
+    }
+
+    return [
+      b.device_type,
+      b.device_brand || '',
+      b.device_model,
+      b.issue,
+      b.part_type,
+      b.notes || '',
+      (Number(b.total_price) / 100).toFixed(2).replace('.', ','),
+      b.installment_price ? (Number(b.installment_price) / 100).toFixed(2).replace('.', ',') : '0,00',
+      b.installments,
+      b.payment_condition,
+      b.warranty_months,
+      validityDays,
+      b.includes_delivery ? 'sim' : 'nao',
+      b.includes_screen_protector ? 'sim' : 'nao',
+    ];
+  });
 
   const csvRows = [
     headers.join(';'),

@@ -13,22 +13,22 @@ export const generateTemplateCsv = (): string => {
     '2. NAO altere os nomes das colunas.',
     '3. Campos com (*) sao obrigatorios.',
     '4. Para precos, use virgula ou ponto como separador decimal (ex: 150,00 ou 150.00).',
-    '5. Para colunas "sim/nao", digite exatamente "sim" ou "nao".',
+    '5. Para colunas de sim/nao, digite exatamente "sim" ou "nao".',
     ''
   ];
 
-  // Cabeçalhos amigáveis para o usuário
+  // Cabeçalhos amigáveis para o usuário, compatíveis com a exportação
   const headers = [
     'Tipo Aparelho (*)', 'Marca Aparelho', 'Modelo Aparelho (*)', 'Defeito ou Problema (*)',
     'Servico Realizado (*)', 'Observacoes', 'Preco Total (*)', 'Preco Parcelado', 'Parcelas',
-    'Condicao Pagamento', 'Garantia (meses)', 'Validade (dias)', 'Inclui Entrega (sim/nao)',
-    'Inclui Pelicula (sim/nao)'
+    'Condicao Pagamento', 'Garantia (meses)', 'Validade (dias)', 'Inclui Entrega',
+    'Inclui Pelicula'
   ];
   
   // Linha de exemplo para guiar o usuário
   const exampleRow = [
     'Smartphone', 'Samsung', 'Galaxy A12', 'Tela Trincada',
-    'Troca de Frontal Completa', 'Aparelho com marcas de uso na tampa', '350.00', '400.00', '2',
+    'Troca de Frontal Completa', 'Aparelho com marcas de uso na tampa', '350,00', '400,00', '2',
     'Cartao de Credito', '3', '10', 'nao', 'sim'
   ];
 

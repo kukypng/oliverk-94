@@ -1,4 +1,3 @@
-
 import { normalizeHeader } from './normalizer';
 
 type BudgetInsert = any; // Manter tipo para consistencia
@@ -33,7 +32,6 @@ export const parseAndPrepareBudgets = (csvText: string, userId: string): BudgetI
   const dataRows = lines.slice(1);
 
   const newBudgets = dataRows.map((line, rowIndex) => {
-    // Ignora linhas de exemplo ou vazias
     if (line.trim() === '' || line.includes('Galaxy A12')) return null;
 
     const values = line.split(/;(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(v => v.trim().replace(/^"|"$/g, ''));
@@ -79,8 +77,8 @@ export const parseAndPrepareBudgets = (csvText: string, userId: string): BudgetI
       installments: isNaN(installments) || installments <= 1 ? 1 : installments,
       payment_condition: paymentCondition,
       warranty_months: Number(rowObject['garantia_meses'] || 3),
-      includes_delivery: String(rowObject['inclui_entrega_sim_nao']).toLowerCase() === 'sim',
-      includes_screen_protector: String(rowObject['inclui_pelicula_sim_nao']).toLowerCase() === 'sim',
+      includes_delivery: String(rowObject['inclui_entrega']).toLowerCase() === 'sim',
+      includes_screen_protector: String(rowObject['inclui_pelicula']).toLowerCase() === 'sim',
       valid_until: validUntil.toISOString(),
       client_name: null,
       client_phone: null,
