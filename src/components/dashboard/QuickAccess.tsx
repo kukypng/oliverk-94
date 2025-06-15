@@ -2,19 +2,27 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { PlusCircle, List, Users, Settings, Shield } from 'lucide-react';
+import { PlusCircle, List, Users, Settings, Shield, type LucideIcon } from 'lucide-react';
 
 interface QuickAccessProps {
   onTabChange: (tab: string) => void;
   hasPermission: (permission: string) => boolean;
 }
 
-const quickAccessButtons = [
-  { label: 'Novo Orçamento', icon: PlusCircle, tab: 'new-budget', permission: 'create_budgets' },
-  { label: 'Ver Orçamentos', icon: List, tab: 'budgets', permission: 'view_own_budgets' },
-  { label: 'Clientes', icon: Users, tab: 'clients', permission: 'view_clients' },
-  { label: 'Configurações', icon: Settings, tab: 'settings', permission: null },
-  { label: 'Painel Admin', icon: Shield, tab: 'admin', permission: 'access_admin_panel' },
+interface QuickAccessButton {
+  label: string;
+  icon: LucideIcon;
+  tab: string;
+  permission: string | null;
+  iconColorClass: string;
+}
+
+const quickAccessButtons: QuickAccessButton[] = [
+  { label: 'Novo Orçamento', icon: PlusCircle, tab: 'new-budget', permission: 'create_budgets', iconColorClass: 'text-green-500' },
+  { label: 'Ver Orçamentos', icon: List, tab: 'budgets', permission: 'view_own_budgets', iconColorClass: 'text-blue-500' },
+  { label: 'Clientes', icon: Users, tab: 'clients', permission: 'manage_clients', iconColorClass: 'text-purple-500' },
+  { label: 'Configurações', icon: Settings, tab: 'settings', permission: null, iconColorClass: 'text-slate-500' },
+  { label: 'Painel Admin', icon: Shield, tab: 'admin', permission: 'manage_users', iconColorClass: 'text-red-500' },
 ];
 
 export const QuickAccess = ({ onTabChange, hasPermission }: QuickAccessProps) => {
@@ -25,19 +33,21 @@ export const QuickAccess = ({ onTabChange, hasPermission }: QuickAccessProps) =>
           Acesso Rápido
         </CardTitle>
       </CardHeader>
-      <CardContent className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 p-6 pt-0">
+      <CardContent className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 p-6 pt-0">
         {quickAccessButtons.map(btn => {
-          if (btn.permission && !hasPermission(btn.permission)) return null;
+          if (btn.permission && !hasPermission(btn.permission)) {
+            return null;
+          }
           const Icon = btn.icon;
           return (
-            <Button 
-              key={btn.tab} 
-              variant="outline" 
-              onClick={() => onTabChange(btn.tab)} 
-              className="flex-col h-28 text-center text-sm font-medium bg-background/50 hover:bg-background/90 border-border/50 hover:border-primary/50"
+            <Button
+              key={btn.tab}
+              variant="outline"
+              onClick={() => onTabChange(btn.tab)}
+              className="group flex-col h-32 text-center text-sm font-medium bg-background/50 hover:bg-background/90 border-border/50 hover-lift"
             >
-              <Icon className="h-7 w-7 mb-2 text-primary" />
-              <span>{btn.label}</span>
+              <Icon className={`h-8 w-8 mb-3 transition-transform group-hover:scale-110 ${btn.iconColorClass}`} />
+              <span className="font-semibold">{btn.label}</span>
             </Button>
           )
         })}
