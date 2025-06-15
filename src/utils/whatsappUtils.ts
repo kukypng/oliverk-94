@@ -1,4 +1,3 @@
-
 interface BudgetData {
   id: string;
   device_model: string;
@@ -58,7 +57,6 @@ ${priceSection}
 
 *DETALHES*
 Serviço: ${budget.part_type}
-Especificação: ${budget.brand || 'Padrão'}
 Garantia de: ${warrantyText}
 
 *Garantia não cobre quebrado ou molhado*${additionalServices}`;
