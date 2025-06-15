@@ -3,7 +3,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/hooks/useAuth';
 import { differenceInDays, parseISO } from 'date-fns';
 import { CreditCard } from 'lucide-react';
-import { SubscriptionButton } from '../SubscriptionButton';
 
 export const LicenseStatus = () => {
   const { profile } = useAuth();
@@ -86,10 +85,9 @@ export const LicenseStatus = () => {
           {status.description}
         </p>
         {status.showRenew && (
-          <SubscriptionButton className="w-full bg-green-600 hover:bg-green-700 text-white">
-            <CreditCard className="w-4 h-4 mr-2" />
-            Renovar Assinatura
-          </SubscriptionButton>
+          <p className="text-sm text-muted-foreground p-4 bg-secondary rounded-lg">
+            Para renovar sua assinatura e continuar com acesso total, por favor, entre em contato com nosso suporte.
+          </p>
         )}
       </CardContent>
     </Card>

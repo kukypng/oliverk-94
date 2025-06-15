@@ -15,7 +15,6 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { ResetPasswordPage } from "./pages/ResetPasswordPage";
 import { ResetEmailPage } from "./pages/ResetEmailPage";
 import { VerifyPage } from "./pages/VerifyPage";
-import PlansPage from "./pages/PlansPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -72,7 +71,6 @@ const App = () => (
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/auth" element={<AuthPage />} />
-                <Route path="/planos" element={<PlansPage />} />
                 <Route path="/reset-password" element={<ResetPasswordPage />} />
                 <Route path="/verify" element={<VerifyPage />} />
                 <Route

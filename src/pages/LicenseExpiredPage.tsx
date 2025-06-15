@@ -1,8 +1,6 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Clock, CreditCard, ShieldCheck } from 'lucide-react';
-import { SubscriptionButton } from '@/components/SubscriptionButton';
 import { useAuth } from '@/hooks/useAuth';
 
 export const LicenseExpiredPage = () => {
@@ -22,11 +20,10 @@ export const LicenseExpiredPage = () => {
     description: isNewUser
       ? 'Para começar a usar o sistema, você precisa de uma assinatura ativa.'
       : 'Para continuar usando o sistema, você precisa renovar sua licença.',
-    ctaTitle: isNewUser ? 'Ative sua assinatura agora' : 'Renove sua licença agora',
+    ctaTitle: isNewUser ? 'Como ativar sua assinatura?' : 'Como renovar sua licença?',
     ctaDescription: isNewUser
-      ? 'Clique no botão abaixo para escolher seu plano e ativar sua conta.'
-      : 'Clique no botão abaixo para renovar sua licença e continuar aproveitando todos os recursos do sistema.',
-    buttonText: isNewUser ? 'Ativar Assinatura' : 'Renovar Assinatura',
+      ? 'Para ativar sua conta, entre em contato com o nosso suporte para que possamos liberar seu acesso.'
+      : 'Para renovar sua licença e continuar aproveitando todos os recursos do sistema, entre em contato com nosso suporte.',
     footerText: isNewUser
       ? 'Após a ativação, você terá acesso completo ao sistema.'
       : 'Após a renovação, você terá acesso completo ao sistema.',
@@ -53,17 +50,13 @@ export const LicenseExpiredPage = () => {
             </p>
           </div>
 
-          <div className="border border-green-200 rounded-lg p-4">
-            <h3 className="font-semibold mb-2 text-slate-50">
+          <div className="border border-primary/20 bg-secondary rounded-lg p-4">
+            <h3 className="font-semibold mb-2 text-foreground">
               {pageContent.ctaTitle}
             </h3>
-            <p className="text-sm mb-4 text-slate-50">
+            <p className="text-sm text-muted-foreground">
               {pageContent.ctaDescription}
             </p>
-            <SubscriptionButton className="w-full bg-green-600 hover:bg-green-700 text-white">
-              <CreditCard className="w-4 h-4 mr-2" />
-              {pageContent.buttonText}
-            </SubscriptionButton>
           </div>
 
           <div className="text-xs text-gray-500 border-t pt-4">
