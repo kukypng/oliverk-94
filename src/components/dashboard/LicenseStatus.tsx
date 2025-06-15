@@ -22,7 +22,7 @@ export const LicenseStatus = () => {
   };
 
   const getStatus = () => {
-    if (remainingDays > 7) {
+    if (remainingDays > 10) { // Alterado de 7 para 10 para alinhar com as notificações
       return {
         title: "Licença Ativa",
         description: `Sua licença expira em ${remainingDays} dias.`,
@@ -42,7 +42,7 @@ export const LicenseStatus = () => {
       return {
         title: "Licença Expirada",
         description: `Sua licença expirou. Renove para continuar usando o sistema.`,
-        icon: <AlertTriangle className="h-8 w-8 text-red-500" />,
+        icon: <span className="text-4xl" role="img" aria-label="Coração partido">💔</span>,
         cardClass: "border-red-500/30",
         showRenew: true
       };

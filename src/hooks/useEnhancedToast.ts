@@ -10,6 +10,7 @@ export interface EnhancedToastOptions {
     onClick: () => void;
   };
   onDismiss?: () => void;
+  style?: React.CSSProperties;
 }
 
 export const useEnhancedToast = () => {
@@ -22,6 +23,7 @@ export const useEnhancedToast = () => {
         onClick: options.action.onClick,
       } : undefined,
       onDismiss: options.onDismiss,
+      style: options.style,
     });
   };
 
@@ -35,6 +37,7 @@ export const useEnhancedToast = () => {
         onClick: options.action.onClick,
       } : undefined,
       onDismiss: options.onDismiss,
+      style: options.style,
     });
   };
 
@@ -48,6 +51,7 @@ export const useEnhancedToast = () => {
         onClick: options.action.onClick,
       } : undefined,
       onDismiss: options.onDismiss,
+      style: options.style,
     });
   };
 
@@ -60,6 +64,7 @@ export const useEnhancedToast = () => {
         onClick: options.action.onClick,
       } : undefined,
       onDismiss: options.onDismiss,
+      style: options.style,
     });
   };
 

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -7,6 +6,7 @@ import { DashboardSkeleton } from '@/components/ui/loading-states';
 import { EmptyState } from '@/components/EmptyState';
 import { useAuth } from '@/hooks/useAuth';
 import { useEnhancedToast } from '@/hooks/useEnhancedToast';
+import { useLicenseNotifications } from '@/hooks/useLicenseNotifications';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { DashboardHeader } from './dashboard/DashboardHeader';
 import { QuickAccess } from './dashboard/QuickAccess';
@@ -20,6 +20,7 @@ interface DashboardContentProps {
 }
 
 export const DashboardContent = ({ onTabChange }: DashboardContentProps) => {
+  useLicenseNotifications();
   const { profile, hasPermission, user } = useAuth();
   const { showError } = useEnhancedToast();
 
