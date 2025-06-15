@@ -1,4 +1,3 @@
-
 import { normalizeDataString } from './normalizer';
 
 /**
@@ -24,6 +23,7 @@ const formatCsvField = (value: any): string => {
  * @returns O conteúdo do arquivo CSV como uma string.
  */
 export const generateExportCsv = (budgets: any[]): string => {
+  // Cabeçalhos para exportação devem ser limpos e consistentes para re-importação.
   const headers = [
     'Tipo Aparelho', 'Marca Aparelho', 'Modelo Aparelho', 'Defeito ou Problema',
     'Servico Realizado', 'Observacoes', 'Preco Total', 'Preco Parcelado', 'Parcelas',
@@ -43,6 +43,10 @@ export const generateExportCsv = (budgets: any[]): string => {
       validityDays = String(Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24))));
     }
 
+    // Os preços são exportados com ponto decimal para consistência.
+    const totalPrice = (Number(b.total_price) / 100).toFixed(2);
+    const installmentPrice = b.installment_price ? (Number(b.installment_price) / 100).toFixed(2) : '';
+
     return [
       b.device_type,
       b.device_brand || '',
@@ -50,8 +54,8 @@ export const generateExportCsv = (budgets: any[]): string => {
       b.issue,
       b.part_type,
       b.notes || '',
-      (Number(b.total_price) / 100).toFixed(2).replace('.', ','),
-      b.installment_price ? (Number(b.installment_price) / 100).toFixed(2).replace('.', ',') : '0,00',
+      totalPrice,
+      installmentPrice,
       b.installments,
       b.payment_condition,
       b.warranty_months,

@@ -1,4 +1,3 @@
-
 /**
  * Gera o conteúdo CSV para o modelo de importação com um layout amigável, semelhante a uma planilha.
  * @returns O conteúdo do arquivo de modelo CSV como uma string.
@@ -12,7 +11,7 @@ export const generateTemplateCsv = (): string => {
     '1. Preencha uma linha para cada orcamento, seguindo as colunas definidas abaixo.',
     '2. NAO altere os nomes das colunas.',
     '3. Campos com (*) sao obrigatorios.',
-    '4. Para precos, use virgula ou ponto como separador decimal (ex: 150,00 ou 150.00).',
+    '4. Para precos, use virgula ou ponto como separador decimal (ex: 150.00 ou 150,00).',
     '5. Para colunas de sim/nao, digite exatamente "sim" ou "nao".',
     ''
   ];
@@ -25,10 +24,10 @@ export const generateTemplateCsv = (): string => {
     'Inclui Pelicula'
   ];
   
-  // Linha de exemplo para guiar o usuário
+  // Linha de exemplo para guiar o usuário (usando ponto decimal)
   const exampleRow = [
     'Smartphone', 'Samsung', 'Galaxy A12', 'Tela Trincada',
-    'Troca de Frontal Completa', 'Aparelho com marcas de uso na tampa', '350,00', '400,00', '2',
+    'Troca de Frontal Completa', 'Aparelho com marcas de uso na tampa', '350.00', '400.00', '2',
     'Cartao de Credito', '3', '10', 'nao', 'sim'
   ];
 
