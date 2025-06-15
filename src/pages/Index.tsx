@@ -22,7 +22,7 @@ const Index = () => {
   // Landing page para usuários não logados
   return <div className="min-h-screen">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b shadow-sm sticky top-0 z-50">
+      <header className="backdrop-blur-sm border-b shadow-sm sticky top-0 z-50 bg-black">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 bg-black">
           <div className="flex justify-between items-center py-4 bg-black">
             <Link to="/" className="flex items-center space-x-2">
