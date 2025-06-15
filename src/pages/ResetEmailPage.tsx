@@ -1,20 +1,37 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2, CheckCircle, AlertTriangle } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 
 export const ResetEmailPage = () => {
   const { updateEmail, user } = useAuth();
+  const navigate = useNavigate();
 
   const [newEmail, setNewEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [isConfirmation, setIsConfirmation] = useState(false);
+
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (hash.includes('type=email_change')) {
+      setIsConfirmation(true);
+      setMessage({ type: 'success', text: 'Seu endereço de e-mail foi alterado com sucesso! Redirecionando...' });
+      
+      // Limpa o hash da URL para evitar que a mensagem apareça novamente
+      window.history.replaceState({}, document.title, window.location.pathname + window.location.search);
+
+      setTimeout(() => {
+        navigate('/dashboard/settings');
+      }, 4000);
+    }
+  }, [navigate]);
 
   const handleEmailChange = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,46 +76,57 @@ export const ResetEmailPage = () => {
             <img src="/icone.png" alt="Oliver Logo" className="w-20 h-20 mx-auto mb-4" />
           </Link>
           <h1 className="text-3xl font-bold text-foreground tracking-tight">
-            Alterar Email
+            {isConfirmation ? 'E-mail Alterado!' : 'Alterar Email'}
           </h1>
         </div>
 
         <Card className="glass-card border-0 shadow-2xl backdrop-blur-xl">
           <CardHeader>
             <CardDescription className="text-center">
-              Seu email atual é <strong>{user?.email}</strong>.
-              <br />
-              Digite o novo endereço e enviaremos um link de confirmação.
+              {isConfirmation 
+                ? 'Seu novo endereço de e-mail foi confirmado e atualizado.'
+                : <>Seu email atual é <strong>{user?.email}</strong>.<br />Digite o novo endereço e enviaremos um link de confirmação.</>
+              }
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             {renderMessage()}
-            <form onSubmit={handleEmailChange} className="space-y-6">
-              <div className="space-y-3">
-                <Label htmlFor="email">Novo Endereço de Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="novo@email.com"
-                  value={newEmail}
-                  onChange={(e) => setNewEmail(e.target.value)}
-                  required
-                  className="h-12 text-base rounded-xl input-focus"
-                />
-              </div>
-              <Button type="submit" className="w-full h-12" disabled={loading}>
-                {loading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : 'Enviar Link de Confirmação'}
-              </Button>
-            </form>
-            <div className="text-center text-sm">
-              <Link to="/dashboard/settings" className="underline text-muted-foreground hover:text-primary">
-                Voltar para Configurações
-              </Link>
-            </div>
+            {!isConfirmation && (
+              <>
+                <form onSubmit={handleEmailChange} className="space-y-6">
+                  <div className="space-y-3">
+                    <Label htmlFor="email">Novo Endereço de Email</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="novo@email.com"
+                      value={newEmail}
+                      onChange={(e) => setNewEmail(e.target.value)}
+                      required
+                      className="h-12 text-base rounded-xl input-focus"
+                    />
+                  </div>
+                  <Button type="submit" className="w-full h-12" disabled={loading}>
+                    {loading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : 'Enviar Link de Confirmação'}
+                  </Button>
+                </form>
+                <div className="text-center text-sm">
+                  <Link to="/dashboard/settings" className="underline text-muted-foreground hover:text-primary">
+                    Voltar para Configurações
+                  </Link>
+                </div>
+              </>
+            )}
+             {isConfirmation && (
+                <div className="text-center text-sm">
+                  <Link to="/dashboard/settings" className="underline text-muted-foreground hover:text-primary">
+                    Voltar para Configurações
+                  </Link>
+                </div>
+              )}
           </CardContent>
         </Card>
       </div>
     </div>
   );
 };
-
