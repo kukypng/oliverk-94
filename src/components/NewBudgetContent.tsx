@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { NewBudgetForm } from './NewBudgetForm';
 import { Button } from '@/components/ui/button';
@@ -149,7 +148,7 @@ export const NewBudgetContent = () => {
         animationDelay: '200ms'
       }}>
           <h2 className="text-xl lg:text-2xl font-bold text-foreground mb-4">Orçamentos Recentes</h2>
-          <Card className="glass-card border-0 bg-white/50 dark:bg-black/50 backdrop-blur-xl">
+          <Card className="glass-card border-0">
             <CardContent className="p-4 lg:p-6 space-y-3">
               {isLoading && <>
                   <RecentBudgetSkeleton />
@@ -162,7 +161,7 @@ export const NewBudgetContent = () => {
                     <div className="flex-1 min-w-0 pr-3">
                       <div className="flex flex-col space-y-2">
                         <div>
-                          <p className="font-semibold text-sm lg:text-base text-foreground group-hover:text-[#fec832] transition-colors truncate">
+                          <p className="font-semibold text-sm lg:text-base text-foreground group-hover:text-orange-600 transition-colors truncate">
                             {budget.device_model || 'Modelo não informado'}
                           </p>
                           <p className="text-xs lg:text-sm text-muted-foreground truncate">{new Date(budget.created_at).toLocaleDateString('pt-BR')}</p>
@@ -178,13 +177,13 @@ export const NewBudgetContent = () => {
                       </div>
                     </div>
                     <div className="flex space-x-1 ml-2">
-                      <Button variant="ghost" size="sm" className="h-9 w-9 p-0 rounded-xl text-green-600 hover:text-green-700 hover:bg-green-50/10" onClick={() => handleShareWhatsApp(budget)}>
+                      <Button variant="ghost" size="sm" className="h-9 w-9 p-0 rounded-xl text-green-600 hover:text-green-700 hover:bg-green-500/10" onClick={() => handleShareWhatsApp(budget)}>
                         <MessageCircle className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="sm" className="h-9 w-9 p-0 rounded-xl hover:bg-[#fec832]/10 hover:text-[#fec832]" onClick={() => handleViewPdf(budget)} disabled={isGenerating}>
+                      <Button variant="ghost" size="sm" className="h-9 w-9 p-0 rounded-xl hover:bg-orange-50 hover:text-orange-600" onClick={() => handleViewPdf(budget)} disabled={isGenerating}>
                         <Eye className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="sm" className="h-9 w-9 p-0 rounded-xl hover:bg-blue-50 hover:text-blue-600" onClick={() => handleEdit(budget)}>
+                      <Button variant="ghost" size="sm" className="h-9 w-9 p-0 rounded-xl hover:bg-blue-500/10 hover:text-blue-600" onClick={() => handleEdit(budget)}>
                         <Edit className="h-4 w-4" />
                       </Button>
                       

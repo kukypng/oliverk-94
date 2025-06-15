@@ -265,12 +265,12 @@ export const NewBudgetForm = ({
         </Button>
         <div>
           <h1 className="text-3xl font-bold text-[#fec832]">Novo Orçamento</h1>
-          <p className="mt-2 text-white">Crie um novo orçamento personalizado</p>
+          <p className="mt-2 text-muted-foreground">Crie um novo orçamento personalizado</p>
         </div>
       </div>
 
       <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-6">
-        <Card className="bg-black">
+        <Card>
           <CardHeader>
             <CardTitle>Informações do Dispositivo</CardTitle>
           </CardHeader>
@@ -360,7 +360,7 @@ export const NewBudgetForm = ({
           </CardContent>
         </Card>
 
-        <Card className="bg-black">
+        <Card>
           <CardHeader>
             <CardTitle>Preços e Condições</CardTitle>
           </CardHeader>
@@ -431,7 +431,7 @@ export const NewBudgetForm = ({
           </CardContent>
         </Card>
 
-        <Card className="bg-black">
+        <Card>
           <CardHeader>
             <CardTitle>Configurações do Orçamento</CardTitle>
           </CardHeader>
@@ -474,7 +474,7 @@ export const NewBudgetForm = ({
         </Card>
 
         <div className="flex space-x-4">
-          <Button type="button" variant="outline" onClick={onBack} className="flex-1 text-white bg-black/[0.47]">
+          <Button type="button" variant="outline" onClick={onBack} className="flex-1">
             Cancelar
           </Button>
           <Button type="submit" className="flex-1" disabled={createBudgetMutation.isPending}>
