@@ -1,6 +1,7 @@
+
 import React from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { Navigate } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { FileText, Calculator, Smartphone, Shield, Star, Activity } from 'lucide-react';
@@ -25,13 +26,18 @@ const Index = () => {
       <header className="bg-white/80 backdrop-blur-sm border-b shadow-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 bg-black">
           <div className="flex justify-between items-center py-4 bg-black">
-            <div className="flex items-center space-x-2">
+            <Link to="/" className="flex items-center space-x-2">
               <img src="/icone.png" alt="Oliver Logo" className="h-8 w-8" />
               <h1 className="text-2xl font-bold text-white">Oliver</h1>
+            </Link>
+            <div className="flex items-center space-x-2">
+              <Button asChild variant="link" className="text-white hover:text-primary">
+                <Link to="/planos">Planos</Link>
+              </Button>
+              <Button asChild className="bg-primary hover:bg-primary/90 text-primary-foreground">
+                <Link to="/auth">Login</Link>
+              </Button>
             </div>
-            <Button onClick={() => window.location.href = '/auth'} className="bg-primary hover:bg-primary/90 text-primary-foreground">
-              Login
-            </Button>
           </div>
         </div>
       </header>
@@ -49,10 +55,10 @@ const Index = () => {
             clientes e relatórios de forma eficiente e organizada.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" onClick={() => window.location.href = '/auth'} className="text-lg px-8 py-3 bg-primary hover:bg-primary/90 text-primary-foreground">
-              Começar Agora
+            <Button asChild size="lg" className="text-lg px-8 py-3 bg-primary hover:bg-primary/90 text-primary-foreground">
+              <Link to="/auth">Começar Agora</Link>
             </Button>
-            <Button size="lg" variant="outline" className="text-lg px-8 py-3 border-primary text-primary hover:bg-primary hover:text-primary-foreground">
+            <Button size="lg" variant="outline" className="text-lg px-8 py-3 border-primary text-primary hover:bg-primary hover:text-primary-foreground" onClick={() => window.open('https://wa.me/556496028022', '_blank')}>
               Entre em contato
             </Button>
           </div>
@@ -118,8 +124,8 @@ const Index = () => {
             Junte-se a centenas de profissionais que já utilizam o Oliver 
             para gerenciar seus negócios de forma mais eficiente.
           </p>
-          <Button size="lg" onClick={() => window.location.href = '/auth'} className="text-lg px-8 py-3 bg-primary hover:bg-primary/90 text-primary-foreground">
-            Criar Conta Gratuita
+          <Button asChild size="lg" className="text-lg px-8 py-3 bg-primary hover:bg-primary/90 text-primary-foreground">
+            <Link to="/auth">Criar Conta Gratuita</Link>
           </Button>
         </div>
       </section>
