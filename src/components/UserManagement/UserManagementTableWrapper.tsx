@@ -8,16 +8,18 @@ interface Props {
   filteredUsers: User[];
   onEdit: (user: User) => void;
   onDelete: (user: User) => void;
+  onRenew: (user: User) => void;
   searchTerm: string;
 }
 
-export const UserManagementTableWrapper = ({ filteredUsers, onEdit, onDelete, searchTerm }: Props) => (
+export const UserManagementTableWrapper = ({ filteredUsers, onEdit, onDelete, onRenew, searchTerm }: Props) => (
   <CardContent>
     {filteredUsers && filteredUsers.length > 0 ? (
       <UsersTable 
         users={filteredUsers} 
         onEdit={onEdit}
         onDelete={onDelete}
+        onRenew={onRenew}
       />
     ) : (
       <div className="text-center py-8 text-muted-foreground">

@@ -589,6 +589,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      admin_renew_user_license: {
+        Args: { p_user_id: string; p_additional_days: number }
+        Returns: boolean
+      }
       admin_update_user: {
         Args: {
           p_user_id: string

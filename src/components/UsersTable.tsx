@@ -2,7 +2,7 @@ import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Edit, Trash2, Settings, FileText } from 'lucide-react';
+import { Edit, Trash2, Settings, FileText, CalendarClock } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -12,9 +12,10 @@ interface UsersTableProps {
   users: User[];
   onEdit: (user: User) => void;
   onDelete: (user: User) => void;
+  onRenew: (user: User) => void;
 }
 
-export const UsersTable = ({ users, onEdit, onDelete }: UsersTableProps) => {
+export const UsersTable = ({ users, onEdit, onDelete, onRenew }: UsersTableProps) => {
   const getRoleBadge = (role: string) => {
     const colors = {
       admin: 'bg-red-100 text-red-800',
@@ -98,6 +99,9 @@ export const UsersTable = ({ users, onEdit, onDelete }: UsersTableProps) => {
                       </div>
                     </div>
                     <div className="flex justify-end space-x-2 pt-2">
+                      <Button variant="outline" size="sm" onClick={() => onRenew(user)}>
+                        <CalendarClock className="h-4 w-4 mr-1" /> Renovar
+                      </Button>
                       <Button variant="outline" size="sm" onClick={() => onEdit(user)}>
                         <Edit className="h-4 w-4 mr-1" /> Editar
                       </Button>

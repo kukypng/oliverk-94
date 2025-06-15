@@ -1,4 +1,3 @@
-
 import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -11,6 +10,7 @@ export const useUserManagement = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [showDebugInfo, setShowDebugInfo] = useState(false);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
+  const [userToRenew, setUserToRenew] = useState<User | null>(null);
   const { showSuccess, showError } = useEnhancedToast();
   const queryClient = useQueryClient();
 
@@ -59,6 +59,32 @@ export const useUserManagement = () => {
     enabled: !!debugInfo?.is_admin,
   });
 
+  const renewUserLicenseMutation = useMutation({
+    mutationFn: async ({ userId, days }: { userId: string, days: number }) => {
+      const { data, error } = await supabase.rpc('admin_renew_user_license', {
+        p_user_id: userId,
+        p_additional_days: days,
+      });
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['admin-users'] });
+      showSuccess({
+        title: 'Licença Renovada!',
+        description: `A licença do usuário foi estendida por ${variables.days} dias.`,
+      });
+      setUserToRenew(null);
+    },
+    onError: (error: any) => {
+      showError({
+        title: 'Erro ao renovar licença',
+        description: error.message || 'Ocorreu um erro inesperado.',
+      });
+    },
+  });
+
   const deleteUserMutation = useMutation({
     mutationFn: async (userId: string) => {
       const { data, error } = await supabase.rpc('admin_delete_user', { p_user_id: userId });
@@ -96,8 +122,18 @@ export const useUserManagement = () => {
     setIsEditModalOpen(true);
   };
 
+  const handleRenew = (user: User) => {
+    setUserToRenew(user);
+  };
+
   const handleDelete = (user: User) => {
     setUserToDelete(user);
+  };
+
+  const confirmRenewal = (userId: string, days: number) => {
+    if (userToRenew) {
+      renewUserLicenseMutation.mutate({ userId, days });
+    }
   };
 
   const confirmDelete = () => {
@@ -112,16 +148,20 @@ export const useUserManagement = () => {
     isEditModalOpen, setIsEditModalOpen,
     showDebugInfo, setShowDebugInfo,
     userToDelete, setUserToDelete,
+    userToRenew, setUserToRenew,
     debugInfo,
     users,
     isLoading,
     error,
     deleteUserMutation,
+    renewUserLicenseMutation,
     handleRetry,
     filteredUsers,
     handleEdit,
     handleDelete,
+    handleRenew,
     confirmDelete,
+    confirmRenewal,
     queryClient,
   };
 };

@@ -10,6 +10,7 @@ import { UserManagementLoading } from './UserManagement/UserManagementLoading';
 import { UserManagementHeader } from './UserManagement/UserManagementHeader';
 import { UserManagementTableWrapper } from './UserManagement/UserManagementTableWrapper';
 import { UserDeletionDialog } from './UserManagement/UserDeletionDialog';
+import { UserRenewalDialog } from './UserManagement/UserRenewalDialog';
 
 export const UserManagement = () => {
   const {
@@ -23,15 +24,20 @@ export const UserManagement = () => {
     setShowDebugInfo,
     userToDelete,
     setUserToDelete,
+    userToRenew,
+    setUserToRenew,
     debugInfo,
     isLoading,
     error,
     deleteUserMutation,
+    renewUserLicenseMutation,
     handleRetry,
     filteredUsers,
     handleEdit,
     handleDelete,
+    handleRenew,
     confirmDelete,
+    confirmRenewal,
     queryClient
   } = useUserManagement();
 
@@ -61,6 +67,7 @@ export const UserManagement = () => {
           filteredUsers={filteredUsers}
           onEdit={handleEdit}
           onDelete={handleDelete}
+          onRenew={handleRenew}
           searchTerm={searchTerm}
         />
       </Card>
@@ -84,6 +91,14 @@ export const UserManagement = () => {
           queryClient.invalidateQueries({ queryKey: ['admin-users'] });
           queryClient.invalidateQueries({ queryKey: ['debug-current-user'] });
         }}
+      />
+
+      <UserRenewalDialog
+        user={userToRenew}
+        isOpen={!!userToRenew}
+        onClose={() => setUserToRenew(null)}
+        onConfirm={confirmRenewal}
+        isPending={renewUserLicenseMutation.isPending}
       />
 
       <UserDeletionDialog
