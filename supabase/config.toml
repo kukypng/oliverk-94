@@ -1,8 +1,1 @@
-
 project_id = "oghjlypdnmqecaavekyr"
-
-[functions.create-mercadopago-subscription]
-verify_jwt = true
-
-[functions.mercadopago-webhook]
-verify_jwt = false
