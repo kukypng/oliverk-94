@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
@@ -22,11 +21,14 @@ export const ResetPasswordPage = () => {
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   useEffect(() => {
-    // Supabase redirects with the token in the URL fragment
+    // A lógica foi simplificada. A página /verify já garante que apenas
+    // tokens de recuperação de senha cheguem aqui.
+    // Apenas verificamos se o usuário está logado ou se há um token na URL.
     const hash = window.location.hash;
-    // Show password update form if user is logged in, or if they came from recovery link
-    if ((hash.includes('access_token') && hash.includes('type=recovery')) || user) {
+    if (hash.includes('access_token') || user) {
       setIsTokenFlow(true);
+      // Limpa o hash da URL para não ficar visível para o usuário
+      window.history.replaceState({}, document.title, window.location.pathname);
     }
   }, [user]);
 

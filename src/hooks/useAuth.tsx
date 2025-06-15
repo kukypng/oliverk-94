@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -246,8 +245,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const requestPasswordReset = async (email: string) => {
     try {
       console.log('Requesting password reset for:', email);
-      // O URL de redirecionamento deve estar na lista de permissões nas configurações de autenticação do seu projeto Supabase.
-      const redirectUrl = `${window.location.origin}/reset-password`;
+      // Alterado para apontar para a nova página de verificação universal
+      const redirectUrl = `${window.location.origin}/verify`;
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: redirectUrl,
       });
@@ -304,7 +303,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const updateEmail = async (email: string) => {
     try {
       console.log('Attempting to update email to:', email);
-      const { error } = await supabase.auth.updateUser({ email });
+      // Adicionado para apontar para a nova página de verificação universal
+      const redirectUrl = `${window.location.origin}/verify`;
+      const { error } = await supabase.auth.updateUser(
+        { email },
+        { emailRedirectTo: redirectUrl }
+      );
 
       if (error) {
         const errorMessage = error.message === 'New email address should be different from the current one.'
