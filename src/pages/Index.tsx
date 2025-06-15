@@ -1,10 +1,12 @@
+
 import React from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Navigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { FileText, Calculator, Smartphone, Users, TrendingUp, Shield } from 'lucide-react';
+import { FileText, Calculator, Smartphone, Shield, Star, Activity } from 'lucide-react';
 import { DashboardSkeleton } from '@/components/ui/loading-states';
+
 const Index = () => {
   const {
     user,
@@ -76,13 +78,13 @@ const Index = () => {
                 title: "Gestão de Dispositivos",
                 description: "Cadastre diferentes tipos de dispositivos, marcas e defeitos para agilizar o atendimento."
               }, {
-                icon: Users,
-                title: "Controle de Clientes",
-                description: "Mantenha um histórico completo dos seus clientes e todos os serviços realizados."
+                icon: Star,
+                title: "Preço Acessível",
+                description: "Planos que cabem no seu bolso, focados na sua necessidade e sem surpresas."
               }, {
-                icon: TrendingUp,
-                title: "Relatórios e Analytics",
-                description: "Acompanhe o desempenho do seu negócio com gráficos e métricas detalhadas."
+                icon: Activity,
+                title: "Agilidade e Utilidade",
+                description: "Ferramenta rápida e intuitiva, projetada para otimizar o dia a dia da sua assistência."
               }, {
                 icon: Shield,
                 title: "Segurança Avançada",
