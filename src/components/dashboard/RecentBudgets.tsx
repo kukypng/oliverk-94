@@ -15,14 +15,14 @@ interface RecentBudgetsProps {
 
 export const RecentBudgets = ({ recentBudgets, hasPermission, onTabChange }: RecentBudgetsProps) => {
   return (
-    <Card className="glass-card border-0 shadow-lg animate-slide-up bg-white/50 dark:bg-black/50 backdrop-blur-xl">
-      <CardHeader className="flex flex-row items-center justify-between pb-4 p-4 lg:p-6">
+    <Card className="glass-card shadow-strong animate-slide-up">
+      <CardHeader className="flex flex-row items-start justify-between pb-4 p-6">
         <div>
-          <CardTitle className="text-lg lg:text-xl font-semibold text-foreground">
+          <CardTitle className="text-xl lg:text-2xl font-bold text-foreground">
             Orçamentos Recentes
           </CardTitle>
           <p className="text-sm text-muted-foreground mt-1">
-            Últimos 5 orçamentos criados
+            Seus últimos 5 orçamentos criados.
           </p>
         </div>
         {hasPermission('view_all_budgets') && (
@@ -31,7 +31,7 @@ export const RecentBudgets = ({ recentBudgets, hasPermission, onTabChange }: Rec
           </Button>
         )}
       </CardHeader>
-      <CardContent className="p-4 lg:p-6">
+      <CardContent className="p-6 pt-0">
         {recentBudgets && recentBudgets.length > 0 ? (
           <div className="space-y-3 lg:space-y-4">
             {recentBudgets.map((budget, index) => (
@@ -47,7 +47,7 @@ export const RecentBudgets = ({ recentBudgets, hasPermission, onTabChange }: Rec
               label: "Criar Primeiro Orçamento",
               onClick: () => onTabChange('new-budget')
             } : undefined}
-            className="border-0 shadow-none"
+            className="border-0 shadow-none bg-transparent pt-8 pb-4"
           />
         )}
       </CardContent>

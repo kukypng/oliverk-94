@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
@@ -99,23 +100,23 @@ export const ResetPasswordPage = () => {
   );
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-primary/5 to-primary/10 p-4 relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4 relative overflow-hidden">
         <div className="absolute top-6 right-6 z-10">
             <ThemeToggle />
         </div>
         <div className="w-full max-w-md relative z-10">
             <div className="text-center mb-8">
                 <Link to="/">
-                    <img src="/icone.png" alt="Oliver Logo" className="w-20 h-20 mx-auto mb-4" />
+                    <img src="/icone.png" alt="Oliver Logo" className="w-24 h-24 mx-auto mb-4" />
                 </Link>
-                <h1 className="text-3xl font-bold text-foreground tracking-tight">
+                <h1 className="text-4xl font-bold text-foreground tracking-tight">
                     {getTitle()}
                 </h1>
             </div>
 
-            <Card className="glass-card border-0 shadow-2xl backdrop-blur-xl">
+            <Card className="glass-card shadow-strong">
                 <CardHeader>
-                    <CardDescription className="text-center">
+                    <CardDescription className="text-center text-base">
                         {isTokenFlow 
                             ? 'Digite sua nova senha abaixo.' 
                             : 'Digite seu email para receber o link de redefinição.'
@@ -126,7 +127,7 @@ export const ResetPasswordPage = () => {
                     {renderMessage()}
                     {isTokenFlow ? (
                         <form onSubmit={handleUpdatePassword} className="space-y-6">
-                            <div className="space-y-3 relative">
+                            <div className="space-y-2 relative">
                                 <Label htmlFor="password">Nova Senha</Label>
                                 <Input
                                     id="password"
@@ -141,7 +142,7 @@ export const ResetPasswordPage = () => {
                                     {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                                 </Button>
                             </div>
-                            <div className="space-y-3">
+                            <div className="space-y-2">
                                 <Label htmlFor="confirm-password">Confirmar Nova Senha</Label>
                                 <Input
                                     id="confirm-password"
@@ -153,13 +154,13 @@ export const ResetPasswordPage = () => {
                                     className="h-12 text-base rounded-xl input-focus"
                                 />
                             </div>
-                            <Button type="submit" className="w-full h-12" disabled={loading}>
+                            <Button type="submit" className="w-full h-12 text-base font-semibold" disabled={loading}>
                                 {loading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : 'Atualizar Senha'}
                             </Button>
                         </form>
                     ) : (
                         <form onSubmit={handleRequestReset} className="space-y-6">
-                            <div className="space-y-3">
+                            <div className="space-y-2">
                                 <Label htmlFor="email">Email</Label>
                                 <Input
                                     id="email"
@@ -171,7 +172,7 @@ export const ResetPasswordPage = () => {
                                     className="h-12 text-base rounded-xl input-focus"
                                 />
                             </div>
-                            <Button type="submit" className="w-full h-12" disabled={loading}>
+                            <Button type="submit" className="w-full h-12 text-base font-semibold" disabled={loading}>
                                 {loading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : 'Enviar Link'}
                             </Button>
                         </form>

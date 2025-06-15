@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -13,6 +12,7 @@ import { QuickAccess } from './dashboard/QuickAccess';
 import { HelpAndSupport } from './dashboard/HelpAndSupport';
 import { RecentBudgets } from './dashboard/RecentBudgets';
 import { UserProfile } from './dashboard/types';
+import { EnhancedDashboardSkeleton } from '@/components/ui/enhanced-loading';
 
 interface DashboardContentProps {
   onTabChange: (tab: string) => void;
@@ -75,7 +75,7 @@ export const DashboardContent = ({ onTabChange }: DashboardContentProps) => {
   }
 
   if (isLoading) {
-    return <DashboardSkeleton />;
+    return <EnhancedDashboardSkeleton />;
   }
 
   if (error) {
@@ -97,18 +97,18 @@ export const DashboardContent = ({ onTabChange }: DashboardContentProps) => {
 
   return (
     <ErrorBoundary>
-      <div className="p-4 lg:p-8 space-y-6 lg:space-y-8 animate-fade-in pb-24 lg:pb-0">
+      <div className="p-6 lg:p-10 space-y-8 lg:space-y-10 animate-fade-in pb-24 lg:pb-10">
         <DashboardHeader profile={profile as UserProfile | null} weeklyGrowth={stats?.weeklyGrowth || 0} />
         
         <QuickAccess onTabChange={onTabChange} hasPermission={hasPermission} />
         
-        <HelpAndSupport />
-
         <RecentBudgets 
           recentBudgets={stats?.recentBudgets || []} 
           hasPermission={hasPermission} 
           onTabChange={onTabChange} 
         />
+        
+        <HelpAndSupport />
       </div>
     </ErrorBoundary>
   );

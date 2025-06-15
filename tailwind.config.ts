@@ -19,6 +19,11 @@ export default {
 			}
 		},
 		extend: {
+      boxShadow: { // Adding custom shadows
+        soft: 'var(--shadow-soft)',
+        medium: 'var(--shadow-medium)',
+        strong: 'var(--shadow-strong)',
+      },
 			colors: {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
@@ -67,7 +72,9 @@ export default {
 			borderRadius: {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
-				sm: 'calc(var(--radius) - 4px)'
+				sm: 'calc(var(--radius) - 4px)',
+        '2xl': 'calc(var(--radius) + 4px)', // Adding more rounded options
+        '3xl': 'calc(var(--radius) + 8px)',
 			},
 			keyframes: {
 				'accordion-down': {

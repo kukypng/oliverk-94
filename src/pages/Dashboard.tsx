@@ -13,6 +13,7 @@ import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { ClientsContent } from '@/components/ClientsContent';
 import { Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { EnhancedDashboardSkeleton } from '@/components/ui/enhanced-loading';
 
 export const Dashboard = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -46,15 +47,15 @@ export const Dashboard = () => {
         <div className="min-h-screen flex w-full bg-background">
           <AppSidebar activeTab={activeTab} onTabChange={setActiveTab} />
           
-          <SidebarInset className="flex-1">
+          <SidebarInset className="flex-1 flex flex-col">
             {/* Header with menu button */}
-            <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
-              <SidebarTrigger className="flex items-center justify-center">
-                <Menu className="h-5 w-5" />
+            <header className="flex h-20 shrink-0 items-center gap-4 border-b bg-background/95 backdrop-blur-sm px-6 sticky top-0 z-30">
+              <SidebarTrigger className="flex items-center justify-center lg:hidden">
+                <Menu className="h-6 w-6" />
               </SidebarTrigger>
-              <div className="flex items-center gap-2">
-                <img src="/icone.png" alt="Oliver Logo" className="h-8 w-8" />
-                <h1 className="text-xl font-bold">Oliver</h1>
+              <div className="flex items-center gap-3">
+                <img src="/icone.png" alt="Oliver Logo" className="h-9 w-9" />
+                <h1 className="text-2xl font-bold text-foreground">Oliver</h1>
               </div>
             </header>
             

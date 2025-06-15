@@ -34,50 +34,46 @@ export const AppSidebar = ({ activeTab, onTabChange }: AppSidebarProps) => {
   const { signOut, user, profile, hasRole } = useAuth();
 
   const navigationItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: Home },
-    { id: 'budgets', label: 'Orçamentos', icon: FileText },
-    { id: 'new-budget', label: 'Novo Orçamento', icon: Plus },
-    ...(hasRole('admin') ? [{ id: 'admin', label: 'Administração', icon: Users }] : []),
-    { id: 'settings', label: 'Configurações', icon: Settings },
+    { id: 'dashboard', label: 'Dashboard', icon: Home, permission: true },
+    { id: 'budgets', label: 'Orçamentos', icon: FileText, permission: true },
+    { id: 'new-budget', label: 'Novo Orçamento', icon: Plus, permission: true },
+    { id: 'admin', label: 'Administração', icon: Users, permission: hasRole('admin') },
+    { id: 'settings', label: 'Configurações', icon: Settings, permission: true },
   ];
 
   return (
-    <Sidebar>
-      <SidebarHeader className="p-4">
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-            <User className="h-5 w-5 text-primary" />
+    <Sidebar className="border-r-border/50">
+      <SidebarHeader className="p-4 h-20 flex items-center">
+        <div className="flex items-center space-x-4 w-full">
+          <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center border border-primary/20 shrink-0">
+            <User className="h-6 w-6 text-primary" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-foreground truncate">
+            <p className="text-base font-semibold text-foreground truncate">
               {profile?.name || 'Usuário'}
             </p>
             <p className="text-xs text-muted-foreground truncate">
               {user?.email}
             </p>
-            <Badge variant="secondary" className="mt-1 text-xs">
-              <Star className="w-3 h-3 mr-1" />
-              {profile?.role === 'admin' ? 'Admin' : 
-               profile?.role === 'manager' ? 'Gerente' : 'Usuário'}
-            </Badge>
           </div>
         </div>
       </SidebarHeader>
       
       <SidebarSeparator />
       
-      <SidebarContent>
+      <SidebarContent className="p-2">
         <SidebarMenu>
           {navigationItems.map((item) => {
+            if (!item.permission) return null;
             const Icon = item.icon;
             return (
-              <SidebarMenuItem key={item.id}>
+              <SidebarMenuItem key={item.id} className="p-1">
                 <SidebarMenuButton
                   onClick={() => onTabChange(item.id)}
                   isActive={activeTab === item.id}
-                  className="w-full"
+                  className="w-full h-12 text-base font-medium rounded-lg"
                 >
-                  <Icon className="h-4 w-4" />
+                  <Icon className="h-5 w-5" />
                   <span>{item.label}</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -87,14 +83,14 @@ export const AppSidebar = ({ activeTab, onTabChange }: AppSidebarProps) => {
       </SidebarContent>
 
       <SidebarFooter className="p-4">
-        <div className="space-y-3">
+        <div className="space-y-2">
           <ThemeToggle />
           <Button
             variant="ghost"
-            className="w-full justify-start text-muted-foreground hover:text-foreground"
+            className="w-full justify-start text-muted-foreground hover:text-foreground h-12 text-base font-medium rounded-lg"
             onClick={signOut}
           >
-            <LogOut className="mr-3 h-4 w-4" />
+            <LogOut className="mr-3 h-5 w-5" />
             Sair
           </Button>
         </div>
