@@ -180,10 +180,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
 
       if (signInData.user) {
-        // Check user role
+        // Check user profile existence
         const { data: profileData, error: profileError } = await supabase
           .from('user_profiles')
-          .select('role, is_active')
+          .select('id')
           .eq('id', signInData.user.id)
           .single();
 
@@ -196,19 +196,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           return { error: profileError || new Error('Profile not found') };
         }
 
-        if (!profileData.is_active) {
-            await supabase.auth.signOut();
-            showError({
-              title: 'Conta Inativa',
-              description: 'Sua conta está inativa ou a licença expirou. Contate o suporte.',
-            });
-            return { error: new Error('User account is inactive or expired') };
-        }
+        // Login is allowed even if the account is inactive.
+        // AuthGuard and ProtectedRoute will handle redirection to the expired page.
         
-        // User logged in, proceed
         showSuccess({
           title: 'Login realizado com sucesso!',
-          description: 'Redirecionando para o dashboard...'
+          description: 'Redirecionando...'
         });
         setTimeout(() => {
           window.location.href = '/dashboard';
