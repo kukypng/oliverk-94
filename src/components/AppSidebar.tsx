@@ -13,8 +13,6 @@ import {
   SidebarRail,
   useSidebar,
 } from '@/components/ui/sidebar';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { 
   Home, 
   FileText, 
@@ -90,23 +88,24 @@ export const AppSidebar = ({ activeTab, onTabChange }: AppSidebarProps) => {
         </SidebarMenu>
       </SidebarContent>
 
-      {state === "expanded" && (
-        <SidebarFooter className="p-4">
-          <div className="space-y-2">
-            <ThemeToggle />
-            <Button
-              variant="ghost"
-              className="w-full justify-start text-muted-foreground hover:text-foreground h-12 text-base font-medium rounded-lg"
-              onClick={signOut}
-              // @ts-ignore
-              tooltip="Sair"
-            >
-              <LogOut className="mr-3 h-5 w-5" />
-              <span>Sair</span>
-            </Button>
-          </div>
-        </SidebarFooter>
-      )}
+      <SidebarFooter className="p-2 mt-auto">
+        <div className="flex flex-col gap-2 items-center">
+            {state === 'expanded' && <ThemeToggle />}
+            <SidebarMenu className="w-full">
+                <SidebarMenuItem className="p-1">
+                    <SidebarMenuButton
+                        variant="ghost"
+                        className="w-full h-12 text-base font-medium rounded-lg text-muted-foreground hover:text-foreground"
+                        onClick={signOut}
+                        tooltip="Sair"
+                    >
+                        <LogOut className="h-5 w-5" />
+                        <span>Sair</span>
+                    </SidebarMenuButton>
+                </SidebarMenuItem>
+            </SidebarMenu>
+        </div>
+      </SidebarFooter>
     </Sidebar>
   );
 };
