@@ -5,7 +5,6 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Link } from 'react-router-dom';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
-import { SignupAndPayButton } from '@/components/SignupAndPayButton';
 
 export const SignUpPage = () => {
   const [signupForm, setSignupForm] = useState({
@@ -67,11 +66,7 @@ export const SignUpPage = () => {
                 />
               </div>
               
-              <SignupAndPayButton 
-                name={signupForm.name}
-                email={signupForm.email}
-                disabled={isFormInvalid}
-              />
+              {/* O botão de pagamento foi removido. Esta página será transformada em um painel de criação de usuário para administradores. */}
             </div>
           </CardContent>
         </Card>
