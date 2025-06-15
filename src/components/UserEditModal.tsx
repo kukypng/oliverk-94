@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -20,6 +21,7 @@ interface User {
   expiration_date: string;
   created_at: string;
   last_sign_in_at: string | null;
+  budget_count: number;
 }
 
 interface UserEditModalProps {

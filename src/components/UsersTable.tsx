@@ -3,9 +3,10 @@ import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Edit, Trash2, Calendar } from 'lucide-react';
+import { Edit, Trash2, Calendar, Settings, FileText } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 interface User {
   id: string;
@@ -16,6 +17,7 @@ interface User {
   expiration_date: string;
   created_at: string;
   last_sign_in_at: string | null;
+  budget_count: number;
 }
 
 interface UsersTableProps {
@@ -53,49 +55,71 @@ export const UsersTable = ({ users, onEdit, onDelete }: UsersTableProps) => {
       <TableHeader>
         <TableRow>
           <TableHead>Nome</TableHead>
-          <TableHead>Email</TableHead>
-          <TableHead>Função</TableHead>
           <TableHead>Status</TableHead>
-          <TableHead>Expiração</TableHead>
-          <TableHead>Ações</TableHead>
+          <TableHead>Orçamentos</TableHead>
+          <TableHead className="text-right">Ações</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {users.map((user) => (
           <TableRow key={user.id}>
             <TableCell className="font-medium">{user.name}</TableCell>
-            <TableCell>{user.email}</TableCell>
-            <TableCell>
-              <Badge className={getRoleBadge(user.role)}>
-                {user.role === 'admin' ? 'Administrador' : 
-                 user.role === 'manager' ? 'Gerente' : 'Usuário'}
-              </Badge>
-            </TableCell>
             <TableCell>{getStatusBadge(user)}</TableCell>
             <TableCell>
               <div className="flex items-center space-x-1">
-                <Calendar className="h-3 w-3" />
-                <span>{format(new Date(user.expiration_date), 'dd/MM/yyyy', { locale: ptBR })}</span>
+                <FileText className="h-3.5 w-3.5" />
+                <span>{user.budget_count}</span>
               </div>
             </TableCell>
-            <TableCell>
-              <div className="flex items-center space-x-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => onEdit(user)}
-                >
-                  <Edit className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="text-red-600 hover:text-red-700"
-                  onClick={() => onDelete(user)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
+            <TableCell className="text-right">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="ghost" size="icon">
+                    <Settings className="h-4 w-4" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-80">
+                  <div className="grid gap-4">
+                    <div className="space-y-1">
+                      <h4 className="font-medium leading-none">{user.name}</h4>
+                      <p className="text-sm text-muted-foreground">{user.email}</p>
+                    </div>
+                    <div className="grid gap-2 text-sm">
+                      <div className="grid grid-cols-2 items-center">
+                        <strong>Função:</strong>
+                        <Badge className={`${getRoleBadge(user.role)} justify-self-start`}>
+                          {user.role === 'admin' ? 'Administrador' : 
+                           user.role === 'manager' ? 'Gerente' : 'Usuário'}
+                        </Badge>
+                      </div>
+                      <div className="grid grid-cols-2 items-center">
+                        <strong>Expira em:</strong>
+                        <span>{format(new Date(user.expiration_date), 'dd/MM/yyyy', { locale: ptBR })}</span>
+                      </div>
+                       <div className="grid grid-cols-2 items-center">
+                        <strong>Criado em:</strong>
+                        <span>{format(new Date(user.created_at), 'dd/MM/yyyy', { locale: ptBR })}</span>
+                      </div>
+                      <div className="grid grid-cols-2 items-center">
+                        <strong>Último login:</strong>
+                        <span>
+                          {user.last_sign_in_at 
+                            ? format(new Date(user.last_sign_in_at), 'dd/MM/yyyy HH:mm', { locale: ptBR }) 
+                            : 'Nunca'}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex justify-end space-x-2 pt-2">
+                      <Button variant="outline" size="sm" onClick={() => onEdit(user)}>
+                        <Edit className="h-4 w-4 mr-1" /> Editar
+                      </Button>
+                      <Button variant="destructive" size="sm" onClick={() => onDelete(user)}>
+                        <Trash2 className="h-4 w-4 mr-1" /> Deletar
+                      </Button>
+                    </div>
+                  </div>
+                </PopoverContent>
+              </Popover>
             </TableCell>
           </TableRow>
         ))}

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -23,6 +22,7 @@ interface User {
   expiration_date: string;
   created_at: string;
   last_sign_in_at: string | null;
+  budget_count: number;
 }
 
 interface DebugInfo {
@@ -108,6 +108,7 @@ export const UserManagement = () => {
           expiration_date: user.expiration_date || new Date().toISOString(),
           created_at: user.created_at || new Date().toISOString(),
           last_sign_in_at: user.last_sign_in_at || null,
+          budget_count: user.budget_count || 0,
         }));
       } catch (err) {
         console.error('Failed to fetch users:', err);

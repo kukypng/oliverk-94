@@ -543,6 +543,7 @@ export type Database = {
           expiration_date: string
           created_at: string
           last_sign_in_at: string
+          budget_count: number
         }[]
       }
       admin_get_dashboard_stats: {
