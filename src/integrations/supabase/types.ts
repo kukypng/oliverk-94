@@ -9,239 +9,517 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      budget_items: {
+      admin_audit_log: {
         Row: {
-          budget_id: number
-          created_at: string
-          description: string
-          id: number
-          is_service: boolean | null
-          part_id: number | null
-          quantity: number
-          unit_price: number
+          action_details: Json | null
+          action_type: string
+          admin_user_id: string | null
+          created_at: string | null
+          id: string
+          ip_address: unknown | null
+          target_user_id: string | null
+          user_agent: string | null
         }
         Insert: {
-          budget_id: number
-          created_at?: string
-          description: string
-          id?: number
-          is_service?: boolean | null
-          part_id?: number | null
-          quantity?: number
-          unit_price?: number
+          action_details?: Json | null
+          action_type: string
+          admin_user_id?: string | null
+          created_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          target_user_id?: string | null
+          user_agent?: string | null
         }
         Update: {
-          budget_id?: number
-          created_at?: string
-          description?: string
-          id?: number
-          is_service?: boolean | null
-          part_id?: number | null
-          quantity?: number
-          unit_price?: number
+          action_details?: Json | null
+          action_type?: string
+          admin_user_id?: string | null
+          created_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          target_user_id?: string | null
+          user_agent?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "budget_items_budget_id_fkey"
+            foreignKeyName: "admin_audit_log_admin_user_id_fkey"
+            columns: ["admin_user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "admin_audit_log_target_user_id_fkey"
+            columns: ["target_user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      admin_logs: {
+        Row: {
+          action: string
+          admin_user_id: string | null
+          created_at: string | null
+          details: Json | null
+          id: string
+          target_user_id: string | null
+        }
+        Insert: {
+          action: string
+          admin_user_id?: string | null
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          target_user_id?: string | null
+        }
+        Update: {
+          action?: string
+          admin_user_id?: string | null
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          target_user_id?: string | null
+        }
+        Relationships: []
+      }
+      admin_users: {
+        Row: {
+          created_at: string
+          id: string
+          password: string
+          username: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          password: string
+          username: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          password?: string
+          username?: string
+        }
+        Relationships: []
+      }
+      brands: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      budget_parts: {
+        Row: {
+          brand_id: string | null
+          budget_id: string
+          cash_price: number | null
+          created_at: string
+          id: string
+          installment_price: number | null
+          name: string
+          part_type: string | null
+          price: number
+          quantity: number
+          warranty_months: number | null
+        }
+        Insert: {
+          brand_id?: string | null
+          budget_id: string
+          cash_price?: number | null
+          created_at?: string
+          id?: string
+          installment_price?: number | null
+          name: string
+          part_type?: string | null
+          price: number
+          quantity?: number
+          warranty_months?: number | null
+        }
+        Update: {
+          brand_id?: string | null
+          budget_id?: string
+          cash_price?: number | null
+          created_at?: string
+          id?: string
+          installment_price?: number | null
+          name?: string
+          part_type?: string | null
+          price?: number
+          quantity?: number
+          warranty_months?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "budget_parts_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "budget_parts_budget_id_fkey"
             columns: ["budget_id"]
             isOneToOne: false
             referencedRelation: "budgets"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "budget_items_part_id_fkey"
-            columns: ["part_id"]
+            foreignKeyName: "fk_budget_parts_brand_id"
+            columns: ["brand_id"]
             isOneToOne: false
-            referencedRelation: "parts"
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_budget_parts_budget_id"
+            columns: ["budget_id"]
+            isOneToOne: false
+            referencedRelation: "budgets"
             referencedColumns: ["id"]
           },
         ]
       }
       budgets: {
         Row: {
-          client_contact: string
-          client_name: string
+          cash_price: number | null
+          client_name: string | null
+          client_phone: string | null
           created_at: string
-          created_by: string
+          delivery_date: string | null
+          device_brand: string | null
           device_model: string
-          id: number
-          include_delivery: boolean | null
-          include_screen_protector: boolean | null
+          device_type: string
+          id: string
+          includes_delivery: boolean | null
+          includes_screen_protector: boolean | null
+          installment_price: number | null
           installments: number | null
-          price_cash: number | null
-          price_installment: number | null
-          problem_description: string | null
-          status: Database["public"]["Enums"]["budget_status"]
+          issue: string
+          notes: string | null
+          owner_id: string
+          part_type: string | null
+          payment_condition: string | null
+          search_vector: unknown | null
+          status: string
           total_price: number
           updated_at: string
+          valid_until: string | null
           warranty_months: number | null
         }
         Insert: {
-          client_contact: string
-          client_name: string
+          cash_price?: number | null
+          client_name?: string | null
+          client_phone?: string | null
           created_at?: string
-          created_by: string
+          delivery_date?: string | null
+          device_brand?: string | null
           device_model: string
-          id?: number
-          include_delivery?: boolean | null
-          include_screen_protector?: boolean | null
+          device_type: string
+          id?: string
+          includes_delivery?: boolean | null
+          includes_screen_protector?: boolean | null
+          installment_price?: number | null
           installments?: number | null
-          price_cash?: number | null
-          price_installment?: number | null
-          problem_description?: string | null
-          status?: Database["public"]["Enums"]["budget_status"]
-          total_price?: number
+          issue: string
+          notes?: string | null
+          owner_id?: string
+          part_type?: string | null
+          payment_condition?: string | null
+          search_vector?: unknown | null
+          status?: string
+          total_price: number
           updated_at?: string
+          valid_until?: string | null
           warranty_months?: number | null
         }
         Update: {
-          client_contact?: string
-          client_name?: string
+          cash_price?: number | null
+          client_name?: string | null
+          client_phone?: string | null
           created_at?: string
-          created_by?: string
+          delivery_date?: string | null
+          device_brand?: string | null
           device_model?: string
-          id?: number
-          include_delivery?: boolean | null
-          include_screen_protector?: boolean | null
+          device_type?: string
+          id?: string
+          includes_delivery?: boolean | null
+          includes_screen_protector?: boolean | null
+          installment_price?: number | null
           installments?: number | null
-          price_cash?: number | null
-          price_installment?: number | null
-          problem_description?: string | null
-          status?: Database["public"]["Enums"]["budget_status"]
+          issue?: string
+          notes?: string | null
+          owner_id?: string
+          part_type?: string | null
+          payment_condition?: string | null
+          search_vector?: unknown | null
+          status?: string
           total_price?: number
           updated_at?: string
+          valid_until?: string | null
           warranty_months?: number | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "budgets_created_by_fkey"
-            columns: ["created_by"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
-      device_models: {
+      clients: {
         Row: {
-          brand: string
           created_at: string
-          id: number
+          email: string | null
+          id: string
+          name: string
+          phone: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          name: string
+          phone: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string
+          phone?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      defect_types: {
+        Row: {
+          created_at: string
+          id: string
+          label: string
+          user_id: string | null
+          value: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          label: string
+          user_id?: string | null
+          value: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          label?: string
+          user_id?: string | null
+          value?: string
+        }
+        Relationships: []
+      }
+      device_types: {
+        Row: {
+          created_at: string
+          id: string
           name: string
         }
         Insert: {
-          brand: string
           created_at?: string
-          id?: number
+          id?: string
           name: string
         }
         Update: {
-          brand?: string
           created_at?: string
-          id?: number
+          id?: string
           name?: string
         }
         Relationships: []
       }
-      part_brands: {
+      payment_conditions: {
         Row: {
           created_at: string
-          id: number
+          id: string
+          installments: number
           name: string
         }
         Insert: {
           created_at?: string
-          id?: number
+          id?: string
+          installments?: number
           name: string
         }
         Update: {
           created_at?: string
-          id?: number
+          id?: string
+          installments?: number
           name?: string
         }
         Relationships: []
-      }
-      part_categories: {
-        Row: {
-          created_at: string
-          id: number
-          name: string
-        }
-        Insert: {
-          created_at?: string
-          id?: number
-          name: string
-        }
-        Update: {
-          created_at?: string
-          id?: number
-          name?: string
-        }
-        Relationships: []
-      }
-      parts: {
-        Row: {
-          brand_id: number
-          category_id: number
-          created_at: string
-          id: number
-          name: string
-          price_cash: number
-          price_installment: number
-        }
-        Insert: {
-          brand_id: number
-          category_id: number
-          created_at?: string
-          id?: number
-          name: string
-          price_cash?: number
-          price_installment?: number
-        }
-        Update: {
-          brand_id?: number
-          category_id?: number
-          created_at?: string
-          id?: number
-          name?: string
-          price_cash?: number
-          price_installment?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "parts_brand_id_fkey"
-            columns: ["brand_id"]
-            isOneToOne: false
-            referencedRelation: "part_brands"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "parts_category_id_fkey"
-            columns: ["category_id"]
-            isOneToOne: false
-            referencedRelation: "part_categories"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       profiles: {
         Row: {
           created_at: string
           id: string
-          role: Database["public"]["Enums"]["user_role"]
-          updated_at: string
+          name: string
+          role: string
         }
         Insert: {
           created_at?: string
           id: string
-          role?: Database["public"]["Enums"]["user_role"]
-          updated_at?: string
+          name: string
+          role?: string
         }
         Update: {
           created_at?: string
           id?: string
-          role?: Database["public"]["Enums"]["user_role"]
+          name?: string
+          role?: string
+        }
+        Relationships: []
+      }
+      shop_profiles: {
+        Row: {
+          address: string
+          cnpj: string | null
+          contact_phone: string
+          created_at: string
+          id: string
+          logo_url: string | null
+          shop_name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address: string
+          cnpj?: string | null
+          contact_phone: string
+          created_at?: string
+          id?: string
+          logo_url?: string | null
+          shop_name: string
           updated_at?: string
+          user_id: string
+        }
+        Update: {
+          address?: string
+          cnpj?: string | null
+          contact_phone?: string
+          created_at?: string
+          id?: string
+          logo_url?: string | null
+          shop_name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_activity_metrics: {
+        Row: {
+          avg_session_duration: unknown | null
+          created_at: string | null
+          id: string
+          last_activity_at: string | null
+          login_count: number | null
+          total_budgets_created: number | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          avg_session_duration?: unknown | null
+          created_at?: string | null
+          id?: string
+          last_activity_at?: string | null
+          login_count?: number | null
+          total_budgets_created?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          avg_session_duration?: unknown | null
+          created_at?: string | null
+          id?: string
+          last_activity_at?: string | null
+          login_count?: number | null
+          total_budgets_created?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_activity_metrics_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_profiles: {
+        Row: {
+          budget_limit: number | null
+          created_at: string
+          expiration_date: string
+          id: string
+          is_active: boolean
+          name: string
+          role: string | null
+          updated_at: string
+          username: string | null
+        }
+        Insert: {
+          budget_limit?: number | null
+          created_at?: string
+          expiration_date?: string
+          id: string
+          is_active?: boolean
+          name: string
+          role?: string | null
+          updated_at?: string
+          username?: string | null
+        }
+        Update: {
+          budget_limit?: number | null
+          created_at?: string
+          expiration_date?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          role?: string | null
+          updated_at?: string
+          username?: string | null
+        }
+        Relationships: []
+      }
+      warranty_periods: {
+        Row: {
+          created_at: string
+          id: string
+          label: string
+          months: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          label: string
+          months: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          label?: string
+          months?: number
         }
         Relationships: []
       }
@@ -250,17 +528,174 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      has_role: {
+      admin_delete_user: {
+        Args: { p_user_id: string }
+        Returns: boolean
+      }
+      admin_get_all_users: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          id: string
+          name: string
+          email: string
+          role: string
+          is_active: boolean
+          expiration_date: string
+          created_at: string
+          last_sign_in_at: string
+          budget_count: number
+        }[]
+      }
+      admin_get_dashboard_stats: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
+      }
+      admin_get_logs: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          id: string
+          admin_user_id: string
+          admin_name: string
+          target_user_id: string
+          target_name: string
+          action: string
+          details: Json
+          created_at: string
+        }[]
+      }
+      admin_get_users_paginated: {
         Args: {
-          _user_id: string
-          _role: Database["public"]["Enums"]["user_role"]
+          p_page?: number
+          p_limit?: number
+          p_search?: string
+          p_role_filter?: string
+          p_status_filter?: string
+          p_sort_by?: string
+          p_sort_order?: string
+        }
+        Returns: Json
+      }
+      admin_log_audit_action: {
+        Args: {
+          p_target_user_id: string
+          p_action_type: string
+          p_action_details?: Json
+        }
+        Returns: undefined
+      }
+      admin_update_user: {
+        Args: {
+          p_user_id: string
+          p_name?: string
+          p_role?: string
+          p_is_active?: boolean
+          p_expiration_date?: string
+        }
+        Returns: boolean
+      }
+      check_if_user_is_admin: {
+        Args: { user_id: string }
+        Returns: boolean
+      }
+      check_shop_profile_exists: {
+        Args: { p_user_id: string }
+        Returns: boolean
+      }
+      cleanup_expired_users: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      count_user_budgets: {
+        Args: { p_user_id: string }
+        Returns: number
+      }
+      debug_current_user: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          user_id: string
+          user_email: string
+          user_role: string
+          is_active: boolean
+          is_admin: boolean
+        }[]
+      }
+      get_shop_profile: {
+        Args: { p_user_id: string }
+        Returns: Json
+      }
+      get_user_role: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      get_username_from_email: {
+        Args: { email: string }
+        Returns: string
+      }
+      has_reached_budget_limit: {
+        Args: { p_user_id: string }
+        Returns: boolean
+      }
+      insert_shop_profile: {
+        Args: {
+          p_user_id: string
+          p_shop_name: string
+          p_address: string
+          p_contact_phone: string
+        }
+        Returns: boolean
+      }
+      is_admin: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
+      is_current_user_admin: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
+      is_license_valid: {
+        Args: { p_user_id?: string }
+        Returns: boolean
+      }
+      is_user_admin: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
+      is_user_expired: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
+      log_admin_action: {
+        Args: { p_target_user_id: string; p_action: string; p_details?: Json }
+        Returns: undefined
+      }
+      set_user_budget_limit: {
+        Args: { p_user_id: string; p_budget_limit: number }
+        Returns: boolean
+      }
+      test_admin_permissions: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          test_name: string
+          result: boolean
+          details: string
+        }[]
+      }
+      update_expired_users: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      update_shop_profile: {
+        Args: {
+          p_user_id: string
+          p_shop_name: string
+          p_address: string
+          p_contact_phone: string
         }
         Returns: boolean
       }
     }
     Enums: {
-      budget_status: "Pendente" | "Aprovado" | "Recusado" | "Concluído"
-      user_role: "Admin" | "Técnico" | "Atendente"
+      [_ in never]: never
     }
     CompositeTypes: {
       [_ in never]: never
@@ -375,9 +810,6 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {
-      budget_status: ["Pendente", "Aprovado", "Recusado", "Concluído"],
-      user_role: ["Admin", "Técnico", "Atendente"],
-    },
+    Enums: {},
   },
 } as const
