@@ -19,9 +19,7 @@ export const RecentBudgetItem = ({
       <div className="flex-1 min-w-0 pr-3">
         <div className="flex flex-col space-y-2">
           <div>
-            <p className="font-semibold text-sm lg:text-base text-foreground group-hover:text-[#fec832] transition-colors truncate">
-              {budget.client_name || 'Cliente não informado'}
-            </p>
+            
             <p className="text-xs lg:text-sm text-muted-foreground truncate">{budget.device_model}</p>
           </div>
           <div className="flex items-center justify-between">
