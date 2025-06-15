@@ -1,6 +1,10 @@
 
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { Resend } from 'npm:resend@3.4.0'
+import { renderAsync } from 'npm:@react-email/components@0.0.22'
+import React from 'npm:react@18.3.1'
+import { InvitationEmail } from './_templates/invitation-email.tsx'
 
 const supabaseAdmin = createClient(
   Deno.env.get('SUPABASE_URL') ?? '',
@@ -98,7 +102,7 @@ serve(async (req) => {
 
         const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
             email: email,
-            email_confirm: false,
+            email_confirm: true, // We will confirm via our custom email
             user_metadata: { name: name },
         });
 
@@ -113,8 +117,39 @@ serve(async (req) => {
         await supabaseAdmin.from('user_profiles').insert({ id: userId, name: name, role: 'user', is_active: true, expiration_date: expirationDate.toISOString() });
         await supabaseAdmin.from('subscriptions').insert({ user_id: userId, status: 'active', mercado_pago_subscription_id: mercadoPagoSubscriptionId, current_period_end: expirationDate.toISOString(), plan_id: 'monthly_brl_40' });
         
-        await supabaseAdmin.auth.admin.inviteUserByEmail(email);
-        console.log(`Profile created and invitation sent to user ${userId}. License valid until ${expirationDate.toISOString()}`);
+        // Generate invitation link
+        const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
+          type: 'invite',
+          email: email,
+        });
+        if (linkError) throw linkError;
+
+        const invitationLink = linkData.properties.action_link;
+
+        // Render Email
+        const emailHtml = await renderAsync(
+          React.createElement(InvitationEmail, {
+            userName: name,
+            invitationLink: invitationLink,
+          })
+        );
+        
+        // Send Email with Resend
+        const resendApiKey = Deno.env.get('RESEND_API_KEY');
+        if (!resendApiKey) {
+            console.error('RESEND_API_KEY is not set.');
+            throw new Error('Internal server configuration error for email.');
+        }
+        const resend = new Resend(resendApiKey);
+
+        await resend.emails.send({
+          from: 'Oliver <onboarding@resend.dev>',
+          to: [email],
+          subject: 'Bem-vindo ao Oliver! Complete seu cadastro',
+          html: emailHtml,
+        });
+
+        console.log(`Profile created and custom invitation sent to user ${userId}. License valid until ${expirationDate.toISOString()}`);
       }
     } else if (['cancelled', 'refunded', 'charged_back'].includes(paymentInfo.status ?? '')) {
         const externalReference = paymentInfo.external_reference;
