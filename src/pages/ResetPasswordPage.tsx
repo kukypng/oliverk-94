@@ -10,7 +10,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 
 export const ResetPasswordPage = () => {
-  const { requestPasswordReset, updatePassword } = useAuth();
+  const { requestPasswordReset, updatePassword, user } = useAuth();
   const navigate = useNavigate();
 
   const [email, setEmail] = useState('');
@@ -24,10 +24,11 @@ export const ResetPasswordPage = () => {
   useEffect(() => {
     // Supabase redirects with the token in the URL fragment
     const hash = window.location.hash;
-    if (hash.includes('access_token') && hash.includes('type=recovery')) {
+    // Show password update form if user is logged in, or if they came from recovery link
+    if ((hash.includes('access_token') && hash.includes('type=recovery')) || user) {
       setIsTokenFlow(true);
     }
-  }, []);
+  }, [user]);
 
   const handleRequestReset = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,8 +58,14 @@ export const ResetPasswordPage = () => {
     if (error) {
       setMessage({ type: 'error', text: `Erro ao atualizar a senha: ${error.message}` });
     } else {
-      setMessage({ type: 'success', text: 'Senha atualizada com sucesso! Você será redirecionado para o login.' });
-      setTimeout(() => navigate('/auth'), 3000);
+      setMessage({ type: 'success', text: 'Senha atualizada com sucesso! Você será redirecionado.' });
+      setTimeout(() => {
+        if (user) {
+          navigate('/dashboard/settings');
+        } else {
+          navigate('/auth');
+        }
+      }, 3000);
     }
   };
 
@@ -72,6 +79,23 @@ export const ResetPasswordPage = () => {
     );
   };
 
+  const getTitle = () => {
+    if (isTokenFlow) {
+      return user ? 'Alterar Senha' : 'Definir Nova Senha';
+    }
+    return 'Redefinir Senha';
+  };
+
+  const backLink = user ? (
+    <Link to="/dashboard/settings" className="underline text-muted-foreground hover:text-primary">
+      Voltar para Configurações
+    </Link>
+  ) : (
+    <Link to="/auth" className="underline text-muted-foreground hover:text-primary">
+      Voltar para o Login
+    </Link>
+  );
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-primary/5 to-primary/10 p-4 relative overflow-hidden">
         <div className="absolute top-6 right-6 z-10">
@@ -83,7 +107,7 @@ export const ResetPasswordPage = () => {
                     <img src="/icone.png" alt="Oliver Logo" className="w-20 h-20 mx-auto mb-4" />
                 </Link>
                 <h1 className="text-3xl font-bold text-foreground tracking-tight">
-                    {isTokenFlow ? 'Definir Nova Senha' : 'Redefinir Senha'}
+                    {getTitle()}
                 </h1>
             </div>
 
@@ -151,9 +175,7 @@ export const ResetPasswordPage = () => {
                         </form>
                     )}
                      <div className="text-center text-sm">
-                        <Link to="/auth" className="underline text-muted-foreground hover:text-primary">
-                            Voltar para o Login
-                        </Link>
+                        {backLink}
                     </div>
                 </CardContent>
             </Card>

@@ -1,7 +1,10 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Shield, MessageCircle, Lock } from 'lucide-react';
+import { Link } from 'react-router-dom';
+
 export const SecuritySettings = () => {
   const handleSupportContact = () => {
     window.open('https://wa.me/556496028022', '_blank');
@@ -17,7 +20,22 @@ export const SecuritySettings = () => {
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-4">
-          
+          <div className="flex items-center justify-between p-4 border rounded-lg">
+            <div className="flex items-center space-x-3">
+              <Lock className="h-5 w-5 text-yellow-600" />
+              <div>
+                <p className="font-medium">Alterar Senha</p>
+                <p className="text-sm text-muted-foreground">
+                  Altere sua senha de acesso para mais segurança.
+                </p>
+              </div>
+            </div>
+            <Button asChild variant="outline" size="sm" className="text-yellow-600 border-yellow-600 hover:bg-yellow-50 hover:text-yellow-700">
+              <Link to="/reset-password">
+                Alterar
+              </Link>
+            </Button>
+          </div>
           
           <div className="flex items-center justify-between p-4 border rounded-lg">
             <div className="flex items-center space-x-3">
