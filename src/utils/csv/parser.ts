@@ -10,7 +10,19 @@ type BudgetInsert = any; // Manter tipo para consistencia
  * @returns Uma lista de objetos de orçamento prontos para serem inseridos.
  */
 export const parseAndPrepareBudgets = (csvText: string, userId: string): BudgetInsert[] => {
-  const lines = csvText.split(/\r\n|\n/).filter(line => line.trim() !== '' && !line.trim().startsWith('#'));
+  const allLines = csvText.split(/\r\n|\n/);
+  
+  // Encontra a linha do cabeçalho, que deve conter os campos principais
+  const headerRowIndex = allLines.findIndex(line => 
+    line.includes('Tipo Aparelho') && line.includes('Modelo Aparelho') && line.includes('Preco Total')
+  );
+
+  if (headerRowIndex === -1) {
+    throw new Error("Nao foi possivel encontrar o cabecalho no arquivo CSV. Verifique se o modelo esta correto.");
+  }
+
+  // Considera apenas as linhas a partir do cabeçalho
+  const lines = allLines.slice(headerRowIndex).filter(line => line.trim() !== '');
   if (lines.length < 2) {
       throw new Error("Arquivo CSV invalido. Verifique se contem dados alem do cabecalho.");
   }
@@ -21,6 +33,9 @@ export const parseAndPrepareBudgets = (csvText: string, userId: string): BudgetI
   const dataRows = lines.slice(1);
 
   const newBudgets = dataRows.map((line, rowIndex) => {
+    // Ignora linhas de exemplo ou vazias
+    if (line.trim() === '' || line.includes('Galaxy A12')) return null;
+
     const values = line.split(/;(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(v => v.trim().replace(/^"|"$/g, ''));
     
     const rowObject: { [key: string]: string } = {};
@@ -32,11 +47,11 @@ export const parseAndPrepareBudgets = (csvText: string, userId: string): BudgetI
     const price = parseFloat(priceString);
 
     if (isNaN(price) || price <= 0) {
-      throw new Error(`Preco total invalido ou zerado na linha ${rowIndex + 2}. O preco deve ser um numero maior que zero.`);
+      throw new Error(`Preco total invalido ou zerado na linha ${headerRowIndex + rowIndex + 2}. O preco deve ser um numero maior que zero.`);
     }
 
     if (!rowObject['tipo_aparelho'] || !rowObject['modelo_aparelho'] || !rowObject['defeito_ou_problema'] || !rowObject['servico_realizado']) {
-      throw new Error(`Dados obrigatorios faltando na linha ${rowIndex + 2}. Verifique 'Tipo Aparelho', 'Modelo Aparelho', 'Defeito ou Problema' e 'Servico Realizado'.`);
+      throw new Error(`Dados obrigatorios faltando na linha ${headerRowIndex + rowIndex + 2}. Verifique 'Tipo Aparelho', 'Modelo Aparelho', 'Defeito ou Problema' e 'Servico Realizado'.`);
     }
 
     const installmentPriceString = String(rowObject['preco_parcelado'] || '0').replace(',', '.');
@@ -67,8 +82,8 @@ export const parseAndPrepareBudgets = (csvText: string, userId: string): BudgetI
       includes_delivery: String(rowObject['inclui_entrega_sim_nao']).toLowerCase() === 'sim',
       includes_screen_protector: String(rowObject['inclui_pelicula_sim_nao']).toLowerCase() === 'sim',
       valid_until: validUntil.toISOString(),
-      client_name: rowObject['nome_cliente'] || null,
-      client_phone: rowObject['telefone_cliente'] || null,
+      client_name: null,
+      client_phone: null,
     };
   }).filter(Boolean);
 

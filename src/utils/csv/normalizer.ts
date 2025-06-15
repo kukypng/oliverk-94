@@ -3,13 +3,14 @@
  * Normaliza um texto removendo acentos, convertendo para minúsculas e
  * substituindo caracteres não alfanuméricos por underscores.
  * Ideal para criar chaves seguras a partir de cabeçalhos.
- * Ex: "Preço Total" -> "preco_total"
+ * Ex: "Preço Total (*)" -> "preco_total"
  */
 export const normalizeHeader = (text: string): string => {
   if (!text) return '';
   return text
     .toString()
     .toLowerCase()
+    .replace(/\s?\(\*\)/g, '') // Remove o " (*)" dos cabeçalhos obrigatórios
     .normalize('NFD') // Decompor caracteres acentuados
     .replace(/[\u0300-\u036f]/g, '') // Remover acentos
     .replace(/ç/g, 'c')

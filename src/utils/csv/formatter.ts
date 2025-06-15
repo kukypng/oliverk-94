@@ -1,4 +1,3 @@
-
 import { normalizeDataString } from './normalizer';
 
 /**
@@ -19,24 +18,18 @@ const formatCsvField = (value: any): string => {
 
 /**
  * Gera o conteúdo CSV para exportação a partir de uma lista de orçamentos.
- * Usa cabeçalhos limpos e dados normalizados.
+ * Usa cabeçalhos limpos e apenas dados relevantes do orçamento.
  * @param budgets - A lista de orçamentos a ser exportada.
  * @returns O conteúdo do arquivo CSV como uma string.
  */
 export const generateExportCsv = (budgets: any[]): string => {
   const headers = [
-    'ID', 'Status', 'Nome Cliente', 'Telefone Cliente', 'Tipo Aparelho',
-    'Marca Aparelho', 'Modelo', 'Problema', 'Servico Realizado', 'Preco Total',
-    'Preco Parcelado', 'Parcelas', 'Condicao Pagamento', 'Garantia (meses)',
-    'Inclui Entrega', 'Inclui Pelicula', 'Data Criacao',
-    'Valido Ate', 'Observacoes'
+    'Tipo Aparelho', 'Marca Aparelho', 'Modelo', 'Problema', 'Servico Realizado',
+    'Preco Total', 'Preco Parcelado', 'Parcelas', 'Condicao Pagamento', 'Garantia (meses)',
+    'Inclui Entrega', 'Inclui Pelicula', 'Valido Ate', 'Observacoes'
   ];
 
   const formattedData = budgets.map(b => [
-    b.id,
-    b.status,
-    b.client_name || '',
-    b.client_phone || '',
     b.device_type,
     b.device_brand || '',
     b.device_model,
@@ -49,7 +42,6 @@ export const generateExportCsv = (budgets: any[]): string => {
     b.warranty_months,
     b.includes_delivery ? 'sim' : 'nao',
     b.includes_screen_protector ? 'sim' : 'nao',
-    new Date(b.created_at).toLocaleDateString('pt-BR'),
     b.valid_until ? new Date(b.valid_until).toLocaleDateString('pt-BR') : '',
     b.notes || '',
   ]);
