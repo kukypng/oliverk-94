@@ -11,6 +11,11 @@ const getGreeting = () => {
   return "Boa noite";
 };
 
+interface DashboardHeaderProps {
+  profile: UserProfile | null;
+  weeklyGrowth: number;
+}
+
 export const DashboardHeader = ({ profile, weeklyGrowth }: DashboardHeaderProps) => {
   return (
     <div className="flex flex-col space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0">
