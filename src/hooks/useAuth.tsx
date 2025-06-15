@@ -14,6 +14,8 @@ export interface UserProfile {
   is_active: boolean;
   budget_limit: number | null;
   expiration_date: string;
+  budget_warning_enabled: boolean;
+  budget_warning_days: number;
 }
 
 interface AuthContextType {
