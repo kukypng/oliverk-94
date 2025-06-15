@@ -22,23 +22,7 @@ export const LicenseStatus = () => {
   };
 
   const getStatus = () => {
-    if (remainingDays > 10) { // Alterado de 7 para 10 para alinhar com as notificações
-      return {
-        title: "Licença Ativa",
-        description: `Sua licença expira em ${remainingDays} dias.`,
-        icon: <img src="/icones/limao.png" alt="Licença Ativa" className="h-8 w-8" />,
-        cardClass: "border-green-500/20",
-        showRenew: false
-      };
-    } else if (remainingDays >= 0) {
-      return {
-        title: "Atenção: Licença Expirando",
-        description: `Sua licença expira em ${remainingDays} ${remainingDays === 1 ? 'dia' : 'dias'}. Renove para não perder o acesso.`,
-        icon: <img src="/icones/laranja.png" alt="Licença Expirando" className="h-8 w-8" />,
-        cardClass: "border-yellow-500/30",
-        showRenew: true
-      };
-    } else {
+    if (remainingDays < 0) {
       return {
         title: "Licença Expirada",
         description: `Sua licença expirou. Renove para continuar usando o sistema.`,
@@ -47,6 +31,45 @@ export const LicenseStatus = () => {
         showRenew: true
       };
     }
+    
+    if (remainingDays <= 1) {
+      const dayText = remainingDays === 1 ? 'amanhã' : 'hoje';
+      return {
+        title: `Urgente: Sua licença expira ${dayText}!`,
+        description: `Renove para não perder o acesso ao sistema.`,
+        icon: <img src="/icones/coracao.png" alt="Licença Expirando" className="h-8 w-8" />,
+        cardClass: "border-red-500/30",
+        showRenew: true
+      };
+    }
+    
+    if (remainingDays <= 5) {
+      return {
+        title: "Atenção: Licença Expirando",
+        description: `Sua licença expira em ${remainingDays} dias. Renove para não perder o acesso.`,
+        icon: <img src="/icones/laranja.png" alt="Licença Expirando" className="h-8 w-8" />,
+        cardClass: "border-orange-500/30",
+        showRenew: true
+      };
+    }
+    
+    if (remainingDays <= 10) {
+      return {
+        title: "Atenção: Licença Expirando",
+        description: `Sua licença expira em ${remainingDays} dias. Renove para não perder o acesso.`,
+        icon: <img src="/icones/laranja.png" alt="Licença Expirando" className="h-8 w-8" />,
+        cardClass: "border-yellow-500/30",
+        showRenew: true
+      };
+    }
+
+    return {
+      title: "Licença Ativa",
+      description: `Sua licença expira em ${remainingDays} dias.`,
+      icon: <img src="/icones/limao.png" alt="Licença Ativa" className="h-8 w-8" />,
+      cardClass: "border-green-500/20",
+      showRenew: false
+    };
   };
 
   const status = getStatus();
