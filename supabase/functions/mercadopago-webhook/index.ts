@@ -1,3 +1,4 @@
+
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { Resend } from 'npm:resend@3.4.0'
@@ -99,24 +100,69 @@ serve(async (req) => {
           return new Response('Webhook processed: User already exists.', { status: 200 });
         }
 
-        // Invite user using Supabase native email system
-        const { data: newUserResponse, error: inviteError } = await supabaseAdmin.auth.admin.inviteUserByEmail(
-            email,
-            { data: { name: name } }
-        );
+        const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
+            type: 'invite',
+            email: email,
+            data: { name: name }
+        });
 
-        if (inviteError) throw inviteError;
+        if (linkError) {
+            console.error('Error generating invite link:', linkError);
+            throw linkError;
+        }
         
-        const userId = newUserResponse.user.id;
-        console.log(`User invited and created successfully with ID: ${userId}`);
+        const { properties, user } = linkData;
+        const confirmationUrl = properties.action_link;
+        const userId = user.id;
+        console.log(`User created via invite link generation with ID: ${userId}`);
+
+        const resendApiKey = Deno.env.get('RESEND_API_KEY');
+        if (!resendApiKey) {
+            console.error('RESEND_API_KEY is not set. Cannot send custom email. User will not be notified.');
+            throw new Error('RESEND_API_KEY is not configured. Cannot send invitation email.');
+        }
+        const resend = new Resend(resendApiKey);
+
+        const emailHtml = await renderAsync(
+            React.createElement(InvitationEmail, {
+                name: name,
+                confirmationUrl: confirmationUrl,
+            })
+        );
+        
+        // IMPORTANTE: O e-mail "from" deve ser de um domínio verificado no seu painel do Resend.
+        const { data: emailData, error: emailError } = await resend.emails.send({
+            from: 'Oliver <bemvindo@seu-dominio-verificado.com>',
+            to: [email],
+            subject: 'Bem-vindo ao Oliver! Complete seu cadastro.',
+            html: emailHtml,
+        });
+
+        if (emailError) {
+            console.error('Error sending email via Resend:', emailError);
+            throw new Error(`Failed to send invitation email: ${emailError.message}`);
+        }
+
+        console.log(`Custom invitation email sent to ${email} successfully. Message ID: ${emailData?.id}`);
         
         const expirationDate = new Date();
         expirationDate.setMonth(expirationDate.getMonth() + 1);
 
-        await supabaseAdmin.from('user_profiles').insert({ id: userId, name: name, role: 'user', is_active: true, expiration_date: expirationDate.toISOString() });
-        await supabaseAdmin.from('subscriptions').insert({ user_id: userId, status: 'active', mercado_pago_subscription_id: mercadoPagoSubscriptionId, current_period_end: expirationDate.toISOString(), plan_id: 'monthly_brl_40' });
+        // O trigger on_auth_user_created já cria o perfil. Aqui, atualizamos com os dados corretos da assinatura.
+        await supabaseAdmin.from('user_profiles').update({
+            expiration_date: expirationDate.toISOString(), 
+            is_active: true
+        }).eq('id', userId);
         
-        console.log(`Profile created and Supabase invitation sent to user ${userId}. License valid until ${expirationDate.toISOString()}`);
+        await supabaseAdmin.from('subscriptions').insert({ 
+            user_id: userId, 
+            status: 'active', 
+            mercado_pago_subscription_id: mercadoPagoSubscriptionId, 
+            current_period_end: expirationDate.toISOString(), 
+            plan_id: 'monthly_brl_40' 
+        });
+        
+        console.log(`Profile updated and subscription created for user ${userId}. License valid until ${expirationDate.toISOString()}`);
       }
     } else if (['cancelled', 'refunded', 'charged_back'].includes(paymentInfo.status ?? '')) {
         const externalReference = paymentInfo.external_reference;
@@ -145,3 +191,4 @@ serve(async (req) => {
     })
   }
 })
+
