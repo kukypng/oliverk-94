@@ -1,6 +1,5 @@
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-import { MercadoPagoConfig, PreApproval } from 'https://esm.sh/mercadopago@2.0.9'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -27,10 +26,20 @@ serve(async (req) => {
       const mercadoPagoAccessToken = Deno.env.get('MERCADO_PAGO_ACCESS_TOKEN');
       if (!mercadoPagoAccessToken) throw new Error("MERCADO_PAGO_ACCESS_TOKEN is not set.");
       
-      const client = new MercadoPagoConfig({ accessToken: mercadoPagoAccessToken });
-      const preapproval = new PreApproval(client);
-
-      const subscriptionDetails = await preapproval.get({ preApprovalId });
+      const mpResponse = await fetch(`https://api.mercadopago.com/preapproval/${preapprovalId}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${mercadoPagoAccessToken}`
+        }
+      });
+      
+      const subscriptionDetails = await mpResponse.json();
+      
+      if (!mpResponse.ok) {
+        console.error(`Mercado Pago API error fetching preapproval ${preapprovalId}:`, subscriptionDetails);
+        throw new Error(`Falha ao buscar detalhes da assinatura: ${subscriptionDetails.message || mpResponse.statusText}`);
+      }
+      
       console.log('Subscription Details from MP:', JSON.stringify(subscriptionDetails, null, 2));
       
       const externalReference = subscriptionDetails.external_reference;

@@ -1,7 +1,5 @@
-
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-import { MercadoPagoConfig, PreApproval } from 'https://esm.sh/mercadopago@2.0.9'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -67,9 +65,6 @@ serve(async (req) => {
         })
     }
 
-    const client = new MercadoPagoConfig({ accessToken: mercadoPagoAccessToken });
-    const preapproval = new PreApproval(client);
-
     const subscriptionData = {
       reason: 'Assinatura Oliver Mensal',
       auto_recurring: {
@@ -84,15 +79,37 @@ serve(async (req) => {
       notification_url: `https://oghjlypdnmqecaavekyr.supabase.co/functions/v1/mercadopago-webhook`,
     };
 
-    const result = await preapproval.create({ body: subscriptionData });
-    
+    console.log("Sending subscription data to Mercado Pago:", JSON.stringify(subscriptionData, null, 2));
+
+    const mpResponse = await fetch('https://api.mercadopago.com/preapproval', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${mercadoPagoAccessToken}`
+      },
+      body: JSON.stringify(subscriptionData)
+    });
+
+    const result = await mpResponse.json();
+
+    if (!mpResponse.ok) {
+      console.error("Mercado Pago API error:", result);
+      const errorMessage = result.message || 'Falha ao comunicar com o serviço de pagamento.';
+      return new Response(JSON.stringify({ error: errorMessage }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: mpResponse.status,
+      });
+    }
+
     if (!result.init_point) {
         console.error("Failed to get init_point from Mercado Pago", result);
-        return new Response(JSON.stringify({ error: "Falha ao comunicar com o serviço de pagamento." }), {
+        return new Response(JSON.stringify({ error: "Falha ao criar o link de pagamento." }), {
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
             status: 500,
         });
     }
+
+    console.log("Successfully created Mercado Pago subscription, init_point:", result.init_point);
 
     return new Response(JSON.stringify({ init_point: result.init_point }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
