@@ -3,8 +3,9 @@ import React from 'react';
 import { CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search } from 'lucide-react';
+import { Search, Download, Loader2 } from 'lucide-react';
 import { DebugInfo } from '@/types/user';
+import { useUserExport } from '@/hooks/useUserExport';
 
 interface Props {
   searchTerm: string;
@@ -14,31 +15,50 @@ interface Props {
   setShowDebugInfo: (show: boolean) => void;
 }
 
-export const UserManagementHeader = ({ searchTerm, setSearchTerm, debugInfo, showDebugInfo, setShowDebugInfo }: Props) => (
-  <CardHeader>
-    <CardTitle className="flex flex-col md:flex-row items-stretch md:items-center md:justify-between gap-4">
-      <span>Gerenciar Usuários</span>
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-        {debugInfo && (
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={() => setShowDebugInfo(!showDebugInfo)}
-            className="text-xs"
-          >
-            {showDebugInfo ? 'Ocultar' : 'Mostrar'} Debug
-          </Button>
-        )}
-        <div className="relative flex-grow">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Buscar usuários..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 w-full"
-          />
+export const UserManagementHeader = ({ searchTerm, setSearchTerm, debugInfo, showDebugInfo, setShowDebugInfo }: Props) => {
+  const { isExporting, exportUsers } = useUserExport();
+
+  return (
+    <CardHeader>
+      <CardTitle className="flex flex-col md:flex-row items-stretch md:items-center md:justify-between gap-4">
+        <span>Gerenciar Usuários</span>
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+          {debugInfo?.is_admin && (
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={exportUsers}
+              disabled={isExporting}
+            >
+              {isExporting ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Download className="mr-2 h-4 w-4" />
+              )}
+              Exportar Usuários
+            </Button>
+          )}
+          {debugInfo && (
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => setShowDebugInfo(!showDebugInfo)}
+              className="text-xs"
+            >
+              {showDebugInfo ? 'Ocultar' : 'Mostrar'} Debug
+            </Button>
+          )}
+          <div className="relative flex-grow">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Buscar usuários..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 w-full"
+            />
+          </div>
         </div>
-      </div>
-    </CardTitle>
-  </CardHeader>
-);
+      </CardTitle>
+    </CardHeader>
+  );
+};
