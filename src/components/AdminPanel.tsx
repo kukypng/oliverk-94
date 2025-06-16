@@ -1,73 +1,118 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { UserManagement } from '@/components/UserManagement';
 import { AdminLogs } from '@/components/AdminLogs';
 import { AdminDebugPanel } from '@/components/AdminDebugPanel';
 import { AdminTestPanel } from '@/components/AdminTestPanel';
-import { Users, FileText, Shield, TestTube, UserPlus } from 'lucide-react';
+import { Users, Shield, UserPlus, Settings, ChevronLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 
 export const AdminPanel = () => {
+  const [showSettings, setShowSettings] = useState(false);
+
+  if (showSettings) {
+    return (
+      <div className="container mx-auto p-2 sm:p-4 md:p-6 space-y-6 animate-fade-in">
+        <div className="flex items-center space-x-4 mb-6">
+          <Button 
+            variant="ghost" 
+            size="sm"
+            onClick={() => setShowSettings(false)}
+            className="h-10 w-10 p-0"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </Button>
+          <div className="flex items-center space-x-4">
+            <div className="bg-primary/10 p-3 rounded-xl">
+              <Settings className="h-8 w-8 text-primary" />
+            </div>
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold">Configurações Avançadas</h1>
+              <p className="text-muted-foreground">Ferramentas de diagnóstico e teste</p>
+            </div>
+          </div>
+        </div>
+
+        <Tabs defaultValue="test" className="w-full">
+          <div className="overflow-x-auto pb-2 -mx-4 px-4">
+            <TabsList className="grid w-full min-w-max grid-cols-3 gap-2">
+              <TabsTrigger value="test" className="flex items-center gap-2 text-sm">
+                <Shield className="h-4 w-4" />
+                <span>Testes</span>
+              </TabsTrigger>
+              <TabsTrigger value="logs" className="flex items-center gap-2 text-sm">
+                <Shield className="h-4 w-4" />
+                <span>Logs</span>
+              </TabsTrigger>
+              <TabsTrigger value="debug" className="flex items-center gap-2 text-sm">
+                <Shield className="h-4 w-4" />
+                <span>Debug</span>
+              </TabsTrigger>
+            </TabsList>
+          </div>
+
+          <TabsContent value="test" className="mt-6 animate-fade-in">
+            <AdminTestPanel />
+          </TabsContent>
+
+          <TabsContent value="logs" className="mt-6 animate-fade-in">
+            <AdminLogs />
+          </TabsContent>
+
+          <TabsContent value="debug" className="mt-6 animate-fade-in">
+            <AdminDebugPanel />
+          </TabsContent>
+        </Tabs>
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto p-2 sm:p-4 md:p-6 space-y-6 animate-fade-in">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-3 sm:space-y-0">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-3 sm:space-y-0 gap-4">
         <div className="flex items-center space-x-4">
           <div className="bg-primary/10 p-3 rounded-xl">
             <Shield className="h-8 w-8 text-primary" />
           </div>
           <div>
             <h1 className="text-2xl md:text-3xl font-bold">Painel Administrativo</h1>
-            <p className="text-muted-foreground">Gerencie usuários e monitore atividades do sistema</p>
+            <p className="text-muted-foreground">Gerencie usuários do sistema</p>
           </div>
         </div>
-        <Link to="/signup">
-          <Button>
-            <UserPlus className="mr-2 h-4 w-4" />
-            Criar Novo Usuário
+        
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowSettings(true)}
+            className="flex items-center gap-2"
+          >
+            <Settings className="h-4 w-4" />
+            <span className="hidden sm:inline">Configurações</span>
           </Button>
-        </Link>
+          <Link to="/signup">
+            <Button size="sm" className="w-full sm:w-auto">
+              <UserPlus className="mr-2 h-4 w-4" />
+              Criar Usuário
+            </Button>
+          </Link>
+        </div>
       </div>
 
-      <Tabs defaultValue="test" className="w-full">
-        <div className="overflow-x-auto pb-2 -mx-4 px-4">
-          <TabsList className="grid w-full min-w-max grid-cols-4 gap-2">
-            <TabsTrigger value="test" className="flex items-center gap-2">
-              <TestTube className="h-4 w-4" />
-              <span>Testes</span>
-            </TabsTrigger>
-            <TabsTrigger value="users" className="flex items-center gap-2">
-              <Users className="h-4 w-4" />
-              <span>Usuários</span>
-            </TabsTrigger>
-            <TabsTrigger value="logs" className="flex items-center gap-2">
-              <FileText className="h-4 w-4" />
-              <span>Logs</span>
-            </TabsTrigger>
-            <TabsTrigger value="debug" className="flex items-center gap-2">
-              <Shield className="h-4 w-4" />
-              <span>Debug</span>
-            </TabsTrigger>
-          </TabsList>
+      <div className="bg-card rounded-lg border">
+        <div className="p-4 border-b">
+          <div className="flex items-center space-x-2">
+            <Users className="h-5 w-5 text-primary" />
+            <h2 className="text-xl font-semibold">Gerenciamento de Usuários</h2>
+          </div>
         </div>
-
-        <TabsContent value="test" className="mt-6 animate-fade-in">
-          <AdminTestPanel />
-        </TabsContent>
-
-        <TabsContent value="users" className="mt-6 animate-fade-in">
+        
+        <div className="p-0">
           <UserManagement />
-        </TabsContent>
-
-        <TabsContent value="logs" className="mt-6 animate-fade-in">
-          <AdminLogs />
-        </TabsContent>
-
-        <TabsContent value="debug" className="mt-6 animate-fade-in">
-          <AdminDebugPanel />
-        </TabsContent>
-      </Tabs>
+        </div>
+      </div>
     </div>
   );
 };
