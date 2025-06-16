@@ -23,7 +23,6 @@ interface SiteSettings {
   plan_currency: string;
   plan_period: string;
   plan_features: string[];
-  payment_url: string;
   whatsapp_number: string;
   page_title: string;
   page_subtitle: string;
@@ -34,6 +33,9 @@ interface SiteSettings {
   show_support_info: boolean;
   additional_info: string;
 }
+
+// Link de pagamento fixo - não pode ser alterado pelo admin
+const FIXED_PAYMENT_URL = "https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=bbb0d6d04e3440f395e562d80f870761";
 
 export const PlansPage = () => {
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -67,7 +69,6 @@ export const PlansPage = () => {
             "Atualizações gratuitas",
             "Backup automático"
           ],
-          payment_url: 'https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=DEFAULT_PLAN_ID',
           whatsapp_number: '556496028022',
           page_title: 'Escolha seu Plano',
           page_subtitle: 'Tenha acesso completo ao sistema de gestão de orçamentos mais eficiente para assistências técnicas.',
@@ -119,10 +120,9 @@ export const PlansPage = () => {
 
   const handleConfirmPayment = () => {
     setShowConfirmation(false);
-    // Use the payment URL from settings (configured by admin)
-    const paymentUrl = settings?.payment_url || "https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=DEFAULT_PLAN_ID";
-    console.log('Redirecting to payment URL:', paymentUrl);
-    window.location.href = paymentUrl;
+    // Usar sempre o link fixo de pagamento
+    console.log('Redirecting to fixed payment URL:', FIXED_PAYMENT_URL);
+    window.location.href = FIXED_PAYMENT_URL;
   };
 
   // Show loading state while fetching settings
@@ -151,7 +151,6 @@ export const PlansPage = () => {
       "Atualizações gratuitas",
       "Backup automático"
     ],
-    payment_url: 'https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=DEFAULT_PLAN_ID',
     whatsapp_number: '556496028022',
     page_title: 'Escolha seu Plano',
     page_subtitle: 'Tenha acesso completo ao sistema de gestão de orçamentos mais eficiente para assistências técnicas.',

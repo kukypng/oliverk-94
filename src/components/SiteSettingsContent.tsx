@@ -1,26 +1,26 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
-import { Badge } from '@/components/ui/badge';
-import { Plus, Trash2, Save, Globe, DollarSign, MessageSquare, Star } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Separator } from '@/components/ui/separator';
+import { Save, AlertTriangle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 interface SiteSettings {
-  id: string;
+  id?: number;
   plan_name: string;
   plan_description: string;
   plan_price: number;
   plan_currency: string;
   plan_period: string;
   plan_features: string[];
-  payment_url: string;
   whatsapp_number: string;
   page_title: string;
   page_subtitle: string;
@@ -33,371 +33,314 @@ interface SiteSettings {
 }
 
 export const SiteSettingsContent = () => {
-  const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [newFeature, setNewFeature] = useState('');
-  const [localSettings, setLocalSettings] = useState<SiteSettings | null>(null);
+  
+  const [settings, setSettings] = useState<SiteSettings>({
+    plan_name: 'Plano Profissional',
+    plan_description: 'Para assistências técnicas que querem crescer',
+    plan_price: 15,
+    plan_currency: 'R$',
+    plan_period: '/mês',
+    plan_features: [
+      "Sistema completo de orçamentos",
+      "Gestão de clientes ilimitada",
+      "Relatórios e estatísticas"
+    ],
+    whatsapp_number: '556496028022',
+    page_title: 'Escolha seu Plano',
+    page_subtitle: 'Tenha acesso completo ao sistema de gestão de orçamentos mais eficiente para assistências técnicas.',
+    popular_badge_text: 'Mais Popular',
+    cta_button_text: 'Assinar Agora',
+    support_text: 'Suporte via WhatsApp incluso',
+    show_popular_badge: true,
+    show_support_info: true,
+    additional_info: '✓ Sem taxa de setup • ✓ Cancele quando quiser • ✓ Suporte brasileiro'
+  });
 
-  const { data: settings, isLoading } = useQuery({
+  const [featuresText, setFeaturesText] = useState('');
+
+  // Fetch current site settings
+  const { data: currentSettings, isLoading } = useQuery({
     queryKey: ['site-settings'],
     queryFn: async () => {
-      console.log('Fetching site settings...');
       const { data, error } = await supabase
         .from('site_settings')
         .select('*')
         .single();
       
-      if (error) {
-        console.error('Error fetching site settings:', error);
+      if (error && error.code !== 'PGRST116') {
         throw error;
       }
       
-      console.log('Site settings fetched:', data);
-      const settingsData = data as SiteSettings;
-      setLocalSettings(settingsData);
-      return settingsData;
+      return data;
     }
   });
 
-  const updateSettingsMutation = useMutation({
-    mutationFn: async (updatedSettings: Partial<SiteSettings>) => {
-      if (!settings?.id) throw new Error('Settings ID not found');
-      
-      console.log('Updating settings with:', updatedSettings);
-      
+  // Update mutation
+  const updateMutation = useMutation({
+    mutationFn: async (newSettings: SiteSettings) => {
       const { data, error } = await supabase
         .from('site_settings')
-        .update(updatedSettings)
-        .eq('id', settings.id)
+        .upsert(newSettings)
         .select()
         .single();
       
-      if (error) {
-        console.error('Error updating settings:', error);
-        throw error;
-      }
-      
-      console.log('Settings updated successfully:', data);
+      if (error) throw error;
       return data;
     },
-    onSuccess: (data) => {
-      console.log('Update mutation success, invalidating queries...');
+    onSuccess: () => {
+      toast.success('Configurações salvas com sucesso!');
       queryClient.invalidateQueries({ queryKey: ['site-settings'] });
-      setLocalSettings(data as SiteSettings);
-      toast({
-        title: "Configurações atualizadas",
-        description: "As configurações do site foram salvas com sucesso.",
-      });
     },
     onError: (error) => {
-      console.error('Update mutation error:', error);
-      toast({
-        title: "Erro ao salvar",
-        description: "Ocorreu um erro ao salvar as configurações.",
-        variant: "destructive",
-      });
+      toast.error('Erro ao salvar configurações: ' + error.message);
     }
   });
 
+  // Load current settings when data is available
+  useEffect(() => {
+    if (currentSettings) {
+      setSettings(currentSettings);
+      setFeaturesText(currentSettings.plan_features?.join('\n') || '');
+    }
+  }, [currentSettings]);
+
+  const handleSave = () => {
+    const features = featuresText.split('\n').filter(feature => feature.trim() !== '');
+    
+    updateMutation.mutate({
+      ...settings,
+      plan_features: features
+    });
+  };
+
   const handleInputChange = (field: keyof SiteSettings, value: any) => {
-    if (!settings) return;
-    
-    console.log(`Updating field ${field} with value:`, value);
-    
-    // Update local state immediately for better UX
-    setLocalSettings(prev => prev ? { ...prev, [field]: value } : null);
-    
-    // Debounce the actual save to database
-    const updatedSettings = { [field]: value };
-    updateSettingsMutation.mutate(updatedSettings);
+    setSettings(prev => ({
+      ...prev,
+      [field]: value
+    }));
   };
-
-  const handleAddFeature = () => {
-    if (!newFeature.trim() || !settings) return;
-    
-    const updatedFeatures = [...settings.plan_features, newFeature.trim()];
-    handleInputChange('plan_features', updatedFeatures);
-    setNewFeature('');
-  };
-
-  const handleRemoveFeature = (index: number) => {
-    if (!settings) return;
-    
-    const updatedFeatures = settings.plan_features.filter((_, i) => i !== index);
-    handleInputChange('plan_features', updatedFeatures);
-  };
-
-  // Use local settings if available, otherwise fall back to server settings
-  const currentSettings = localSettings || settings;
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
+      <div className="flex items-center justify-center h-96">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
-
-  if (!currentSettings) {
-    return (
-      <div className="text-center py-8">
-        <p className="text-muted-foreground">Configurações não encontradas.</p>
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center space-x-4">
-        <div className="bg-primary/10 p-3 rounded-xl">
-          <Globe className="h-8 w-8 text-primary" />
-        </div>
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold">Configurações do Site</h1>
-          <p className="text-muted-foreground">Gerencie o conteúdo da página de planos</p>
+          <h1 className="text-3xl font-bold tracking-tight">Configurações do Site</h1>
+          <p className="text-muted-foreground">
+            Configure as informações exibidas na página de planos
+          </p>
         </div>
+        <Button onClick={handleSave} disabled={updateMutation.isPending}>
+          <Save className="h-4 w-4 mr-2" />
+          {updateMutation.isPending ? 'Salvando...' : 'Salvar Configurações'}
+        </Button>
       </div>
 
-      {/* Plan Information */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Star className="h-5 w-5" />
-            Informações do Plano
-          </CardTitle>
-          <CardDescription>Configure os detalhes principais do plano</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="plan_name">Nome do Plano</Label>
-              <Input
-                id="plan_name"
-                value={currentSettings.plan_name}
-                onChange={(e) => handleInputChange('plan_name', e.target.value)}
-                placeholder="Ex: Plano Profissional"
-              />
-            </div>
-            <div>
-              <Label htmlFor="plan_description">Descrição do Plano</Label>
-              <Input
-                id="plan_description"
-                value={currentSettings.plan_description}
-                onChange={(e) => handleInputChange('plan_description', e.target.value)}
-                placeholder="Ex: Para assistências técnicas..."
-              />
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <Label htmlFor="plan_currency">Moeda</Label>
-              <Input
-                id="plan_currency"
-                value={currentSettings.plan_currency}
-                onChange={(e) => handleInputChange('plan_currency', e.target.value)}
-                placeholder="R$"
-              />
-            </div>
-            <div>
-              <Label htmlFor="plan_price">Preço</Label>
-              <Input
-                id="plan_price"
-                type="number"
-                value={currentSettings.plan_price}
-                onChange={(e) => handleInputChange('plan_price', Number(e.target.value))}
-                placeholder="15"
-              />
-            </div>
-            <div>
-              <Label htmlFor="plan_period">Período</Label>
-              <Input
-                id="plan_period"
-                value={currentSettings.plan_period}
-                onChange={(e) => handleInputChange('plan_period', e.target.value)}
-                placeholder="/mês"
-              />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      <Alert>
+        <AlertTriangle className="h-4 w-4" />
+        <AlertDescription>
+          <strong>URL de Pagamento:</strong> A URL de pagamento está configurada como fixa no sistema e não pode ser alterada através desta interface. 
+          URL atual: https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=bbb0d6d04e3440f395e562d80f870761
+        </AlertDescription>
+      </Alert>
 
-      {/* Plan Features */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Recursos do Plano</CardTitle>
-          <CardDescription>Gerencie a lista de funcionalidades incluídas</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex gap-2">
-            <Input
-              value={newFeature}
-              onChange={(e) => setNewFeature(e.target.value)}
-              placeholder="Digite uma nova funcionalidade"
-              onKeyPress={(e) => e.key === 'Enter' && handleAddFeature()}
-            />
-            <Button onClick={handleAddFeature} disabled={!newFeature.trim()}>
-              <Plus className="h-4 w-4 mr-2" />
-              Adicionar
-            </Button>
-          </div>
-          
-          <div className="space-y-2">
-            {currentSettings.plan_features.map((feature, index) => (
-              <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
-                <span>{feature}</span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleRemoveFeature(index)}
-                  className="text-destructive hover:text-destructive"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+      <div className="grid gap-6">
+        {/* Informações do Plano */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Informações do Plano</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="plan_name">Nome do Plano</Label>
+                <Input
+                  id="plan_name"
+                  value={settings.plan_name}
+                  onChange={(e) => handleInputChange('plan_name', e.target.value)}
+                  placeholder="Ex: Plano Profissional"
+                />
               </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+              <div>
+                <Label htmlFor="plan_description">Descrição do Plano</Label>
+                <Input
+                  id="plan_description"
+                  value={settings.plan_description}
+                  onChange={(e) => handleInputChange('plan_description', e.target.value)}
+                  placeholder="Ex: Para assistências técnicas que querem crescer"
+                />
+              </div>
+            </div>
 
-      {/* Page Content */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Conteúdo da Página</CardTitle>
-          <CardDescription>Configure textos e títulos da página</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <Label htmlFor="page_title">Título Principal</Label>
-            <Input
-              id="page_title"
-              value={currentSettings.page_title}
-              onChange={(e) => handleInputChange('page_title', e.target.value)}
-            />
-          </div>
-          
-          <div>
-            <Label htmlFor="page_subtitle">Subtítulo</Label>
-            <Textarea
-              id="page_subtitle"
-              value={currentSettings.page_subtitle}
-              onChange={(e) => handleInputChange('page_subtitle', e.target.value)}
-              rows={3}
-            />
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <Label htmlFor="plan_price">Preço</Label>
+                <Input
+                  id="plan_price"
+                  type="number"
+                  value={settings.plan_price}
+                  onChange={(e) => handleInputChange('plan_price', parseFloat(e.target.value))}
+                  placeholder="15"
+                />
+              </div>
+              <div>
+                <Label htmlFor="plan_currency">Moeda</Label>
+                <Input
+                  id="plan_currency"
+                  value={settings.plan_currency}
+                  onChange={(e) => handleInputChange('plan_currency', e.target.value)}
+                  placeholder="R$"
+                />
+              </div>
+              <div>
+                <Label htmlFor="plan_period">Período</Label>
+                <Input
+                  id="plan_period"
+                  value={settings.plan_period}
+                  onChange={(e) => handleInputChange('plan_period', e.target.value)}
+                  placeholder="/mês"
+                />
+              </div>
+            </div>
+
             <div>
-              <Label htmlFor="cta_button_text">Texto do Botão</Label>
-              <Input
-                id="cta_button_text"
-                value={currentSettings.cta_button_text}
-                onChange={(e) => handleInputChange('cta_button_text', e.target.value)}
+              <Label htmlFor="plan_features">Recursos do Plano (um por linha)</Label>
+              <Textarea
+                id="plan_features"
+                value={featuresText}
+                onChange={(e) => setFeaturesText(e.target.value)}
+                placeholder="Sistema completo de orçamentos&#10;Gestão de clientes ilimitada&#10;Relatórios e estatísticas"
+                rows={8}
               />
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Configurações da Página */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Configurações da Página</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
             <div>
-              <Label htmlFor="popular_badge_text">Texto do Badge Popular</Label>
+              <Label htmlFor="page_title">Título da Página</Label>
               <Input
-                id="popular_badge_text"
-                value={currentSettings.popular_badge_text}
-                onChange={(e) => handleInputChange('popular_badge_text', e.target.value)}
+                id="page_title"
+                value={settings.page_title}
+                onChange={(e) => handleInputChange('page_title', e.target.value)}
+                placeholder="Escolha seu Plano"
               />
             </div>
-          </div>
-          
-          <div>
-            <Label htmlFor="additional_info">Informações Adicionais</Label>
-            <Input
-              id="additional_info"
-              value={currentSettings.additional_info}
-              onChange={(e) => handleInputChange('additional_info', e.target.value)}
-            />
-          </div>
-        </CardContent>
-      </Card>
 
-      {/* Payment & Contact */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <DollarSign className="h-5 w-5" />
-            Pagamento e Contato
-          </CardTitle>
-          <CardDescription>Configure integrações de pagamento e suporte</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <Label htmlFor="payment_url">URL de Pagamento</Label>
-            <Input
-              id="payment_url"
-              value={currentSettings.payment_url}
-              onChange={(e) => handleInputChange('payment_url', e.target.value)}
-              placeholder="Ex: https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=..."
-            />
-            <p className="text-sm text-muted-foreground mt-1">
-              Link para onde o usuário será redirecionado ao clicar em "Assinar Agora"
-            </p>
-          </div>
-          
-          <div>
-            <Label htmlFor="whatsapp_number">Número do WhatsApp</Label>
-            <Input
-              id="whatsapp_number"
-              value={currentSettings.whatsapp_number}
-              onChange={(e) => handleInputChange('whatsapp_number', e.target.value)}
-              placeholder="556496028022"
-            />
-          </div>
-          
-          <div>
-            <Label htmlFor="support_text">Texto de Suporte</Label>
-            <Input
-              id="support_text"
-              value={currentSettings.support_text}
-              onChange={(e) => handleInputChange('support_text', e.target.value)}
-            />
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Display Options */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Opções de Exibição</CardTitle>
-          <CardDescription>Configure elementos visuais da página</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
             <div>
-              <Label htmlFor="show_popular_badge">Mostrar Badge "Popular"</Label>
-              <p className="text-sm text-muted-foreground">Exibe o badge destacando o plano como popular</p>
+              <Label htmlFor="page_subtitle">Subtítulo da Página</Label>
+              <Textarea
+                id="page_subtitle"
+                value={settings.page_subtitle}
+                onChange={(e) => handleInputChange('page_subtitle', e.target.value)}
+                placeholder="Tenha acesso completo ao sistema de gestão de orçamentos mais eficiente para assistências técnicas."
+                rows={3}
+              />
             </div>
-            <Switch
-              id="show_popular_badge"
-              checked={currentSettings.show_popular_badge}
-              onCheckedChange={(checked) => handleInputChange('show_popular_badge', checked)}
-            />
-          </div>
-          
-          <div className="flex items-center justify-between">
-            <div>
-              <Label htmlFor="show_support_info">Mostrar Informações de Suporte</Label>
-              <p className="text-sm text-muted-foreground">Exibe as informações de suporte na parte inferior</p>
-            </div>
-            <Switch
-              id="show_support_info"
-              checked={currentSettings.show_support_info}
-              onCheckedChange={(checked) => handleInputChange('show_support_info', checked)}
-            />
-          </div>
-        </CardContent>
-      </Card>
 
-      <div className="flex justify-center">
-        <Badge variant="secondary" className="text-xs">
-          {updateSettingsMutation.isPending ? "Salvando..." : "Todas as alterações são salvas automaticamente"}
-        </Badge>
+            <div>
+              <Label htmlFor="additional_info">Informações Adicionais</Label>
+              <Input
+                id="additional_info"
+                value={settings.additional_info}
+                onChange={(e) => handleInputChange('additional_info', e.target.value)}
+                placeholder="✓ Sem taxa de setup • ✓ Cancele quando quiser • ✓ Suporte brasileiro"
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Configurações de Interface */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Configurações de Interface</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="popular_badge_text">Texto do Badge Popular</Label>
+                <Input
+                  id="popular_badge_text"
+                  value={settings.popular_badge_text}
+                  onChange={(e) => handleInputChange('popular_badge_text', e.target.value)}
+                  placeholder="Mais Popular"
+                />
+              </div>
+              <div>
+                <Label htmlFor="cta_button_text">Texto do Botão CTA</Label>
+                <Input
+                  id="cta_button_text"
+                  value={settings.cta_button_text}
+                  onChange={(e) => handleInputChange('cta_button_text', e.target.value)}
+                  placeholder="Assinar Agora"
+                />
+              </div>
+            </div>
+
+            <Separator />
+
+            <div className="space-y-4">
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="show_popular_badge"
+                  checked={settings.show_popular_badge}
+                  onCheckedChange={(checked) => handleInputChange('show_popular_badge', checked)}
+                />
+                <Label htmlFor="show_popular_badge">Mostrar Badge "Popular"</Label>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="show_support_info"
+                  checked={settings.show_support_info}
+                  onCheckedChange={(checked) => handleInputChange('show_support_info', checked)}
+                />
+                <Label htmlFor="show_support_info">Mostrar Informações de Suporte</Label>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Configurações de Suporte */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Configurações de Suporte</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label htmlFor="whatsapp_number">Número do WhatsApp (com código do país)</Label>
+              <Input
+                id="whatsapp_number"
+                value={settings.whatsapp_number}
+                onChange={(e) => handleInputChange('whatsapp_number', e.target.value)}
+                placeholder="556496028022"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="support_text">Texto de Suporte</Label>
+              <Input
+                id="support_text"
+                value={settings.support_text}
+                onChange={(e) => handleInputChange('support_text', e.target.value)}
+                placeholder="Suporte via WhatsApp incluso"
+              />
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
