@@ -10,6 +10,7 @@ import { ConfirmationDialog } from '@/components/ConfirmationDialog';
 declare global {
   interface Window {
     $MPC_loaded?: boolean;
+    attachEvent?: (event: string, callback: () => void) => void;
   }
 }
 
