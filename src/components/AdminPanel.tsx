@@ -5,7 +5,8 @@ import { UserManagement } from '@/components/UserManagement';
 import { AdminLogs } from '@/components/AdminLogs';
 import { AdminDebugPanel } from '@/components/AdminDebugPanel';
 import { AdminTestPanel } from '@/components/AdminTestPanel';
-import { Users, Shield, UserPlus, Settings, ChevronLeft } from 'lucide-react';
+import { SiteSettingsContent } from '@/components/SiteSettingsContent';
+import { Users, Shield, UserPlus, Settings, ChevronLeft, Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 
@@ -78,7 +79,7 @@ export const AdminPanel = () => {
           </div>
           <div>
             <h1 className="text-2xl md:text-3xl font-bold">Painel Administrativo</h1>
-            <p className="text-muted-foreground">Gerencie usuários do sistema</p>
+            <p className="text-muted-foreground">Gerencie usuários e configurações do sistema</p>
           </div>
         </div>
         
@@ -101,18 +102,39 @@ export const AdminPanel = () => {
         </div>
       </div>
 
-      <div className="bg-card rounded-lg border">
-        <div className="p-4 border-b">
-          <div className="flex items-center space-x-2">
-            <Users className="h-5 w-5 text-primary" />
-            <h2 className="text-xl font-semibold">Gerenciamento de Usuários</h2>
+      <Tabs defaultValue="users" className="w-full">
+        <div className="overflow-x-auto pb-2 -mx-4 px-4">
+          <TabsList className="grid w-full min-w-max grid-cols-2 gap-2">
+            <TabsTrigger value="users" className="flex items-center gap-2 text-sm">
+              <Users className="h-4 w-4" />
+              <span>Usuários</span>
+            </TabsTrigger>
+            <TabsTrigger value="site" className="flex items-center gap-2 text-sm">
+              <Globe className="h-4 w-4" />
+              <span>Site</span>
+            </TabsTrigger>
+          </TabsList>
+        </div>
+
+        <TabsContent value="users" className="mt-6 animate-fade-in">
+          <div className="bg-card rounded-lg border">
+            <div className="p-4 border-b">
+              <div className="flex items-center space-x-2">
+                <Users className="h-5 w-5 text-primary" />
+                <h2 className="text-xl font-semibold">Gerenciamento de Usuários</h2>
+              </div>
+            </div>
+            
+            <div className="p-0">
+              <UserManagement />
+            </div>
           </div>
-        </div>
-        
-        <div className="p-0">
-          <UserManagement />
-        </div>
-      </div>
+        </TabsContent>
+
+        <TabsContent value="site" className="mt-6 animate-fade-in">
+          <SiteSettingsContent />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

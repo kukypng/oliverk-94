@@ -1,10 +1,13 @@
+
 import React, { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Check, Star, MessageCircle, ArrowLeft, AlertCircle } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { ConfirmationDialog } from '@/components/ConfirmationDialog';
+import { supabase } from '@/integrations/supabase/client';
 
 declare global {
   interface Window {
@@ -13,9 +16,73 @@ declare global {
   }
 }
 
+interface SiteSettings {
+  plan_name: string;
+  plan_description: string;
+  plan_price: number;
+  plan_currency: string;
+  plan_period: string;
+  plan_features: string[];
+  mercadopago_plan_id?: string;
+  whatsapp_number: string;
+  page_title: string;
+  page_subtitle: string;
+  popular_badge_text: string;
+  cta_button_text: string;
+  support_text: string;
+  show_popular_badge: boolean;
+  show_support_info: boolean;
+  additional_info: string;
+}
+
 export const PlansPage = () => {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const navigate = useNavigate();
+
+  // Fetch site settings from database
+  const { data: settings, isLoading } = useQuery({
+    queryKey: ['site-settings'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('site_settings')
+        .select('*')
+        .single();
+      
+      if (error) {
+        console.error('Error fetching site settings:', error);
+        // Return default fallback values
+        return {
+          plan_name: 'Plano Profissional',
+          plan_description: 'Para assistências técnicas que querem crescer',
+          plan_price: 15,
+          plan_currency: 'R$',
+          plan_period: '/mês',
+          plan_features: [
+            "Sistema completo de orçamentos",
+            "Gestão de clientes ilimitada",
+            "Relatórios e estatísticas",
+            "Cálculos automáticos",
+            "Controle de dispositivos",
+            "Suporte técnico incluso",
+            "Atualizações gratuitas",
+            "Backup automático"
+          ],
+          mercadopago_plan_id: '2c9380849763dae0019775d20c5b05d3',
+          whatsapp_number: '556496028022',
+          page_title: 'Escolha seu Plano',
+          page_subtitle: 'Tenha acesso completo ao sistema de gestão de orçamentos mais eficiente para assistências técnicas.',
+          popular_badge_text: 'Mais Popular',
+          cta_button_text: 'Assinar Agora',
+          support_text: 'Suporte via WhatsApp incluso',
+          show_popular_badge: true,
+          show_support_info: true,
+          additional_info: '✓ Sem taxa de setup • ✓ Cancele quando quiser • ✓ Suporte brasileiro'
+        } as SiteSettings;
+      }
+      
+      return data as SiteSettings;
+    }
+  });
 
   useEffect(() => {
     // Load MercadoPago script
@@ -52,20 +119,47 @@ export const PlansPage = () => {
 
   const handleConfirmPayment = () => {
     setShowConfirmation(false);
-    // Redirect to MercadoPago
-    window.location.href = "https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=2c9380849763dae0019775d20c5b05d3";
+    // Use dynamic MercadoPago plan ID or fallback
+    const planId = settings?.mercadopago_plan_id || "2c9380849763dae0019775d20c5b05d3";
+    window.location.href = `https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=${planId}`;
   };
 
-  const planFeatures = [
-    "Sistema completo de orçamentos",
-    "Gestão de clientes ilimitada",
-    "Relatórios e estatísticas",
-    "Cálculos automáticos",
-    "Controle de dispositivos",
-    "Suporte técnico incluso",
-    "Atualizações gratuitas",
-    "Backup automático"
-  ];
+  // Show loading state while fetching settings
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-primary/10 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  // Use settings or fallback values
+  const config = settings || {
+    plan_name: 'Plano Profissional',
+    plan_description: 'Para assistências técnicas que querem crescer',
+    plan_price: 15,
+    plan_currency: 'R$',
+    plan_period: '/mês',
+    plan_features: [
+      "Sistema completo de orçamentos",
+      "Gestão de clientes ilimitada",
+      "Relatórios e estatísticas",
+      "Cálculos automáticos",
+      "Controle de dispositivos",
+      "Suporte técnico incluso",
+      "Atualizações gratuitas",
+      "Backup automático"
+    ],
+    whatsapp_number: '556496028022',
+    page_title: 'Escolha seu Plano',
+    page_subtitle: 'Tenha acesso completo ao sistema de gestão de orçamentos mais eficiente para assistências técnicas.',
+    popular_badge_text: 'Mais Popular',
+    cta_button_text: 'Assinar Agora',
+    support_text: 'Suporte via WhatsApp incluso',
+    show_popular_badge: true,
+    show_support_info: true,
+    additional_info: '✓ Sem taxa de setup • ✓ Cancele quando quiser • ✓ Suporte brasileiro'
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-primary/10 relative overflow-hidden">
@@ -75,12 +169,10 @@ export const PlansPage = () => {
         <div className="absolute -bottom-1/2 -left-1/2 w-96 h-96 bg-primary/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
       </div>
 
-      {/* Theme toggle */}
       <div className="absolute top-6 right-6 z-10">
         <ThemeToggle />
       </div>
 
-      {/* Back button */}
       <div className="absolute top-6 left-6 z-10">
         <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
           <ArrowLeft className="h-4 w-4 mr-2" />
@@ -96,39 +188,41 @@ export const PlansPage = () => {
             <h1 className="text-4xl font-bold text-foreground">Oliver</h1>
           </div>
           <h2 className="text-3xl lg:text-5xl font-bold mb-6 text-foreground">
-            Escolha seu <span className="text-primary">Plano</span>
+            {config.page_title}
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Tenha acesso completo ao sistema de gestão de orçamentos mais eficiente para assistências técnicas.
+            {config.page_subtitle}
           </p>
         </div>
 
         {/* Plan Card */}
         <div className="max-w-md mx-auto">
           <Card className="glass-card animate-scale-in border-0 shadow-2xl backdrop-blur-xl relative overflow-hidden">
-            {/* Popular badge */}
-            <div className="absolute top-4 right-4">
-              <div className="bg-primary text-primary-foreground px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1">
-                <Star className="h-3 w-3" />
-                Mais Popular
+            {/* Popular badge - conditionally rendered */}
+            {config.show_popular_badge && (
+              <div className="absolute top-4 right-4">
+                <div className="bg-primary text-primary-foreground px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1">
+                  <Star className="h-3 w-3" />
+                  {config.popular_badge_text}
+                </div>
               </div>
-            </div>
+            )}
 
             <CardHeader className="text-center pb-6 pt-8">
-              <CardTitle className="text-3xl text-foreground mb-2">Plano Profissional</CardTitle>
+              <CardTitle className="text-3xl text-foreground mb-2">{config.plan_name}</CardTitle>
               <CardDescription className="text-base mb-4">
-                Para assistências técnicas que querem crescer
+                {config.plan_description}
               </CardDescription>
               <div className="mb-6">
-                <span className="text-5xl font-bold text-primary">R$ 15</span>
-                <span className="text-muted-foreground text-lg">/mês</span>
+                <span className="text-5xl font-bold text-primary">{config.plan_currency} {config.plan_price}</span>
+                <span className="text-muted-foreground text-lg">{config.plan_period}</span>
               </div>
             </CardHeader>
 
             <CardContent className="space-y-6">
               {/* Features */}
               <div className="space-y-3">
-                {planFeatures.map((feature, index) => (
+                {config.plan_features.map((feature, index) => (
                   <div key={index} className="flex items-center gap-3">
                     <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
                       <Check className="h-3 w-3 text-primary" />
@@ -144,16 +238,18 @@ export const PlansPage = () => {
                 className="w-full h-12 text-base bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-xl transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl"
                 size="lg"
               >
-                Assinar Agora
+                {config.cta_button_text}
               </Button>
 
-              {/* Support info */}
-              <div className="text-center pt-4 border-t border-border/50">
-                <p className="text-sm text-muted-foreground flex items-center justify-center gap-2">
-                  <MessageCircle className="h-4 w-4" />
-                  Suporte via WhatsApp incluso
-                </p>
-              </div>
+              {/* Support info - conditionally rendered */}
+              {config.show_support_info && (
+                <div className="text-center pt-4 border-t border-border/50">
+                  <p className="text-sm text-muted-foreground flex items-center justify-center gap-2">
+                    <MessageCircle className="h-4 w-4" />
+                    {config.support_text}
+                  </p>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -161,7 +257,7 @@ export const PlansPage = () => {
         {/* Additional info */}
         <div className="text-center mt-12 space-y-4">
           <p className="text-muted-foreground">
-            ✓ Sem taxa de setup • ✓ Cancele quando quiser • ✓ Suporte brasileiro
+            {config.additional_info}
           </p>
           <p className="text-sm text-muted-foreground">
             Já tem uma conta?{' '}
@@ -205,7 +301,7 @@ export const PlansPage = () => {
               
               <div className="text-center">
                 <Button
-                  onClick={() => window.open('https://wa.me/556496028022', '_blank')}
+                  onClick={() => window.open(`https://wa.me/${config.whatsapp_number}`, '_blank')}
                   variant="outline"
                   className="w-full mb-3"
                 >
@@ -213,7 +309,7 @@ export const PlansPage = () => {
                   Abrir WhatsApp
                 </Button>
                 <p className="text-xs text-muted-foreground">
-                  (64) 9602-8022
+                  ({config.whatsapp_number.replace(/^55/, '').replace(/(\d{2})(\d{4,5})(\d{4})/, '($1) $2-$3')})
                 </p>
               </div>
 

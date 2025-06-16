@@ -425,6 +425,72 @@ export type Database = {
         }
         Relationships: []
       }
+      site_settings: {
+        Row: {
+          additional_info: string
+          created_at: string
+          cta_button_text: string
+          id: string
+          mercadopago_plan_id: string | null
+          page_subtitle: string
+          page_title: string
+          plan_currency: string
+          plan_description: string
+          plan_features: Json
+          plan_name: string
+          plan_period: string
+          plan_price: number
+          popular_badge_text: string
+          show_popular_badge: boolean
+          show_support_info: boolean
+          support_text: string
+          updated_at: string
+          whatsapp_number: string
+        }
+        Insert: {
+          additional_info?: string
+          created_at?: string
+          cta_button_text?: string
+          id?: string
+          mercadopago_plan_id?: string | null
+          page_subtitle?: string
+          page_title?: string
+          plan_currency?: string
+          plan_description?: string
+          plan_features?: Json
+          plan_name?: string
+          plan_period?: string
+          plan_price?: number
+          popular_badge_text?: string
+          show_popular_badge?: boolean
+          show_support_info?: boolean
+          support_text?: string
+          updated_at?: string
+          whatsapp_number?: string
+        }
+        Update: {
+          additional_info?: string
+          created_at?: string
+          cta_button_text?: string
+          id?: string
+          mercadopago_plan_id?: string | null
+          page_subtitle?: string
+          page_title?: string
+          plan_currency?: string
+          plan_description?: string
+          plan_features?: Json
+          plan_name?: string
+          plan_period?: string
+          plan_price?: number
+          popular_badge_text?: string
+          show_popular_badge?: boolean
+          show_support_info?: boolean
+          support_text?: string
+          updated_at?: string
+          whatsapp_number?: string
+        }
+        Relationships: []
+      }
       user_activity_metrics: {
         Row: {
           avg_session_duration: unknown | null
