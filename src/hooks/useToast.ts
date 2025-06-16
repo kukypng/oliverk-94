@@ -1,60 +1,46 @@
 
-import { toast } from 'sonner';
+// Consolidated toast hook - replaces both useToast and useEnhancedToast
+import { toast } from "sonner";
 
 interface ToastOptions {
   title: string;
   description?: string;
-  action?: {
-    label: string;
-    onClick: () => void;
-  };
+  variant?: "default" | "destructive";
 }
 
 export const useToast = () => {
-  const showSuccess = (options: ToastOptions) => {
-    toast.success(options.title, {
-      description: options.description,
-      action: options.action ? {
-        label: options.action.label,
-        onClick: options.action.onClick,
-      } : undefined,
+  const showSuccess = ({ title, description }: Omit<ToastOptions, 'variant'>) => {
+    toast.success(title, {
+      description,
     });
   };
 
-  const showError = (options: ToastOptions) => {
-    toast.error(options.title, {
-      description: options.description,
-      action: options.action ? {
-        label: options.action.label,
-        onClick: options.action.onClick,
-      } : undefined,
+  const showError = ({ title, description }: Omit<ToastOptions, 'variant'>) => {
+    toast.error(title, {
+      description,
     });
   };
 
-  const showWarning = (options: ToastOptions) => {
-    toast.warning(options.title, {
-      description: options.description,
-      action: options.action ? {
-        label: options.action.label,
-        onClick: options.action.onClick,
-      } : undefined,
+  const showInfo = ({ title, description }: Omit<ToastOptions, 'variant'>) => {
+    toast(title, {
+      description,
     });
   };
 
-  const showInfo = (options: ToastOptions) => {
-    toast.info(options.title, {
-      description: options.description,
-      action: options.action ? {
-        label: options.action.label,
-        onClick: options.action.onClick,
-      } : undefined,
+  const showWarning = ({ title, description }: Omit<ToastOptions, 'variant'>) => {
+    toast.warning(title, {
+      description,
     });
   };
 
   return {
+    toast,
     showSuccess,
     showError,
-    showWarning,
     showInfo,
+    showWarning,
   };
 };
+
+// Legacy compatibility
+export const useEnhancedToast = useToast;
