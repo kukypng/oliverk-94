@@ -1,18 +1,17 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle, MessageCircle, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
-
 export const PurchaseSuccessPage = () => {
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-primary/10 relative overflow-hidden">
+  return <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-primary/10 relative overflow-hidden">
       {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-1/2 -right-1/2 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute -bottom-1/2 -left-1/2 w-96 h-96 bg-primary/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute -bottom-1/2 -left-1/2 w-96 h-96 bg-primary/5 rounded-full blur-3xl animate-pulse" style={{
+        animationDelay: '1s'
+      }}></div>
       </div>
 
       {/* Theme toggle */}
@@ -64,11 +63,7 @@ export const PurchaseSuccessPage = () => {
               </div>
 
               {/* WhatsApp Contact Button */}
-              <Button 
-                onClick={() => window.open('https://wa.me/556496028022', '_blank')}
-                className="w-full h-12 text-base bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl"
-                size="lg"
-              >
+              <Button onClick={() => window.open('https://wa.me/556496028022', '_blank')} className="w-full h-12 text-base bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl" size="lg">
                 <MessageCircle className="h-5 w-5 mr-2" />
                 Enviar Comprovante via WhatsApp
               </Button>
@@ -77,9 +72,7 @@ export const PurchaseSuccessPage = () => {
                 <p className="text-sm text-muted-foreground mb-2">
                   <strong>WhatsApp:</strong> (64) 9602-8022
                 </p>
-                <p className="text-xs text-muted-foreground">
-                  Suporte disponível de segunda a sexta, das 8h às 18h
-                </p>
+                <p className="text-xs text-muted-foreground">Suporte disponível de segunda a sábado, das 8h às 18h</p>
               </div>
 
               {/* Back to login */}
@@ -99,6 +92,5 @@ export const PurchaseSuccessPage = () => {
           </p>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
