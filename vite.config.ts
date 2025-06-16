@@ -53,14 +53,14 @@ export default defineConfig(({ mode }) => ({
         }
       }
     },
-    // Enable compression
-    minify: 'terser',
-    terserOptions: {
+    // Enable compression with better error handling
+    minify: mode === 'production' ? 'terser' : false,
+    terserOptions: mode === 'production' ? {
       compress: {
-        drop_console: mode === 'production',
-        drop_debugger: mode === 'production'
+        drop_console: true,
+        drop_debugger: true
       }
-    },
+    } : undefined,
     // Chunk size warnings
     chunkSizeWarningLimit: 1000,
     sourcemap: mode !== 'production'
