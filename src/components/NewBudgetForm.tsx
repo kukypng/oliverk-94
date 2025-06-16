@@ -12,7 +12,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { useEnhancedToast } from '@/hooks/useEnhancedToast';
 import { ArrowLeft } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
-
 interface BudgetFormData {
   deviceType: string;
   deviceModel: string;
@@ -31,12 +30,10 @@ interface BudgetFormData {
   validityDays: number;
   paymentCondition: string;
 }
-
 interface NewBudgetFormProps {
   onBack: () => void;
   initialData?: any;
 }
-
 export const NewBudgetForm = ({
   onBack,
   initialData
@@ -49,7 +46,6 @@ export const NewBudgetForm = ({
     user
   } = useAuth();
   const queryClient = useQueryClient();
-  
   const [formData, setFormData] = useState<BudgetFormData>({
     deviceType: 'Smartphone',
     deviceModel: '',
@@ -68,7 +64,6 @@ export const NewBudgetForm = ({
     validityDays: 15,
     paymentCondition: 'À Vista'
   });
-
   useEffect(() => {
     if (initialData) {
       setFormData({
@@ -87,7 +82,7 @@ export const NewBudgetForm = ({
         enableInstallmentPrice: !!initialData.installment_price,
         notes: initialData.notes || '',
         validityDays: 15,
-        paymentCondition: initialData.payment_condition || 'À Vista',
+        paymentCondition: initialData.payment_condition || 'À Vista'
       });
       showSuccess({
         title: "Orçamento copiado!",
@@ -125,7 +120,6 @@ export const NewBudgetForm = ({
       return data;
     }
   });
-
   const createBudgetMutation = useMutation({
     mutationFn: async (data: BudgetFormData) => {
       if (!user) {
@@ -160,7 +154,6 @@ export const NewBudgetForm = ({
         valid_until: validUntil.toISOString(),
         payment_condition: data.paymentCondition
       }).select('id').single();
-      
       if (budgetError) {
         console.error('Budget creation error:', budgetError);
         throw budgetError;
@@ -181,7 +174,6 @@ export const NewBudgetForm = ({
         installment_price: data.enableInstallmentPrice ? Math.round(data.installmentPrice * 100) : null,
         warranty_months: data.warrantyMonths
       });
-      
       if (partError) {
         console.error('Budget part creation error:', partError);
         throw partError;
@@ -210,7 +202,6 @@ export const NewBudgetForm = ({
       });
     }
   });
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) {
@@ -229,14 +220,12 @@ export const NewBudgetForm = ({
     }
     createBudgetMutation.mutate(formData);
   };
-
   if (!user) {
     return <div className="p-8 text-center">
         <h1 className="text-2xl font-bold text-gray-900 mb-4">Acesso Negado</h1>
         <p className="text-gray-600">Você precisa estar logado para criar orçamentos.</p>
       </div>;
   }
-
   return <div className="p-4 sm:p-8">
       <div className="flex items-center mb-6 sm:mb-8">
         <Button variant="ghost" onClick={onBack} className="mr-4">
@@ -289,17 +278,11 @@ export const NewBudgetForm = ({
             </div>
 
             <div>
-              <Label htmlFor="issue">Problema/Defeito</Label>
-              <Textarea 
-                id="issue" 
-                value={formData.issue} 
-                onChange={e => setFormData({
-                  ...formData,
-                  issue: e.target.value
-                })} 
-                placeholder="Descreva o problema ou defeito do aparelho..." 
-                className="min-h-[80px]"
-              />
+              <Label htmlFor="issue">Problema Relatado*</Label>
+              <Textarea id="issue" value={formData.issue} onChange={e => setFormData({
+              ...formData,
+              issue: e.target.value
+            })} placeholder="Descreva o problema ou defeito do aparelho..." className="min-h-[80px]" />
             </div>
 
             <div>
@@ -377,11 +360,11 @@ export const NewBudgetForm = ({
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {Array.from({ length: 12 }, (_, i) => i + 1).map((installment) => (
-                        <SelectItem key={installment} value={installment.toString()}>
+                      {Array.from({
+                    length: 12
+                  }, (_, i) => i + 1).map(installment => <SelectItem key={installment} value={installment.toString()}>
                           {`${installment}x`}
-                        </SelectItem>
-                      ))}
+                        </SelectItem>)}
                     </SelectContent>
                   </Select>
                 </div>
