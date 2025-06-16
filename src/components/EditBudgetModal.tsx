@@ -1,8 +1,5 @@
-
 import React, { useState, useEffect } from 'react';
-import { Dialog, DialogContent,
-
- DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -11,15 +8,19 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-
 interface EditBudgetModalProps {
   budget: any;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
-
-export const EditBudgetModal = ({ budget, open, onOpenChange }: EditBudgetModalProps) => {
-  const { toast } = useToast();
+export const EditBudgetModal = ({
+  budget,
+  open,
+  onOpenChange
+}: EditBudgetModalProps) => {
+  const {
+    toast
+  } = useToast();
   const queryClient = useQueryClient();
   const [formData, setFormData] = useState({
     device_type: '',
@@ -30,7 +31,7 @@ export const EditBudgetModal = ({ budget, open, onOpenChange }: EditBudgetModalP
     payment_condition: '',
     installments: 1,
     notes: '',
-    validity_period_days: 15,
+    validity_period_days: 15
   });
 
   // Carregar dados do orçamento quando o modal abrir ou budget mudar
@@ -45,7 +46,6 @@ export const EditBudgetModal = ({ budget, open, onOpenChange }: EditBudgetModalP
           days = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
         }
       }
-
       setFormData({
         device_type: budget.device_type || '',
         device_model: budget.device_model || '',
@@ -55,17 +55,15 @@ export const EditBudgetModal = ({ budget, open, onOpenChange }: EditBudgetModalP
         payment_condition: budget.payment_condition || 'À Vista',
         installments: budget.installments || 1,
         notes: budget.notes || '',
-        validity_period_days: days,
+        validity_period_days: days
       });
     }
   }, [budget, open]);
-
   const updateBudgetMutation = useMutation({
     mutationFn: async (data: any) => {
       const createdAt = new Date(budget.created_at);
       const validUntilDate = new Date(createdAt);
       validUntilDate.setDate(validUntilDate.getDate() + Number(data.validity_period_days));
-
       const updateData = {
         device_type: data.device_type,
         device_model: data.device_model,
@@ -75,69 +73,62 @@ export const EditBudgetModal = ({ budget, open, onOpenChange }: EditBudgetModalP
         payment_condition: data.payment_condition,
         installments: data.installments,
         notes: data.notes,
-        valid_until: validUntilDate.toISOString(),
+        valid_until: validUntilDate.toISOString()
       };
-      
-      const { error } = await supabase
-        .from('budgets')
-        .update(updateData)
-        .eq('id', budget.id);
-      
+      const {
+        error
+      } = await supabase.from('budgets').update(updateData).eq('id', budget.id);
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['budgets'] });
+      queryClient.invalidateQueries({
+        queryKey: ['budgets']
+      });
       toast({
         title: "Orçamento atualizado",
-        description: "As alterações foram salvas com sucesso.",
+        description: "As alterações foram salvas com sucesso."
       });
       onOpenChange(false);
     },
-    onError: (error) => {
+    onError: error => {
       console.error('Error updating budget:', error);
       toast({
         title: "Erro ao atualizar",
         description: "Ocorreu um erro ao salvar as alterações.",
-        variant: "destructive",
+        variant: "destructive"
       });
-    },
+    }
   });
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Validação básica
     if (!formData.device_model || !formData.issue || !formData.total_price) {
       toast({
         title: "Campos obrigatórios",
         description: "Preencha todos os campos obrigatórios.",
-        variant: "destructive",
+        variant: "destructive"
       });
       return;
     }
-
     const totalPrice = parseFloat(formData.total_price);
     if (isNaN(totalPrice) || totalPrice <= 0) {
       toast({
         title: "Valor inválido",
         description: "Digite um valor válido para o orçamento.",
-        variant: "destructive",
+        variant: "destructive"
       });
       return;
     }
-
     updateBudgetMutation.mutate(formData);
   };
-
   const handleInputChange = (field: string, value: string | number) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
     }));
   };
-
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+  return <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Editar Orçamento</DialogTitle>
@@ -148,8 +139,8 @@ export const EditBudgetModal = ({ budget, open, onOpenChange }: EditBudgetModalP
             <h3 className="font-semibold text-lg">Informações do Dispositivo</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="device_type">Tipo de Dispositivo *</Label>
-                <Select value={formData.device_type} onValueChange={(value) => handleInputChange('device_type', value)}>
+                <Label htmlFor="device_type">Tipo de Dispositivo*</Label>
+                <Select value={formData.device_type} onValueChange={value => handleInputChange('device_type', value)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Selecione o tipo" />
                   </SelectTrigger>
@@ -165,33 +156,16 @@ export const EditBudgetModal = ({ budget, open, onOpenChange }: EditBudgetModalP
               </div>
               <div className="space-y-2">
                 <Label htmlFor="device_brand">Marca</Label>
-                <Input
-                  id="device_brand"
-                  value={formData.device_brand}
-                  onChange={(e) => handleInputChange('device_brand', e.target.value)}
-                  placeholder="Ex: Apple, Samsung, etc."
-                />
+                <Input id="device_brand" value={formData.device_brand} onChange={e => handleInputChange('device_brand', e.target.value)} placeholder="Ex: Apple, Samsung, etc." />
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="device_model">Modelo do Dispositivo *</Label>
-              <Input
-                id="device_model"
-                value={formData.device_model}
-                onChange={(e) => handleInputChange('device_model', e.target.value)}
-                placeholder="Ex: iPhone 13, Galaxy S21, etc."
-                required
-              />
+              <Label htmlFor="device_model">Modelo do Dispositivo*</Label>
+              <Input id="device_model" value={formData.device_model} onChange={e => handleInputChange('device_model', e.target.value)} placeholder="Ex: iPhone 13, Galaxy S21, etc." required />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="issue">Problema Relatado *</Label>
-              <Input
-                id="issue"
-                value={formData.issue}
-                onChange={(e) => handleInputChange('issue', e.target.value)}
-                placeholder="Descreva o problema"
-                required
-              />
+              <Label htmlFor="issue">Problema Relatado*</Label>
+              <Input id="issue" value={formData.issue} onChange={e => handleInputChange('issue', e.target.value)} placeholder="Descreva o problema" required />
             </div>
           </div>
 
@@ -200,30 +174,19 @@ export const EditBudgetModal = ({ budget, open, onOpenChange }: EditBudgetModalP
             <h3 className="font-semibold text-lg">Informações do Orçamento</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="total_price">Valor Total (R$) *</Label>
-                <Input
-                  id="total_price"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  value={formData.total_price}
-                  onChange={(e) => handleInputChange('total_price', e.target.value)}
-                  placeholder="0.00"
-                  required
-                />
+                <Label htmlFor="total_price">Valor Total (R$)*</Label>
+                <Input id="total_price" type="number" step="0.01" min="0" value={formData.total_price} onChange={e => handleInputChange('total_price', e.target.value)} placeholder="0.00" required />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="installments">Parcelas</Label>
-                <Select value={formData.installments.toString()} onValueChange={(value) => handleInputChange('installments', parseInt(value))}>
+                <Select value={formData.installments.toString()} onValueChange={value => handleInputChange('installments', parseInt(value))}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {[1, 2, 3, 4, 5, 6, 10, 12].map(num => (
-                      <SelectItem key={num} value={num.toString()}>
+                    {[1, 2, 3, 4, 5, 6, 10, 12].map(num => <SelectItem key={num} value={num.toString()}>
                         {num}x {num === 1 ? '(À vista)' : ''}
-                      </SelectItem>
-                    ))}
+                      </SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
@@ -231,7 +194,7 @@ export const EditBudgetModal = ({ budget, open, onOpenChange }: EditBudgetModalP
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="payment_condition">Condição de Pagamento</Label>
-                <Select value={formData.payment_condition} onValueChange={(value) => handleInputChange('payment_condition', value)}>
+                <Select value={formData.payment_condition} onValueChange={value => handleInputChange('payment_condition', value)}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -245,15 +208,8 @@ export const EditBudgetModal = ({ budget, open, onOpenChange }: EditBudgetModalP
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="validity_period_days">Validade (dias) *</Label>
-                <Input
-                  id="validity_period_days"
-                  type="number"
-                  min="1"
-                  value={formData.validity_period_days}
-                  onChange={(e) => handleInputChange('validity_period_days', parseInt(e.target.value, 10) || 1)}
-                  required
-                />
+                <Label htmlFor="validity_period_days">Validade (dias)*</Label>
+                <Input id="validity_period_days" type="number" min="1" value={formData.validity_period_days} onChange={e => handleInputChange('validity_period_days', parseInt(e.target.value, 10) || 1)} required />
               </div>
             </div>
           </div>
@@ -261,13 +217,7 @@ export const EditBudgetModal = ({ budget, open, onOpenChange }: EditBudgetModalP
           {/* Observações */}
           <div className="space-y-2">
             <Label htmlFor="notes">Observações</Label>
-            <Textarea
-              id="notes"
-              value={formData.notes}
-              onChange={(e) => handleInputChange('notes', e.target.value)}
-              placeholder="Observações adicionais sobre o orçamento..."
-              rows={3}
-            />
+            <Textarea id="notes" value={formData.notes} onChange={e => handleInputChange('notes', e.target.value)} placeholder="Observações adicionais sobre o orçamento..." rows={3} />
           </div>
 
           <div className="flex justify-end space-x-2 pt-4">
@@ -280,6 +230,5 @@ export const EditBudgetModal = ({ budget, open, onOpenChange }: EditBudgetModalP
           </div>
         </form>
       </DialogContent>
-    </Dialog>
-  );
+    </Dialog>;
 };
