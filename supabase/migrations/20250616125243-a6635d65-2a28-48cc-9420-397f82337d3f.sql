@@ -15,6 +15,7 @@ CREATE TABLE public.site_settings (
   
   -- Payment configuration
   mercadopago_plan_id text,
+  payment_url text NOT NULL DEFAULT 'https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=2c9380849763dae0019775d20c5b05d3',
   whatsapp_number text NOT NULL DEFAULT '556496028022',
   
   -- Page content

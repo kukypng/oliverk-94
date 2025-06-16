@@ -21,6 +21,7 @@ interface SiteSettings {
   plan_period: string;
   plan_features: string[];
   mercadopago_plan_id?: string;
+  payment_url: string;
   whatsapp_number: string;
   page_title: string;
   page_subtitle: string;
@@ -121,6 +122,7 @@ export const SiteSettingsContent = () => {
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex items-center space-x-4">
         <div className="bg-primary/10 p-3 rounded-xl">
           <Globe className="h-8 w-8 text-primary" />
@@ -299,6 +301,19 @@ export const SiteSettingsContent = () => {
           <CardDescription>Configure integrações de pagamento e suporte</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          <div>
+            <Label htmlFor="payment_url">URL de Pagamento</Label>
+            <Input
+              id="payment_url"
+              value={settings.payment_url}
+              onChange={(e) => handleInputChange('payment_url', e.target.value)}
+              placeholder="Ex: https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=..."
+            />
+            <p className="text-sm text-muted-foreground mt-1">
+              Link para onde o usuário será redirecionado ao clicar em "Assinar Agora"
+            </p>
+          </div>
+
           <div>
             <Label htmlFor="mercadopago_plan_id">ID do Plano MercadoPago</Label>
             <Input

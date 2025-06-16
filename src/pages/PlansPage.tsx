@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
@@ -24,6 +23,7 @@ interface SiteSettings {
   plan_period: string;
   plan_features: string[];
   mercadopago_plan_id?: string;
+  payment_url: string;
   whatsapp_number: string;
   page_title: string;
   page_subtitle: string;
@@ -68,6 +68,7 @@ export const PlansPage = () => {
             "Backup automático"
           ],
           mercadopago_plan_id: '2c9380849763dae0019775d20c5b05d3',
+          payment_url: 'https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=2c9380849763dae0019775d20c5b05d3',
           whatsapp_number: '556496028022',
           page_title: 'Escolha seu Plano',
           page_subtitle: 'Tenha acesso completo ao sistema de gestão de orçamentos mais eficiente para assistências técnicas.',
@@ -119,9 +120,8 @@ export const PlansPage = () => {
 
   const handleConfirmPayment = () => {
     setShowConfirmation(false);
-    // Use dynamic MercadoPago plan ID or fallback
-    const planId = settings?.mercadopago_plan_id || "2c9380849763dae0019775d20c5b05d3";
-    window.location.href = `https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=${planId}`;
+    // Use the configured payment URL
+    window.location.href = settings?.payment_url || "https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=2c9380849763dae0019775d20c5b05d3";
   };
 
   // Show loading state while fetching settings
@@ -150,6 +150,7 @@ export const PlansPage = () => {
       "Atualizações gratuitas",
       "Backup automático"
     ],
+    payment_url: 'https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=2c9380849763dae0019775d20c5b05d3',
     whatsapp_number: '556496028022',
     page_title: 'Escolha seu Plano',
     page_subtitle: 'Tenha acesso completo ao sistema de gestão de orçamentos mais eficiente para assistências técnicas.',
