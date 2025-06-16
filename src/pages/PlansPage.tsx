@@ -1,5 +1,6 @@
+
 import React, { useState, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Check, Star, MessageCircle, ArrowLeft, AlertCircle } from 'lucide-react';
@@ -34,14 +35,72 @@ interface SiteSettings {
   additional_info: string;
 }
 
+// Default settings object
+const defaultSettings: SiteSettings = {
+  plan_name: 'Plano Profissional',
+  plan_description: 'Para assistências técnicas que querem crescer',
+  plan_price: 15,
+  plan_currency: 'R$',
+  plan_period: '/mês',
+  plan_features: [
+    'Sistema completo de orçamentos',
+    'Gestão de clientes ilimitada',
+    'Relatórios e estatísticas',
+    'Cálculos automáticos',
+    'Controle de dispositivos',
+    'Suporte técnico incluso',
+    'Atualizações gratuitas',
+    'Backup automático'
+  ],
+  payment_url: 'https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=2c9380849763dae0019775d20c5b05d3',
+  whatsapp_number: '556496028022',
+  page_title: 'Escolha seu Plano',
+  page_subtitle: 'Tenha acesso completo ao sistema de gestão de orçamentos mais eficiente para assistências técnicas.',
+  popular_badge_text: 'Mais Popular',
+  cta_button_text: 'Assinar Agora',
+  support_text: 'Suporte via WhatsApp incluso',
+  show_popular_badge: true,
+  show_support_info: true,
+  additional_info: '✓ Sem taxa de setup • ✓ Cancele quando quiser • ✓ Suporte brasileiro'
+};
+
 export const PlansPage = () => {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  // Mutation to create default settings
+  const createDefaultSettingsMutation = useMutation({
+    mutationFn: async () => {
+      console.log('Creating default site settings...');
+      const { data, error } = await supabase
+        .from('site_settings')
+        .insert([defaultSettings])
+        .select()
+        .single();
+      
+      if (error) {
+        console.error('Error creating default settings:', error);
+        throw error;
+      }
+      
+      console.log('Default settings created:', data);
+      return data as SiteSettings;
+    },
+    onSuccess: (data) => {
+      console.log('Default settings created successfully');
+      queryClient.setQueryData(['site-settings'], data);
+    },
+    onError: (error) => {
+      console.error('Failed to create default settings:', error);
+    }
+  });
 
   // Fetch site settings from database
-  const { data: settings, isLoading } = useQuery({
+  const { data: settings, isLoading, error } = useQuery({
     queryKey: ['site-settings'],
     queryFn: async () => {
+      console.log('Fetching site settings...');
       const { data, error } = await supabase
         .from('site_settings')
         .select('*')
@@ -49,11 +108,21 @@ export const PlansPage = () => {
       
       if (error) {
         console.error('Error fetching site settings:', error);
+        
+        // If no settings found, create default ones
+        if (error.code === 'PGRST116') {
+          console.log('No settings found, creating default settings...');
+          createDefaultSettingsMutation.mutate();
+          return defaultSettings;
+        }
+        
         throw error;
       }
       
+      console.log('Site settings fetched:', data);
       return data as SiteSettings;
-    }
+    },
+    retry: false
   });
 
   useEffect(() => {
@@ -92,35 +161,49 @@ export const PlansPage = () => {
   const handleConfirmPayment = () => {
     setShowConfirmation(false);
     
-    if (!settings?.payment_url) {
-      console.error('No payment URL configured by admin');
+    const currentSettings = settings || defaultSettings;
+    
+    if (!currentSettings.payment_url) {
+      console.error('No payment URL configured');
       return;
     }
     
-    console.log('Redirecting to admin-configured payment URL:', settings.payment_url);
-    window.location.href = settings.payment_url;
+    console.log('Redirecting to payment URL:', currentSettings.payment_url);
+    window.location.href = currentSettings.payment_url;
   };
 
-  // Show loading state while fetching settings
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-primary/10 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
-
-  // If no settings found, show error
-  if (!settings) {
+  // Show loading state while fetching settings or creating defaults
+  if (isLoading || createDefaultSettingsMutation.isPending) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-primary/10 flex items-center justify-center">
         <div className="text-center">
-          <p className="text-muted-foreground">Configurações do site não encontradas.</p>
-          <p className="text-sm text-muted-foreground mt-2">Entre em contato com o administrador.</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">
+            {createDefaultSettingsMutation.isPending ? 'Configurando sistema...' : 'Carregando...'}
+          </p>
         </div>
       </div>
     );
   }
+
+  // Show error state only for non-recoverable errors
+  if (error && !createDefaultSettingsMutation.isPending) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-primary/10 flex items-center justify-center">
+        <div className="text-center">
+          <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
+          <h2 className="text-xl font-semibold mb-2">Erro ao carregar configurações</h2>
+          <p className="text-muted-foreground mb-4">Ocorreu um erro ao carregar as configurações do site.</p>
+          <Button onClick={() => window.location.reload()}>
+            Tentar novamente
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // Use settings or fallback to default
+  const currentSettings = settings || defaultSettings;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-primary/10 relative overflow-hidden">
@@ -160,30 +243,30 @@ export const PlansPage = () => {
         <div className="max-w-md mx-auto">
           <Card className="glass-card animate-scale-in border-0 shadow-2xl backdrop-blur-xl relative overflow-hidden">
             {/* Popular badge - conditionally rendered */}
-            {settings.show_popular_badge && (
+            {currentSettings.show_popular_badge && (
               <div className="absolute top-4 right-4">
                 <div className="bg-primary text-primary-foreground px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1">
                   <Star className="h-3 w-3" />
-                  {settings.popular_badge_text}
+                  {currentSettings.popular_badge_text}
                 </div>
               </div>
             )}
 
             <CardHeader className="text-center pb-6 pt-8">
-              <CardTitle className="text-3xl text-foreground mb-2">{settings.plan_name}</CardTitle>
+              <CardTitle className="text-3xl text-foreground mb-2">{currentSettings.plan_name}</CardTitle>
               <CardDescription className="text-base mb-4">
-                {settings.plan_description}
+                {currentSettings.plan_description}
               </CardDescription>
               <div className="mb-6">
-                <span className="text-5xl font-bold text-primary">{settings.plan_currency} {settings.plan_price}</span>
-                <span className="text-muted-foreground text-lg">{settings.plan_period}</span>
+                <span className="text-5xl font-bold text-primary">{currentSettings.plan_currency} {currentSettings.plan_price}</span>
+                <span className="text-muted-foreground text-lg">{currentSettings.plan_period}</span>
               </div>
             </CardHeader>
 
             <CardContent className="space-y-6">
               {/* Features */}
               <div className="space-y-3">
-                {settings.plan_features.map((feature, index) => (
+                {currentSettings.plan_features.map((feature, index) => (
                   <div key={index} className="flex items-center gap-3">
                     <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
                       <Check className="h-3 w-3 text-primary" />
@@ -199,15 +282,15 @@ export const PlansPage = () => {
                 className="w-full h-12 text-base bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-xl transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl"
                 size="lg"
               >
-                {settings.cta_button_text}
+                {currentSettings.cta_button_text}
               </Button>
 
               {/* Support info - conditionally rendered */}
-              {settings.show_support_info && (
+              {currentSettings.show_support_info && (
                 <div className="text-center pt-4 border-t border-border/50">
                   <p className="text-sm text-muted-foreground flex items-center justify-center gap-2">
                     <MessageCircle className="h-4 w-4" />
-                    {settings.support_text}
+                    {currentSettings.support_text}
                   </p>
                 </div>
               )}
@@ -218,7 +301,7 @@ export const PlansPage = () => {
         {/* Additional info */}
         <div className="text-center mt-12 space-y-4">
           <p className="text-muted-foreground">
-            {settings.additional_info}
+            {currentSettings.additional_info}
           </p>
           <p className="text-sm text-muted-foreground">
             Já tem uma conta?{' '}
@@ -262,7 +345,7 @@ export const PlansPage = () => {
               
               <div className="text-center">
                 <Button
-                  onClick={() => window.open(`https://wa.me/${settings.whatsapp_number}`, '_blank')}
+                  onClick={() => window.open(`https://wa.me/${currentSettings.whatsapp_number}`, '_blank')}
                   variant="outline"
                   className="w-full mb-3"
                 >
@@ -270,7 +353,7 @@ export const PlansPage = () => {
                   Abrir WhatsApp
                 </Button>
                 <p className="text-xs text-muted-foreground">
-                  ({settings.whatsapp_number.replace(/^55/, '').replace(/(\d{2})(\d{4,5})(\d{4})/, '($1) $2-$3')})
+                  ({currentSettings.whatsapp_number.replace(/^55/, '').replace(/(\d{2})(\d{4,5})(\d{4})/, '($1) $2-$3')})
                 </p>
               </div>
 
