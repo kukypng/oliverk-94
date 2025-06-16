@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
@@ -23,7 +24,7 @@ interface SiteSettings {
   plan_period: string;
   plan_features: string[];
   mercadopago_plan_id?: string;
-  payment_url: string;
+  payment_url?: string; // Made optional to handle existing records
   whatsapp_number: string;
   page_title: string;
   page_subtitle: string;
@@ -81,7 +82,13 @@ export const PlansPage = () => {
         } as SiteSettings;
       }
       
-      return data as SiteSettings;
+      // Ensure payment_url has a default value if not present
+      const settingsData = {
+        ...data,
+        payment_url: data.payment_url || 'https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=2c9380849763dae0019775d20c5b05d3'
+      } as SiteSettings;
+      
+      return settingsData;
     }
   });
 
