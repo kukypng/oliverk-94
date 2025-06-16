@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
@@ -50,34 +49,7 @@ export const PlansPage = () => {
       
       if (error) {
         console.error('Error fetching site settings:', error);
-        // Return default fallback values
-        return {
-          plan_name: 'Plano Profissional',
-          plan_description: 'Para assistências técnicas que querem crescer',
-          plan_price: 15,
-          plan_currency: 'R$',
-          plan_period: '/mês',
-          plan_features: [
-            "Sistema completo de orçamentos",
-            "Gestão de clientes ilimitada",
-            "Relatórios e estatísticas",
-            "Cálculos automáticos",
-            "Controle de dispositivos",
-            "Suporte técnico incluso",
-            "Atualizações gratuitas",
-            "Backup automático"
-          ],
-          payment_url: 'https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=DEFAULT_PLAN_ID',
-          whatsapp_number: '556496028022',
-          page_title: 'Escolha seu Plano',
-          page_subtitle: 'Tenha acesso completo ao sistema de gestão de orçamentos mais eficiente para assistências técnicas.',
-          popular_badge_text: 'Mais Popular',
-          cta_button_text: 'Assinar Agora',
-          support_text: 'Suporte via WhatsApp incluso',
-          show_popular_badge: true,
-          show_support_info: true,
-          additional_info: '✓ Sem taxa de setup • ✓ Cancele quando quiser • ✓ Suporte brasileiro'
-        } as SiteSettings;
+        throw error;
       }
       
       return data as SiteSettings;
@@ -119,10 +91,14 @@ export const PlansPage = () => {
 
   const handleConfirmPayment = () => {
     setShowConfirmation(false);
-    // Use the payment URL from settings (configured by admin)
-    const paymentUrl = settings?.payment_url || "https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=DEFAULT_PLAN_ID";
-    console.log('Redirecting to payment URL:', paymentUrl);
-    window.location.href = paymentUrl;
+    
+    if (!settings?.payment_url) {
+      console.error('No payment URL configured by admin');
+      return;
+    }
+    
+    console.log('Redirecting to admin-configured payment URL:', settings.payment_url);
+    window.location.href = settings.payment_url;
   };
 
   // Show loading state while fetching settings
@@ -134,34 +110,17 @@ export const PlansPage = () => {
     );
   }
 
-  // Use settings or fallback values
-  const config = settings || {
-    plan_name: 'Plano Profissional',
-    plan_description: 'Para assistências técnicas que querem crescer',
-    plan_price: 15,
-    plan_currency: 'R$',
-    plan_period: '/mês',
-    plan_features: [
-      "Sistema completo de orçamentos",
-      "Gestão de clientes ilimitada",
-      "Relatórios e estatísticas",
-      "Cálculos automáticos",
-      "Controle de dispositivos",
-      "Suporte técnico incluso",
-      "Atualizações gratuitas",
-      "Backup automático"
-    ],
-    payment_url: 'https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=DEFAULT_PLAN_ID',
-    whatsapp_number: '556496028022',
-    page_title: 'Escolha seu Plano',
-    page_subtitle: 'Tenha acesso completo ao sistema de gestão de orçamentos mais eficiente para assistências técnicas.',
-    popular_badge_text: 'Mais Popular',
-    cta_button_text: 'Assinar Agora',
-    support_text: 'Suporte via WhatsApp incluso',
-    show_popular_badge: true,
-    show_support_info: true,
-    additional_info: '✓ Sem taxa de setup • ✓ Cancele quando quiser • ✓ Suporte brasileiro'
-  };
+  // If no settings found, show error
+  if (!settings) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-primary/10 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-muted-foreground">Configurações do site não encontradas.</p>
+          <p className="text-sm text-muted-foreground mt-2">Entre em contato com o administrador.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-primary/10 relative overflow-hidden">
@@ -190,10 +149,10 @@ export const PlansPage = () => {
             <h1 className="text-4xl font-bold text-foreground">Oliver</h1>
           </div>
           <h2 className="text-3xl lg:text-5xl font-bold mb-6 text-foreground">
-            {config.page_title}
+            {settings.page_title}
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            {config.page_subtitle}
+            {settings.page_subtitle}
           </p>
         </div>
 
@@ -201,30 +160,30 @@ export const PlansPage = () => {
         <div className="max-w-md mx-auto">
           <Card className="glass-card animate-scale-in border-0 shadow-2xl backdrop-blur-xl relative overflow-hidden">
             {/* Popular badge - conditionally rendered */}
-            {config.show_popular_badge && (
+            {settings.show_popular_badge && (
               <div className="absolute top-4 right-4">
                 <div className="bg-primary text-primary-foreground px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1">
                   <Star className="h-3 w-3" />
-                  {config.popular_badge_text}
+                  {settings.popular_badge_text}
                 </div>
               </div>
             )}
 
             <CardHeader className="text-center pb-6 pt-8">
-              <CardTitle className="text-3xl text-foreground mb-2">{config.plan_name}</CardTitle>
+              <CardTitle className="text-3xl text-foreground mb-2">{settings.plan_name}</CardTitle>
               <CardDescription className="text-base mb-4">
-                {config.plan_description}
+                {settings.plan_description}
               </CardDescription>
               <div className="mb-6">
-                <span className="text-5xl font-bold text-primary">{config.plan_currency} {config.plan_price}</span>
-                <span className="text-muted-foreground text-lg">{config.plan_period}</span>
+                <span className="text-5xl font-bold text-primary">{settings.plan_currency} {settings.plan_price}</span>
+                <span className="text-muted-foreground text-lg">{settings.plan_period}</span>
               </div>
             </CardHeader>
 
             <CardContent className="space-y-6">
               {/* Features */}
               <div className="space-y-3">
-                {config.plan_features.map((feature, index) => (
+                {settings.plan_features.map((feature, index) => (
                   <div key={index} className="flex items-center gap-3">
                     <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
                       <Check className="h-3 w-3 text-primary" />
@@ -240,15 +199,15 @@ export const PlansPage = () => {
                 className="w-full h-12 text-base bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-xl transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl"
                 size="lg"
               >
-                {config.cta_button_text}
+                {settings.cta_button_text}
               </Button>
 
               {/* Support info - conditionally rendered */}
-              {config.show_support_info && (
+              {settings.show_support_info && (
                 <div className="text-center pt-4 border-t border-border/50">
                   <p className="text-sm text-muted-foreground flex items-center justify-center gap-2">
                     <MessageCircle className="h-4 w-4" />
-                    {config.support_text}
+                    {settings.support_text}
                   </p>
                 </div>
               )}
@@ -259,7 +218,7 @@ export const PlansPage = () => {
         {/* Additional info */}
         <div className="text-center mt-12 space-y-4">
           <p className="text-muted-foreground">
-            {config.additional_info}
+            {settings.additional_info}
           </p>
           <p className="text-sm text-muted-foreground">
             Já tem uma conta?{' '}
@@ -303,7 +262,7 @@ export const PlansPage = () => {
               
               <div className="text-center">
                 <Button
-                  onClick={() => window.open(`https://wa.me/${config.whatsapp_number}`, '_blank')}
+                  onClick={() => window.open(`https://wa.me/${settings.whatsapp_number}`, '_blank')}
                   variant="outline"
                   className="w-full mb-3"
                 >
@@ -311,7 +270,7 @@ export const PlansPage = () => {
                   Abrir WhatsApp
                 </Button>
                 <p className="text-xs text-muted-foreground">
-                  ({config.whatsapp_number.replace(/^55/, '').replace(/(\d{2})(\d{4,5})(\d{4})/, '($1) $2-$3')})
+                  ({settings.whatsapp_number.replace(/^55/, '').replace(/(\d{2})(\d{4,5})(\d{4})/, '($1) $2-$3')})
                 </p>
               </div>
 
