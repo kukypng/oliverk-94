@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Trash2, Save, Globe, DollarSign, MessageSquare, Star } from 'lucide-react';
+import { Plus, Trash2, Save, Globe, MessageSquare, Star, Lock } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -321,22 +321,27 @@ export const SiteSettingsContent = () => {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <DollarSign className="h-5 w-5" />
-            Pagamento e Contato
+            <MessageSquare className="h-5 w-5" />
+            Contato e Suporte
           </CardTitle>
-          <CardDescription>Configure integrações de pagamento e suporte</CardDescription>
+          <CardDescription>Configure informações de contato e suporte</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          {/* URL de Pagamento - Agora somente leitura */}
           <div>
-            <Label htmlFor="payment_url">URL de Pagamento</Label>
+            <Label htmlFor="payment_url" className="flex items-center gap-2">
+              URL de Pagamento
+              <Lock className="h-4 w-4 text-muted-foreground" />
+            </Label>
             <Input
               id="payment_url"
-              value={currentSettings.payment_url}
-              onChange={(e) => handleInputChange('payment_url', e.target.value)}
-              placeholder="Ex: https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=..."
+              value="https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=bbb0d6d04e3440f395e562d80f870761"
+              readOnly
+              disabled
+              className="bg-muted text-muted-foreground cursor-not-allowed"
             />
             <p className="text-sm text-muted-foreground mt-1">
-              Link para onde o usuário será redirecionado ao clicar em "Assinar Agora"
+              ⚠️ Este link de pagamento é fixo e não pode ser alterado por questões de segurança
             </p>
           </div>
           
