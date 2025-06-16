@@ -266,6 +266,42 @@
     animation: bounceSubtle 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   }
 
+  /* Adaptive layout specific styles */
+  .adaptive-grid-mobile {
+    @apply grid grid-cols-1 gap-4;
+  }
+
+  .adaptive-grid-tablet {
+    @apply grid grid-cols-2 lg:grid-cols-3 gap-6;
+  }
+
+  .adaptive-grid-desktop {
+    @apply grid grid-cols-1 xl:grid-cols-3 gap-8;
+  }
+
+  .bottom-nav-safe {
+    padding-bottom: calc(env(safe-area-inset-bottom) + 1rem);
+  }
+
+  /* Enhanced mobile navigation */
+  .mobile-nav-item {
+    @apply relative flex flex-col items-center justify-center gap-1;
+    @apply transition-all duration-200 ease-out;
+    @apply active:scale-95;
+    @apply min-h-[44px] min-w-[44px];
+    touch-action: manipulation;
+  }
+
+  .mobile-nav-item.active {
+    @apply text-primary;
+  }
+
+  .mobile-nav-item.active::after {
+    content: '';
+    @apply absolute bottom-1 left-1/2 transform -translate-x-1/2;
+    @apply w-1 h-1 bg-primary rounded-full;
+  }
+
   /* Color replacements - Orange to #fec832 */
   .text-orange-600 {
     color: #fec832 !important;
