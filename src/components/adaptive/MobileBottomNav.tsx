@@ -1,21 +1,23 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Home, FileText, Plus, Settings } from 'lucide-react';
+import { Home, FileText, Plus, Settings, Shield } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface MobileBottomNavProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
+  hasPermission: (permission: string) => boolean;
 }
 
-export const MobileBottomNav = ({ activeTab, onTabChange }: MobileBottomNavProps) => {
+export const MobileBottomNav = ({ activeTab, onTabChange, hasPermission }: MobileBottomNavProps) => {
   const navItems = [
     { id: 'dashboard', icon: Home, label: 'Início' },
     { id: 'budgets', icon: FileText, label: 'Orçamentos' },
     { id: 'new-budget', icon: Plus, label: 'Novo', isPrimary: true },
+    { id: 'admin', icon: Shield, label: 'Admin', permission: 'manage_users' },
     { id: 'settings', icon: Settings, label: 'Config' },
-  ];
+  ].filter(item => !item.permission || hasPermission(item.permission));
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-xl border-t border-border pb-safe-bottom">

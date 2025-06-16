@@ -1,8 +1,11 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Home, FileText, Plus, Settings, Menu } from 'lucide-react';
+import { Home, FileText, Plus, Settings, Menu, Shield, LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
+import { useAuth } from '@/hooks/useAuth';
+import { Badge } from '@/components/ui/badge';
 
 interface TabletHeaderNavProps {
   activeTab: string;
@@ -11,11 +14,14 @@ interface TabletHeaderNavProps {
 }
 
 export const TabletHeaderNav = ({ activeTab, onTabChange, onMenuToggle }: TabletHeaderNavProps) => {
+  const { signOut, profile, hasPermission } = useAuth();
+
   const navItems = [
     { id: 'dashboard', icon: Home, label: 'Dashboard' },
     { id: 'budgets', icon: FileText, label: 'Orçamentos' },
+    { id: 'admin', icon: Shield, label: 'Admin', permission: 'manage_users' },
     { id: 'settings', icon: Settings, label: 'Configurações' },
-  ];
+  ].filter(item => !item.permission || hasPermission(item.permission));
 
   return (
     <div className="flex items-center justify-between h-16 px-6 bg-card/95 backdrop-blur-xl border-b border-border">
@@ -49,7 +55,17 @@ export const TabletHeaderNav = ({ activeTab, onTabChange, onMenuToggle }: Tablet
         </nav>
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-3">
+        {profile && (
+          <div className="hidden md:flex items-center gap-2">
+            <Badge variant="secondary" className="text-xs">
+              {profile.role.toUpperCase()}
+            </Badge>
+          </div>
+        )}
+        
+        <ThemeToggle />
+        
         <Button
           onClick={() => onTabChange('new-budget')}
           size="sm"
@@ -57,6 +73,16 @@ export const TabletHeaderNav = ({ activeTab, onTabChange, onMenuToggle }: Tablet
         >
           <Plus className="h-4 w-4" />
           Novo Orçamento
+        </Button>
+
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={signOut}
+          className="gap-2 text-muted-foreground hover:text-foreground"
+        >
+          <LogOut className="h-4 w-4" />
+          <span className="hidden md:inline">Sair</span>
         </Button>
         
         <Button

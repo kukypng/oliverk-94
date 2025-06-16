@@ -5,6 +5,7 @@ import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
 import { MobileBottomNav } from './MobileBottomNav';
 import { TabletHeaderNav } from './TabletHeaderNav';
+import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
 
 interface AdaptiveLayoutProps {
@@ -15,6 +16,7 @@ interface AdaptiveLayoutProps {
 
 export const AdaptiveLayout = ({ children, activeTab, onTabChange }: AdaptiveLayoutProps) => {
   const { isMobile, isTablet, isDesktop, showSidebar, showBottomNav } = useLayout();
+  const { hasPermission } = useAuth();
 
   if (isDesktop) {
     return (
@@ -63,7 +65,8 @@ export const AdaptiveLayout = ({ children, activeTab, onTabChange }: AdaptiveLay
       
       <MobileBottomNav 
         activeTab={activeTab} 
-        onTabChange={onTabChange} 
+        onTabChange={onTabChange}
+        hasPermission={hasPermission}
       />
     </div>
   );
