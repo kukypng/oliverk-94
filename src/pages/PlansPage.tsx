@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
@@ -119,8 +118,9 @@ export const PlansPage = () => {
 
   const handleConfirmPayment = () => {
     setShowConfirmation(false);
-    // Use the configured payment URL
-    window.location.href = settings?.payment_url || "https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=2c9380849763dae0019775d20c5b05d3";
+    // Use the configured payment URL from settings
+    const paymentUrl = config?.payment_url || "https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=2c9380849763dae0019775d20c5b05d3";
+    window.location.href = paymentUrl;
   };
 
   // Show loading state while fetching settings
