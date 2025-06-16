@@ -1,9 +1,8 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Check, Star, MessageCircle, ArrowLeft, AlertCircle } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { ConfirmationDialog } from '@/components/ConfirmationDialog';
 
@@ -16,6 +15,7 @@ declare global {
 
 export const PlansPage = () => {
   const [showConfirmation, setShowConfirmation] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Load MercadoPago script
@@ -82,12 +82,10 @@ export const PlansPage = () => {
 
       {/* Back button */}
       <div className="absolute top-6 left-6 z-10">
-        <Link to="/auth">
-          <Button variant="ghost" size="sm">
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Voltar ao Login
-          </Button>
-        </Link>
+        <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Voltar
+        </Button>
       </div>
 
       <div className="relative z-10 container mx-auto px-4 py-20">

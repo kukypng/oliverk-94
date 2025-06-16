@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Link, Navigate } from 'react-router-dom';
@@ -5,11 +6,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { FileText, Calculator, Smartphone, Shield, Star, Activity } from 'lucide-react';
 import { DashboardSkeleton } from '@/components/ui/loading-states';
+
 const Index = () => {
-  const {
-    user,
-    loading
-  } = useAuth();
+  const { user, loading } = useAuth();
+  
   if (loading) {
     return <DashboardSkeleton />;
   }
@@ -20,7 +20,8 @@ const Index = () => {
   }
 
   // Landing page para usuários não logados
-  return <div className="min-h-screen">
+  return (
+    <div className="min-h-screen">
       {/* Header */}
       <header className="backdrop-blur-sm border-b shadow-sm sticky top-0 z-50 bg-black">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 bg-black">
@@ -58,9 +59,14 @@ const Index = () => {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button asChild size="lg" className="text-lg px-8 py-3 bg-primary hover:bg-primary/90 text-primary-foreground">
-              <Link to="/signup">Começar Agora</Link>
+              <Link to="/plans">Começar Agora</Link>
             </Button>
-            <Button size="lg" variant="outline" className="text-lg px-8 py-3 border-primary text-primary hover:bg-primary hover:text-primary-foreground" onClick={() => window.open('https://wa.me/556496028022', '_blank')}>
+            <Button 
+              size="lg" 
+              variant="outline" 
+              className="text-lg px-8 py-3 border-primary text-primary hover:bg-primary hover:text-primary-foreground" 
+              onClick={() => window.open('https://wa.me/556496028022', '_blank')}
+            >
               Entre em contato
             </Button>
           </div>
@@ -127,7 +133,7 @@ const Index = () => {
             para gerenciar seus negócios de forma mais eficiente.
           </p>
           <Button asChild size="lg" className="text-lg px-8 py-3 bg-primary hover:bg-primary/90 text-primary-foreground">
-            <Link to="/signup">Começar Agora</Link>
+            <Link to="/plans">Começar Agora</Link>
           </Button>
         </div>
       </section>
@@ -142,6 +148,8 @@ const Index = () => {
           <p className="text-white">© 2025 Oliver. Sistema profissional para gestão de orçamentos.</p>
         </div>
       </footer>
-    </div>;
+    </div>
+  );
 };
+
 export default Index;

@@ -10,6 +10,7 @@ import Index from "./pages/Index";
 import { AuthPage } from "./pages/AuthPage";
 import { SignUpPage } from "./pages/SignUpPage";
 import { PlansPage } from "./pages/PlansPage";
+import { PurchaseSuccessPage } from "./pages/PurchaseSuccessPage";
 import { Dashboard } from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 import { ThemeProvider } from "./components/ThemeProvider";
@@ -74,6 +75,7 @@ const App = () => (
                 <Route path="/" element={<Index />} />
                 <Route path="/auth" element={<AuthPage />} />
                 <Route path="/plans" element={<PlansPage />} />
+                <Route path="/purchase-success" element={<PurchaseSuccessPage />} />
                 <Route path="/reset-password" element={<ResetPasswordPage />} />
                 <Route path="/verify" element={<VerifyPage />} />
                 <Route
