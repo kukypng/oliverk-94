@@ -20,8 +20,7 @@ interface SiteSettings {
   plan_currency: string;
   plan_period: string;
   plan_features: string[];
-  mercadopago_plan_id?: string;
-  payment_url?: string; // Made optional to handle existing records
+  payment_url: string;
   whatsapp_number: string;
   page_title: string;
   page_subtitle: string;
@@ -48,13 +47,7 @@ export const SiteSettingsContent = () => {
       
       if (error) throw error;
       
-      // Ensure payment_url has a default value if not present
-      const settingsData = {
-        ...data,
-        payment_url: data.payment_url || 'https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=2c9380849763dae0019775d20c5b05d3'
-      } as SiteSettings;
-      
-      return settingsData;
+      return data as SiteSettings;
     }
   });
 
@@ -312,23 +305,13 @@ export const SiteSettingsContent = () => {
             <Label htmlFor="payment_url">URL de Pagamento</Label>
             <Input
               id="payment_url"
-              value={settings.payment_url || ''}
+              value={settings.payment_url}
               onChange={(e) => handleInputChange('payment_url', e.target.value)}
               placeholder="Ex: https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=..."
             />
             <p className="text-sm text-muted-foreground mt-1">
               Link para onde o usuário será redirecionado ao clicar em "Assinar Agora"
             </p>
-          </div>
-
-          <div>
-            <Label htmlFor="mercadopago_plan_id">ID do Plano MercadoPago</Label>
-            <Input
-              id="mercadopago_plan_id"
-              value={settings.mercadopago_plan_id || ''}
-              onChange={(e) => handleInputChange('mercadopago_plan_id', e.target.value)}
-              placeholder="Ex: 2c9380849763dae0019775d20c5b05d3"
-            />
           </div>
           
           <div>

@@ -431,9 +431,9 @@ export type Database = {
           created_at: string
           cta_button_text: string
           id: string
-          mercadopago_plan_id: string | null
           page_subtitle: string
           page_title: string
+          payment_url: string
           plan_currency: string
           plan_description: string
           plan_features: Json
@@ -452,9 +452,9 @@ export type Database = {
           created_at?: string
           cta_button_text?: string
           id?: string
-          mercadopago_plan_id?: string | null
           page_subtitle?: string
           page_title?: string
+          payment_url?: string
           plan_currency?: string
           plan_description?: string
           plan_features?: Json
@@ -473,9 +473,9 @@ export type Database = {
           created_at?: string
           cta_button_text?: string
           id?: string
-          mercadopago_plan_id?: string | null
           page_subtitle?: string
           page_title?: string
+          payment_url?: string
           plan_currency?: string
           plan_description?: string
           plan_features?: Json

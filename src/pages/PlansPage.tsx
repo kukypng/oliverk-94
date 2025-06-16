@@ -23,8 +23,7 @@ interface SiteSettings {
   plan_currency: string;
   plan_period: string;
   plan_features: string[];
-  mercadopago_plan_id?: string;
-  payment_url?: string; // Made optional to handle existing records
+  payment_url: string;
   whatsapp_number: string;
   page_title: string;
   page_subtitle: string;
@@ -68,7 +67,6 @@ export const PlansPage = () => {
             "Atualizações gratuitas",
             "Backup automático"
           ],
-          mercadopago_plan_id: '2c9380849763dae0019775d20c5b05d3',
           payment_url: 'https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=2c9380849763dae0019775d20c5b05d3',
           whatsapp_number: '556496028022',
           page_title: 'Escolha seu Plano',
@@ -82,13 +80,7 @@ export const PlansPage = () => {
         } as SiteSettings;
       }
       
-      // Ensure payment_url has a default value if not present
-      const settingsData = {
-        ...data,
-        payment_url: data.payment_url || 'https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=2c9380849763dae0019775d20c5b05d3'
-      } as SiteSettings;
-      
-      return settingsData;
+      return data as SiteSettings;
     }
   });
 
