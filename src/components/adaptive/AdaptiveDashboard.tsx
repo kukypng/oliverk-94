@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useLayout } from '@/contexts/LayoutContext';
 import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
@@ -13,6 +12,7 @@ import { LogOut, User } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
 
 interface AdaptiveDashboardProps {
   onTabChange: (tab: string) => void;
