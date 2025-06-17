@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/hooks/useAuth';
@@ -21,7 +22,7 @@ export const LicenseStatus = () => {
         title: "Licença Expirada",
         description: `Sua licença expirou. Renove para continuar usando o sistema.`,
         icon: <img src="/icones/coracao.png" alt="Licença Expirada" className="h-8 w-8" />,
-        cardClass: "border-red-500/30",
+        cardClass: "border-red-500/30 bg-gradient-to-br from-red-500/20 via-red-400/15 to-red-600/25",
         showRenew: true
       };
     }
@@ -32,7 +33,7 @@ export const LicenseStatus = () => {
         title: `Urgente: Sua licença expira ${dayText}!`,
         description: `Renove para não perder o acesso ao sistema.`,
         icon: <img src="/icones/coracao.png" alt="Licença Expirando" className="h-8 w-8" />,
-        cardClass: "border-red-500/30",
+        cardClass: "border-red-500/50 bg-gradient-to-br from-red-600/30 via-red-500/25 to-red-700/35 shadow-red-500/20 shadow-lg animate-pulse",
         showRenew: true
       };
     }
@@ -42,7 +43,7 @@ export const LicenseStatus = () => {
         title: "Atenção: Licença Expirando",
         description: `Sua licença expira em ${remainingDays} dias. Renove para não perder o acesso.`,
         icon: <img src="/icones/laranja.png" alt="Licença Expirando" className="h-8 w-8" />,
-        cardClass: "border-orange-500/30",
+        cardClass: "border-orange-500/30 bg-gradient-to-br from-orange-500/20 via-orange-400/15 to-orange-600/25",
         showRenew: true
       };
     }
@@ -52,7 +53,7 @@ export const LicenseStatus = () => {
         title: "Atenção: Licença Expirando",
         description: `Sua licença expira em ${remainingDays} dias. Renove para não perder o acesso.`,
         icon: <img src="/icones/laranja.png" alt="Licença Expirando" className="h-8 w-8" />,
-        cardClass: "border-yellow-500/30",
+        cardClass: "border-[#fec832]/40 bg-gradient-to-br from-[#fec832]/25 via-[#feca32]/20 to-[#feb532]/30 shadow-[#fec832]/15 shadow-md",
         showRenew: true
       };
     }
@@ -61,7 +62,7 @@ export const LicenseStatus = () => {
       title: "Licença Ativa",
       description: `Sua licença expira em ${remainingDays} dias.`,
       icon: <img src="/icones/limao.png" alt="Licença Ativa" className="h-8 w-8" />,
-      cardClass: "border-green-500/20",
+      cardClass: "border-green-500/20 bg-gradient-to-br from-green-500/10 via-green-400/8 to-green-600/15",
       showRenew: false
     };
   };
