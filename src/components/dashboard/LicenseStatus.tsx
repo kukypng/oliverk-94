@@ -1,9 +1,9 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/hooks/useAuth';
 import { differenceInDays, parseISO } from 'date-fns';
-import { CreditCard } from 'lucide-react';
+import { CreditCard, MessageCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export const LicenseStatus = () => {
   const { profile } = useAuth();
@@ -15,6 +15,12 @@ export const LicenseStatus = () => {
   const expirationDate = parseISO(profile.expiration_date);
   const today = new Date();
   const remainingDays = differenceInDays(expirationDate, today);
+
+  const handleWhatsAppContact = () => {
+    const message = encodeURIComponent('Olá! Gostaria de renovar minha licença do sistema.');
+    const whatsappUrl = `https://wa.me/5511999999999?text=${message}`;
+    window.open(whatsappUrl, '_blank');
+  };
 
   const getStatus = () => {
     if (remainingDays < 0) {
@@ -86,9 +92,13 @@ export const LicenseStatus = () => {
           {status.description}
         </p>
         {status.showRenew && (
-          <p className="text-sm text-muted-foreground p-4 bg-secondary rounded-lg">
-            Para renovar sua assinatura e continuar com acesso total, por favor, entre em contato com nosso suporte.
-          </p>
+          <Button
+            onClick={handleWhatsAppContact}
+            className="w-full bg-green-500 hover:bg-green-600 text-white gap-2"
+          >
+            <MessageCircle className="h-4 w-4" />
+            Renovar via WhatsApp
+          </Button>
         )}
       </CardContent>
     </Card>
