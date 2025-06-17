@@ -26,31 +26,69 @@ export const DeleteBudgetConfirm = ({ budget, open, onOpenChange }: DeleteBudget
 
   const deleteBudgetMutation = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase
-        .from('budgets')
-        .delete()
-        .eq('id', budget.id);
+      console.log('Iniciando exclusão do orçamento:', budget.id);
       
-      if (error) throw error;
+      // Verificar se o usuário está autenticado
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError || !user) {
+        throw new Error('Usuário não autenticado');
+      }
+      
+      console.log('Usuário autenticado:', user.id);
+      
+      // Usar a função segura de exclusão
+      const { data, error } = await supabase.rpc('delete_budget_with_parts', {
+        p_budget_id: budget.id
+      });
+      
+      console.log('Resultado da função delete_budget_with_parts:', { data, error });
+      
+      if (error) {
+        console.error('Erro na função de exclusão:', error);
+        throw new Error(error.message || 'Erro ao excluir orçamento');
+      }
+      
+      if (!data) {
+        throw new Error('Orçamento não encontrado ou você não tem permissão para excluí-lo');
+      }
+      
+      console.log('Orçamento excluído com sucesso');
+      return data;
     },
     onSuccess: () => {
+      console.log('Invalidando cache de orçamentos');
       queryClient.invalidateQueries({ queryKey: ['budgets'] });
       toast({
         title: "Orçamento excluído",
-        description: "O orçamento foi removido com sucesso.",
+        description: "O orçamento e suas partes foram removidos com sucesso.",
       });
       onOpenChange(false);
     },
-    onError: () => {
+    onError: (error: Error) => {
+      console.error('Erro na exclusão do orçamento:', error);
+      
+      let errorMessage = "Ocorreu um erro ao excluir o orçamento.";
+      
+      if (error.message.includes('Acesso negado')) {
+        errorMessage = "Você não tem permissão para excluir este orçamento.";
+      } else if (error.message.includes('não encontrado')) {
+        errorMessage = "Orçamento não encontrado.";
+      } else if (error.message.includes('não autenticado')) {
+        errorMessage = "Você precisa estar logado para excluir orçamentos.";
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
       toast({
         title: "Erro ao excluir",
-        description: "Ocorreu um erro ao excluir o orçamento.",
+        description: errorMessage,
         variant: "destructive",
       });
     },
   });
 
   const handleDelete = () => {
+    console.log('Iniciando processo de exclusão para orçamento:', budget.id);
     deleteBudgetMutation.mutate();
   };
 
@@ -66,10 +104,15 @@ export const DeleteBudgetConfirm = ({ budget, open, onOpenChange }: DeleteBudget
             <strong>Cliente:</strong> {budget?.client_name || 'Não informado'}
             <br />
             <strong>Dispositivo:</strong> {budget?.device_model}
+            <br />
+            <br />
+            <em>Todas as partes do orçamento também serão removidas.</em>
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancelar</AlertDialogCancel>
+          <AlertDialogCancel disabled={deleteBudgetMutation.isPending}>
+            Cancelar
+          </AlertDialogCancel>
           <AlertDialogAction
             onClick={handleDelete}
             disabled={deleteBudgetMutation.isPending}

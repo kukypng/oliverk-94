@@ -695,6 +695,10 @@ export type Database = {
           is_admin: boolean
         }[]
       }
+      delete_budget_with_parts: {
+        Args: { p_budget_id: string }
+        Returns: boolean
+      }
       get_shop_profile: {
         Args: { p_user_id: string }
         Returns: Json
