@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useLayout } from '@/contexts/LayoutContext';
 import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
@@ -105,7 +106,7 @@ export const AdaptiveDashboard = ({
           
           <MobileQuickAccess 
             onTabChange={onTabChange}
-            stats={{ totalBudgets: 0, weeklyGrowth }}
+            hasPermission={hasPermission}
           />
           
           <LicenseStatus />
