@@ -41,6 +41,7 @@ export const BudgetCard = ({
 
   const handleDelete = () => {
     if (budget && budget.id) {
+      console.log('BudgetCard: Iniciando exclusão do orçamento:', budget.id);
       onDelete(budget);
     } else {
       console.error('BudgetCard: Tentativa de deletar budget inválido:', budget);

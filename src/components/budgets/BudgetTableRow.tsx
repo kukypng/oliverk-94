@@ -43,6 +43,7 @@ export const BudgetTableRow = ({
 
   const handleDelete = () => {
     if (budget && budget.id) {
+      console.log('BudgetTableRow: Iniciando exclusão do orçamento:', budget.id);
       onDelete(budget);
     } else {
       console.error('BudgetTableRow: Tentativa de deletar budget inválido:', budget);
