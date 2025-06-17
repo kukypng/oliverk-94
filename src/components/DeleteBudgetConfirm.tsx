@@ -26,11 +26,17 @@ export const DeleteBudgetConfirm = ({ budget, open, onOpenChange }: DeleteBudget
 
   const deleteBudgetMutation = useMutation({
     mutationFn: async () => {
+      // Verificar se o budget existe e tem ID
+      if (!budget || !budget.id) {
+        throw new Error('Orçamento inválido ou não encontrado');
+      }
+
       console.log('Iniciando exclusão do orçamento:', budget.id);
       
       // Verificar se o usuário está autenticado
       const { data: { user }, error: authError } = await supabase.auth.getUser();
       if (authError || !user) {
+        console.error('Erro de autenticação:', authError);
         throw new Error('Usuário não autenticado');
       }
       
@@ -75,6 +81,8 @@ export const DeleteBudgetConfirm = ({ budget, open, onOpenChange }: DeleteBudget
         errorMessage = "Orçamento não encontrado.";
       } else if (error.message.includes('não autenticado')) {
         errorMessage = "Você precisa estar logado para excluir orçamentos.";
+      } else if (error.message.includes('inválido')) {
+        errorMessage = "Dados do orçamento são inválidos.";
       } else if (error.message) {
         errorMessage = error.message;
       }
@@ -88,9 +96,25 @@ export const DeleteBudgetConfirm = ({ budget, open, onOpenChange }: DeleteBudget
   });
 
   const handleDelete = () => {
+    // Verificar se o budget existe antes de tentar excluir
+    if (!budget || !budget.id) {
+      console.error('Budget é nulo ou não tem ID:', budget);
+      toast({
+        title: "Erro",
+        description: "Orçamento inválido. Não é possível excluir.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     console.log('Iniciando processo de exclusão para orçamento:', budget.id);
     deleteBudgetMutation.mutate();
   };
+
+  // Se não há budget válido, não renderizar o diálogo
+  if (!budget) {
+    return null;
+  }
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
@@ -103,7 +127,7 @@ export const DeleteBudgetConfirm = ({ budget, open, onOpenChange }: DeleteBudget
             <br />
             <strong>Cliente:</strong> {budget?.client_name || 'Não informado'}
             <br />
-            <strong>Dispositivo:</strong> {budget?.device_model}
+            <strong>Dispositivo:</strong> {budget?.device_model || 'Não informado'}
             <br />
             <br />
             <em>Todas as partes do orçamento também serão removidas.</em>

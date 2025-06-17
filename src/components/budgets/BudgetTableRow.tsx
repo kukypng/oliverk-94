@@ -35,6 +35,20 @@ export const BudgetTableRow = ({
   onEdit,
   onDelete
 }: BudgetTableRowProps) => {
+  // Verificar se o budget é válido antes de renderizar
+  if (!budget || !budget.id) {
+    console.warn('BudgetTableRow: budget inválido:', budget);
+    return null;
+  }
+
+  const handleDelete = () => {
+    if (budget && budget.id) {
+      onDelete(budget);
+    } else {
+      console.error('BudgetTableRow: Tentativa de deletar budget inválido:', budget);
+    }
+  };
+
   return (
     <TableRow 
       className="hover:bg-muted/20 transition-colors border-white/10 animate-fade-in" 
@@ -42,15 +56,15 @@ export const BudgetTableRow = ({
     >
       <TableCell>
         <div className="space-y-1">
-          <p className="font-medium text-foreground">{budget.device_model}</p>
-          <p className="text-sm text-muted-foreground">{budget.device_type}</p>
+          <p className="font-medium text-foreground">{budget.device_model || 'Dispositivo não informado'}</p>
+          <p className="text-sm text-muted-foreground">{budget.device_type || 'Tipo não informado'}</p>
           {budget.client_name && (
             <p className="text-sm text-muted-foreground">{budget.client_name}</p>
           )}
         </div>
       </TableCell>
       <TableCell>
-        <span className="text-sm">{budget.issue}</span>
+        <span className="text-sm">{budget.issue || 'Problema não informado'}</span>
       </TableCell>
       <TableCell>
         <div className="space-y-1">
@@ -67,9 +81,9 @@ export const BudgetTableRow = ({
       <TableCell>
         <div className="flex items-center space-x-2">
           <span className="text-sm text-muted-foreground">
-            {new Date(budget.created_at).toLocaleDateString('pt-BR')}
+            {budget.created_at ? new Date(budget.created_at).toLocaleDateString('pt-BR') : 'Data não informada'}
           </span>
-          {profile?.budget_warning_enabled && isBudgetOld(budget.created_at, profile.budget_warning_days) && (
+          {profile?.budget_warning_enabled && budget.created_at && isBudgetOld(budget.created_at, profile.budget_warning_days) && (
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
@@ -113,7 +127,7 @@ export const BudgetTableRow = ({
           <Button 
             variant="ghost" 
             size="sm" 
-            onClick={() => onDelete(budget)} 
+            onClick={handleDelete} 
             className="h-9 w-9 p-0 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950 rounded-xl"
           >
             <Trash2 className="h-4 w-4" />

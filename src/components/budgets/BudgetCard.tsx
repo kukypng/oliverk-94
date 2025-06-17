@@ -33,18 +33,32 @@ export const BudgetCard = ({
   onEdit,
   onDelete
 }: BudgetCardProps) => {
+  // Verificar se o budget é válido antes de renderizar
+  if (!budget || !budget.id) {
+    console.warn('BudgetCard: budget inválido:', budget);
+    return null;
+  }
+
+  const handleDelete = () => {
+    if (budget && budget.id) {
+      onDelete(budget);
+    } else {
+      console.error('BudgetCard: Tentativa de deletar budget inválido:', budget);
+    }
+  };
+
   return (
     <div className="glass-card border border-white/10 rounded-2xl p-4 hover:shadow-lg transition-all duration-300 hover:scale-[1.01] animate-fade-in">
       <div className="flex items-start justify-between mb-3">
         <div className="flex-1">
           <div className="flex items-center space-x-2 mb-1">
-            <h3 className="font-semibold text-base text-foreground">{budget.device_model}</h3>
+            <h3 className="font-semibold text-base text-foreground">{budget.device_model || 'Dispositivo não informado'}</h3>
             <Badge variant="secondary" className="text-xs bg-muted/50">
-              {budget.device_type}
+              {budget.device_type || 'Tipo não informado'}
             </Badge>
           </div>
           {budget.client_name && <p className="text-sm text-muted-foreground mb-1">{budget.client_name}</p>}
-          <p className="text-sm text-muted-foreground">{budget.issue}</p>
+          <p className="text-sm text-muted-foreground">{budget.issue || 'Problema não informado'}</p>
         </div>
         <div className="text-right">
           <p className="font-bold text-lg text-foreground">
@@ -54,9 +68,9 @@ export const BudgetCard = ({
           </p>
           <div className="flex items-center">
             <p className="text-xs text-muted-foreground">
-              {new Date(budget.created_at).toLocaleDateString('pt-BR')}
+              {budget.created_at ? new Date(budget.created_at).toLocaleDateString('pt-BR') : 'Data não informada'}
             </p>
-            {profile?.budget_warning_enabled && isBudgetOld(budget.created_at, profile.budget_warning_days) && (
+            {profile?.budget_warning_enabled && budget.created_at && isBudgetOld(budget.created_at, profile.budget_warning_days) && (
               <Badge variant="destructive" className="text-xs ml-2 animate-pulse p-1 h-auto">
                 <Clock className="h-3 w-3 mr-1" />
                 Antigo
@@ -96,7 +110,7 @@ export const BudgetCard = ({
           <Button 
             variant="ghost" 
             size="sm" 
-            onClick={() => onDelete(budget)} 
+            onClick={handleDelete} 
             className="h-10 w-10 p-0 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950 rounded-xl"
           >
             <Trash2 className="h-5 w-5" />
