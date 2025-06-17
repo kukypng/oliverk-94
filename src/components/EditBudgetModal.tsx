@@ -8,20 +8,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+
 interface EditBudgetModalProps {
   budget: any;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
-export const EditBudgetModal = ({
-  budget,
-  open,
-  onOpenChange
-}: EditBudgetModalProps) => {
-  const {
-    toast
-  } = useToast();
+
+export const EditBudgetModal = ({ budget, open, onOpenChange }: EditBudgetModalProps) => {
+  const { toast } = useToast();
   const queryClient = useQueryClient();
+
   const [formData, setFormData] = useState({
     device_type: '',
     device_model: '',
@@ -31,7 +28,7 @@ export const EditBudgetModal = ({
     payment_condition: '',
     installments: 1,
     notes: '',
-    validity_period_days: 15
+    validity_period_days: ''
   });
 
   // Carregar dados do orçamento quando o modal abrir ou budget mudar
@@ -46,6 +43,7 @@ export const EditBudgetModal = ({
           days = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
         }
       }
+
       setFormData({
         device_type: budget.device_type || '',
         device_model: budget.device_model || '',
@@ -55,42 +53,48 @@ export const EditBudgetModal = ({
         payment_condition: budget.payment_condition || 'À Vista',
         installments: budget.installments || 1,
         notes: budget.notes || '',
-        validity_period_days: days
+        validity_period_days: days.toString()
       });
     }
   }, [budget, open]);
+
   const updateBudgetMutation = useMutation({
     mutationFn: async (data: any) => {
       const createdAt = new Date(budget.created_at);
       const validUntilDate = new Date(createdAt);
-      validUntilDate.setDate(validUntilDate.getDate() + Number(data.validity_period_days));
+      const validityDays = parseInt(data.validity_period_days) || 15;
+      validUntilDate.setDate(validUntilDate.getDate() + validityDays);
+
+      const totalPrice = parseFloat(data.total_price) || 0;
+
       const updateData = {
         device_type: data.device_type,
         device_model: data.device_model,
         device_brand: data.device_brand,
         issue: data.issue,
-        total_price: parseFloat(data.total_price) * 100,
+        total_price: Math.round(totalPrice * 100),
         payment_condition: data.payment_condition,
         installments: data.installments,
         notes: data.notes,
         valid_until: validUntilDate.toISOString()
       };
-      const {
-        error
-      } = await supabase.from('budgets').update(updateData).eq('id', budget.id);
+
+      const { error } = await supabase
+        .from('budgets')
+        .update(updateData)
+        .eq('id', budget.id);
+
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['budgets']
-      });
+      queryClient.invalidateQueries({ queryKey: ['budgets'] });
       toast({
         title: "Orçamento atualizado",
         description: "As alterações foram salvas com sucesso."
       });
       onOpenChange(false);
     },
-    onError: error => {
+    onError: (error) => {
       console.error('Error updating budget:', error);
       toast({
         title: "Erro ao atualizar",
@@ -99,6 +103,7 @@ export const EditBudgetModal = ({
       });
     }
   });
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -111,6 +116,7 @@ export const EditBudgetModal = ({
       });
       return;
     }
+
     const totalPrice = parseFloat(formData.total_price);
     if (isNaN(totalPrice) || totalPrice <= 0) {
       toast({
@@ -120,15 +126,16 @@ export const EditBudgetModal = ({
       });
       return;
     }
+
     updateBudgetMutation.mutate(formData);
   };
+
   const handleInputChange = (field: string, value: string | number) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
+    setFormData(prev => ({ ...prev, [field]: value }));
   };
-  return <Dialog open={open} onOpenChange={onOpenChange}>
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Editar Orçamento</DialogTitle>
@@ -175,18 +182,32 @@ export const EditBudgetModal = ({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="total_price">Valor Total (R$)*</Label>
-                <Input id="total_price" type="number" step="0.01" min="0" value={formData.total_price} onChange={e => handleInputChange('total_price', e.target.value)} placeholder="0.00" required />
+                <Input
+                  id="total_price"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={formData.total_price}
+                  onChange={(e) => handleInputChange('total_price', e.target.value)}
+                  placeholder="0,00"
+                  required
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="installments">Parcelas</Label>
-                <Select value={formData.installments.toString()} onValueChange={value => handleInputChange('installments', parseInt(value))}>
+                <Select
+                  value={formData.installments.toString()}
+                  onValueChange={(value) => handleInputChange('installments', parseInt(value))}
+                >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {[1, 2, 3, 4, 5, 6, 10, 12].map(num => <SelectItem key={num} value={num.toString()}>
+                    {[1, 2, 3, 4, 5, 6, 10, 12].map(num => (
+                      <SelectItem key={num} value={num.toString()}>
                         {num}x {num === 1 ? '(À vista)' : ''}
-                      </SelectItem>)}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -207,9 +228,18 @@ export const EditBudgetModal = ({
                   </SelectContent>
                 </Select>
               </div>
+              
               <div className="space-y-2">
                 <Label htmlFor="validity_period_days">Validade (dias)*</Label>
-                <Input id="validity_period_days" type="number" min="1" value={formData.validity_period_days} onChange={e => handleInputChange('validity_period_days', parseInt(e.target.value, 10) || 1)} required />
+                <Input
+                  id="validity_period_days"
+                  type="number"
+                  min="1"
+                  value={formData.validity_period_days}
+                  onChange={(e) => handleInputChange('validity_period_days', e.target.value)}
+                  placeholder="15"
+                  required
+                />
               </div>
             </div>
           </div>
@@ -230,5 +260,6 @@ export const EditBudgetModal = ({
           </div>
         </form>
       </DialogContent>
-    </Dialog>;
+    </Dialog>
+  );
 };

@@ -17,12 +17,13 @@ export const BudgetWarningSettings = () => {
   const queryClient = useQueryClient();
 
   const [isEnabled, setIsEnabled] = useState(true);
-  const [days, setDays] = useState(15);
+  const [days, setDays] = useState('');
 
   useEffect(() => {
     if (profile) {
       setIsEnabled(profile.budget_warning_enabled ?? true);
-      setDays(profile.budget_warning_days ?? 15);
+      const warningDays = profile.budget_warning_days ?? 15;
+      setDays(warningDays.toString());
     }
   }, [profile]);
 
@@ -60,7 +61,7 @@ export const BudgetWarningSettings = () => {
   });
 
   const handleSave = () => {
-    const numericDays = Number(days);
+    const numericDays = parseInt(days) || 15;
     if (isNaN(numericDays) || numericDays < 1 || numericDays > 365) {
       showError({
         title: 'Valor inválido',
@@ -68,7 +69,10 @@ export const BudgetWarningSettings = () => {
       });
       return;
     }
-    updateWarningSettingsMutation.mutate({ budget_warning_enabled: isEnabled, budget_warning_days: numericDays });
+    updateWarningSettingsMutation.mutate({ 
+      budget_warning_enabled: isEnabled, 
+      budget_warning_days: numericDays 
+    });
   };
 
   return (
@@ -101,12 +105,12 @@ export const BudgetWarningSettings = () => {
               id="warning-days"
               type="number"
               value={days}
-              onChange={(e) => setDays(Number(e.target.value))}
-              placeholder="Ex: 15"
+              onChange={(e) => setDays(e.target.value)}
+              placeholder="15"
               min="1"
               max="365"
             />
-             <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-muted-foreground">
               Defina o nº de dias para um orçamento ser "antigo".
             </p>
           </div>
