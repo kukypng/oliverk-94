@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { TableCell, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
@@ -47,6 +46,15 @@ export const BudgetTableRow = ({
       onDelete(budget);
     } else {
       console.error('BudgetTableRow: Tentativa de deletar budget inválido:', budget);
+    }
+  };
+
+  const handleBlueDelete = () => {
+    if (budget && budget.id) {
+      console.log('BudgetTableRow: Iniciando exclusão (azul) do orçamento:', budget.id);
+      onDelete(budget);
+    } else {
+      console.error('BudgetTableRow: Tentativa de deletar (azul) budget inválido:', budget);
     }
   };
 
@@ -124,6 +132,14 @@ export const BudgetTableRow = ({
             className="h-9 w-9 p-0 hover:bg-muted/20 hover:text-[#fec832] rounded-xl"
           >
             <Edit className="h-4 w-4" />
+          </Button>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={handleBlueDelete} 
+            className="h-9 w-9 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-950 rounded-xl"
+          >
+            <Trash2 className="h-4 w-4" />
           </Button>
           <Button 
             variant="ghost" 

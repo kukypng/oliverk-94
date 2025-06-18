@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -45,6 +44,15 @@ export const BudgetCard = ({
       onDelete(budget);
     } else {
       console.error('BudgetCard: Tentativa de deletar budget inválido:', budget);
+    }
+  };
+
+  const handleBlueDelete = () => {
+    if (budget && budget.id) {
+      console.log('BudgetCard: Iniciando exclusão (azul) do orçamento:', budget.id);
+      onDelete(budget);
+    } else {
+      console.error('BudgetCard: Tentativa de deletar (azul) budget inválido:', budget);
     }
   };
 
@@ -107,6 +115,14 @@ export const BudgetCard = ({
             className="h-10 w-10 p-0 hover:bg-muted/20 hover:text-[#fec832] rounded-xl"
           >
             <Edit className="h-5 w-5" />
+          </Button>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={handleBlueDelete} 
+            className="h-10 w-10 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-950 rounded-xl"
+          >
+            <Trash2 className="h-5 w-5" />
           </Button>
           <Button 
             variant="ghost" 
