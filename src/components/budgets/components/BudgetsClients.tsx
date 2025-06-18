@@ -1,8 +1,7 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { User, Calendar, DollarSign } from 'lucide-react';
+import { User, Users, Calendar, DollarSign } from 'lucide-react';
 
 interface BudgetsClientsProps {
   budgets: any[];
