@@ -10,10 +10,10 @@ export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
 
   return (
-    <div className="relative rounded-xl bg-secondary/50 p-1 border border-border/50 shadow-soft backdrop-blur-sm">
+    <div className="relative rounded-xl bg-secondary/30 p-1 border border-primary/20 shadow-soft backdrop-blur-sm">
       {/* Background slider */}
       <div 
-        className={`absolute top-1 bottom-1 w-10 bg-primary rounded-lg transition-all duration-300 ease-out shadow-soft ${
+        className={`absolute top-1 bottom-1 w-10 bg-primary rounded-lg transition-all duration-300 ease-out shadow-medium ${
           theme === 'light' ? 'left-1' : 'left-11'
         }`} 
       />
@@ -26,7 +26,7 @@ export function ThemeToggle() {
           className={`h-10 w-10 rounded-lg transition-all duration-300 ease-out hover:scale-105 active:scale-95 ${
             theme === 'light' 
               ? 'text-primary-foreground shadow-none z-10' 
-              : 'text-muted-foreground hover:text-foreground'
+              : 'text-muted-foreground hover:text-primary'
           }`}
         >
           <Sun className={`h-4 w-4 transition-all duration-500 ease-out ${
@@ -40,7 +40,7 @@ export function ThemeToggle() {
           className={`h-10 w-10 rounded-lg transition-all duration-300 ease-out hover:scale-105 active:scale-95 ${
             theme === 'dark' 
               ? 'text-primary-foreground shadow-none z-10' 
-              : 'text-muted-foreground hover:text-foreground'
+              : 'text-muted-foreground hover:text-primary'
           }`}
         >
           <Moon className={`h-4 w-4 transition-all duration-500 ease-out ${

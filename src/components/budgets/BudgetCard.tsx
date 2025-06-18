@@ -45,10 +45,10 @@ export const BudgetCard = ({
 
   return (
     <div className={`
-      glass-card p-6 
+      card-modern p-6 
       transition-all duration-300 ease-out will-change-transform
       hover:shadow-strong hover:scale-[1.02] hover:-translate-y-1
-      ${isSelected ? 'ring-2 ring-primary/50 shadow-medium border-primary/20' : ''}
+      ${isSelected ? 'ring-2 ring-primary/50 shadow-medium border-primary/30' : ''}
       animate-fade-in-up cursor-pointer group
     `} style={{
       transform: 'translateZ(0)'
@@ -59,7 +59,7 @@ export const BudgetCard = ({
             <Checkbox 
               checked={isSelected} 
               onCheckedChange={checked => onSelect(budget.id, !!checked)} 
-              className="w-4 h-4 transition-transform duration-200 hover:scale-110" 
+              className="w-4 h-4 transition-transform duration-200 hover:scale-110 border-primary/30 data-[state=checked]:bg-primary data-[state=checked]:border-primary" 
             />
           </div>
           <div className="flex-1 min-w-0">
@@ -67,7 +67,7 @@ export const BudgetCard = ({
               <h3 className="font-semibold text-lg text-foreground group-hover:text-primary transition-colors duration-200 truncate">
                 {budget.device_model || 'Dispositivo não informado'}
               </h3>
-              <Badge variant="secondary" className="text-xs bg-muted/60 border border-border/50 backdrop-blur-sm">
+              <Badge variant="secondary" className="text-xs bg-primary/10 text-primary border border-primary/20 backdrop-blur-sm">
                 {budget.device_type || 'Tipo não informado'}
               </Badge>
             </div>
@@ -92,7 +92,7 @@ export const BudgetCard = ({
               {budget.created_at ? new Date(budget.created_at).toLocaleDateString('pt-BR') : 'Data não informada'}
             </p>
             {profile?.budget_warning_enabled && budget.created_at && isBudgetOld(budget.created_at, profile.budget_warning_days) && (
-              <Badge variant="destructive" className="text-xs ml-2 px-2 py-1 h-auto status-badge error">
+              <Badge variant="destructive" className="text-xs ml-2 px-2 py-1 h-auto status-badge-modern error">
                 <Clock className="h-3 w-3 mr-1" />
                 Antigo
               </Badge>
@@ -101,13 +101,13 @@ export const BudgetCard = ({
         </div>
       </div>
       
-      <div className="flex items-center justify-between pt-4 border-t border-border/30">
+      <div className="flex items-center justify-between pt-4 border-t border-primary/10">
         <div className="flex items-center space-x-2">
           <Button 
             variant="ghost" 
             size="sm" 
             onClick={() => onShareWhatsApp(budget)} 
-            className="h-10 w-10 p-0 text-green-600 hover:text-green-700 hover:bg-green-50 dark:hover:bg-green-950/20 rounded-xl transition-all duration-200 hover:scale-110"
+            className="h-10 w-10 p-0 text-primary hover:text-primary hover:bg-primary/10 rounded-xl transition-all duration-200 hover:scale-110"
           >
             <MessageCircle className="h-4 w-4" />
           </Button>
@@ -116,7 +116,7 @@ export const BudgetCard = ({
             size="sm" 
             onClick={() => onViewPDF(budget)} 
             disabled={isGenerating} 
-            className="h-10 w-10 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-950/20 rounded-xl transition-all duration-200 disabled:opacity-50 hover:scale-110"
+            className="h-10 w-10 p-0 text-primary hover:text-primary hover:bg-primary/10 rounded-xl transition-all duration-200 disabled:opacity-50 hover:scale-110"
           >
             <Eye className="h-4 w-4" />
           </Button>
@@ -124,7 +124,7 @@ export const BudgetCard = ({
             variant="ghost" 
             size="sm" 
             onClick={() => onEdit(budget)} 
-            className="h-10 w-10 p-0 hover:bg-accent/20 hover:text-primary rounded-xl transition-all duration-200 hover:scale-110"
+            className="h-10 w-10 p-0 hover:bg-primary/10 hover:text-primary rounded-xl transition-all duration-200 hover:scale-110"
           >
             <Edit className="h-4 w-4" />
           </Button>
