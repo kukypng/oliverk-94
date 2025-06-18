@@ -30,6 +30,7 @@ export {
   LayoutDashboard,
   Link,
   List,
+  Loader2,
   LogIn,
   LogOut,
   Mail,
