@@ -223,7 +223,8 @@
 @layer components {
   /* Glassmorphism premium refinado */
   .glass {
-    @apply backdrop-blur-xl bg-card/85 dark:bg-card/70 border border-primary/8 dark:border-primary/6;
+    @apply backdrop-blur-xl bg-card/85 dark:bg-card/70;
+    border: 1px solid hsl(var(--primary) / 0.08);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
   }
@@ -258,9 +259,14 @@
   }
 
   .btn-secondary-modern {
-    @apply bg-secondary text-secondary-foreground border border-border/50;
-    @apply hover:bg-secondary/80 hover:border-border;
+    @apply bg-secondary text-secondary-foreground;
+    border: 1px solid hsl(var(--border) / 0.5);
+    @apply hover:bg-secondary/80;
     background: hsl(var(--secondary));
+  }
+
+  .btn-secondary-modern:hover {
+    border: 1px solid hsl(var(--border));
   }
 
   .btn-destructive-modern {
@@ -271,11 +277,16 @@
 
   /* Cards premium refinados */
   .card-modern {
-    @apply bg-card border border-primary/8 rounded-2xl shadow-soft;
+    @apply bg-card rounded-2xl shadow-soft;
     @apply transition-all duration-300 ease-out;
-    @apply hover:shadow-medium hover:-translate-y-0.5 hover:border-primary/15;
+    @apply hover:shadow-medium hover:-translate-y-0.5;
+    border: 1px solid hsl(var(--primary) / 0.08);
     backdrop-filter: blur(8px);
     background: linear-gradient(135deg, hsl(var(--card)) 0%, hsl(var(--card) / 0.98) 100%);
+  }
+
+  .card-modern:hover {
+    border: 1px solid hsl(var(--primary) / 0.15);
   }
 
   /* Elementos interativos otimizados */
@@ -302,13 +313,15 @@
 
   /* Inputs premium otimizados */
   .input-modern {
-    @apply flex h-10 w-full rounded-lg border border-primary/15 bg-input/70 px-3 py-2;
+    @apply flex h-10 w-full rounded-lg px-3 py-2;
     @apply text-sm ring-offset-background file:border-0 file:bg-transparent;
     @apply file:text-sm file:font-medium placeholder:text-muted-foreground;
     @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/25;
-    @apply focus-visible:ring-offset-1 focus-visible:border-primary/40;
+    @apply focus-visible:ring-offset-1;
     @apply disabled:cursor-not-allowed disabled:opacity-50;
     @apply transition-all duration-200 ease-out;
+    border: 1px solid hsl(var(--primary) / 0.15);
+    background: hsl(var(--input) / 0.7);
     backdrop-filter: blur(8px);
   }
 
@@ -316,39 +329,57 @@
     @apply bg-background/90 shadow-soft;
     transform: translateY(-0.5px);
     box-shadow: var(--shadow-soft), 0 0 0 3px hsl(var(--primary) / 0.1);
+    border: 1px solid hsl(var(--primary) / 0.4);
   }
 
   /* Checkbox moderno */
   .checkbox-modern {
-    @apply w-4 h-4 rounded border-2 border-primary/30;
+    @apply w-4 h-4 rounded;
     @apply transition-all duration-200 ease-out;
-    @apply data-[state=checked]:bg-primary data-[state=checked]:border-primary;
-    @apply data-[state=checked]:text-primary-foreground;
-    @apply hover:border-primary/50 hover:scale-105;
+    @apply data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground;
+    @apply hover:scale-105;
     @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/25;
+    border: 2px solid hsl(var(--primary) / 0.3);
+  }
+
+  .checkbox-modern:hover {
+    border: 2px solid hsl(var(--primary) / 0.5);
+  }
+
+  .checkbox-modern[data-state=checked] {
+    border: 2px solid hsl(var(--primary));
   }
 
   /* Badges de status refinados */
   .status-badge-modern {
     @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium;
     @apply transition-all duration-200 ease-out;
-    @apply border backdrop-blur-sm;
+    @apply backdrop-blur-sm;
+    border: 1px solid;
   }
 
   .status-badge-modern.success {
-    @apply bg-primary/8 text-primary border-primary/15;
+    @apply text-primary;
+    background: hsl(var(--primary) / 0.08);
+    border-color: hsl(var(--primary) / 0.15);
   }
 
   .status-badge-modern.warning {
-    @apply bg-amber-500/8 text-amber-600 border-amber-500/15;
+    @apply text-amber-600;
+    background: hsl(45 100% 50% / 0.08);
+    border-color: hsl(45 100% 50% / 0.15);
   }
 
   .status-badge-modern.error {
-    @apply bg-red-500/8 text-red-600 border-red-500/15;
+    @apply text-red-600;
+    background: hsl(0 84% 60% / 0.08);
+    border-color: hsl(0 84% 60% / 0.15);
   }
 
   .status-badge-modern.info {
-    @apply bg-blue-500/8 text-blue-600 border-blue-500/15;
+    @apply text-blue-600;
+    background: hsl(217 91% 60% / 0.08);
+    border-color: hsl(217 91% 60% / 0.15);
   }
 
   /* Tabelas premium */
@@ -358,17 +389,20 @@
   }
 
   .table-modern th {
-    @apply bg-primary/4 px-4 py-3 text-left font-semibold text-xs text-muted-foreground;
-    @apply uppercase tracking-wider border-b border-primary/8;
+    @apply px-4 py-3 text-left font-semibold text-xs text-muted-foreground;
+    @apply uppercase tracking-wider;
+    background: hsl(var(--primary) / 0.04);
+    border-bottom: 1px solid hsl(var(--primary) / 0.08);
   }
 
   .table-modern td {
-    @apply px-4 py-3 border-b border-primary/4 text-foreground text-sm;
+    @apply px-4 py-3 text-foreground text-sm;
     @apply transition-colors duration-200;
+    border-bottom: 1px solid hsl(var(--primary) / 0.04);
   }
 
   .table-modern tr:hover td {
-    @apply bg-primary/3;
+    background: hsl(var(--primary) / 0.03);
   }
 
   .table-modern tr:last-child td {
@@ -393,8 +427,13 @@
 
   /* Focus rings modernos */
   .focus-ring-modern {
-    @apply focus:outline-none focus:ring-2 focus:ring-primary/25 focus:border-primary/40;
+    @apply focus:outline-none focus:ring-2 focus:ring-primary/25;
     @apply transition-all duration-200 ease-out;
+    border: 1px solid hsl(var(--primary) / 0.4);
+  }
+
+  .focus-ring-modern:focus {
+    border: 1px solid hsl(var(--primary) / 0.4);
   }
 
   /* Loading states aprimorados */
