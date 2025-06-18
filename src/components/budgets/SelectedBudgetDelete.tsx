@@ -24,7 +24,7 @@ interface SelectedBudgetDeleteProps {
 }
 
 export const SelectedBudgetDelete = ({ selectedBudgets, budgets, onDeleteComplete }: SelectedBudgetDeleteProps) => {
-  const { toast } = useToast();
+  const { showSuccess, showError } = useToast();
   const [isOpen, setIsOpen] = useState(false);
 
   const deleteSelectedBudgetsMutation = useMutation({
@@ -61,7 +61,7 @@ export const SelectedBudgetDelete = ({ selectedBudgets, budgets, onDeleteComplet
     onSuccess: (deletedBudgets) => {
       console.log('Orçamentos excluídos com sucesso:', deletedBudgets);
       
-      toast({
+      showSuccess({
         title: "Orçamentos excluídos",
         description: `${deletedBudgets.length} orçamento(s) foram removidos com sucesso.`,
       });
@@ -85,10 +85,9 @@ export const SelectedBudgetDelete = ({ selectedBudgets, budgets, onDeleteComplet
         errorMessage = error.message;
       }
       
-      toast({
+      showError({
         title: "Erro na exclusão",
         description: errorMessage,
-        variant: "destructive",
       });
     },
   });
