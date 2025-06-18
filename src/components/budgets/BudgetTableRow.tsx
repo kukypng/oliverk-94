@@ -1,9 +1,11 @@
+
 import React from 'react';
 import { TableCell } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { MessageCircle, Eye, Edit, Clock, Trash2 } from '@/components/ui/icons';
 import { Checkbox } from '@/components/ui/checkbox';
+
 interface BudgetTableRowProps {
   budget: any;
   profile: any;
@@ -16,6 +18,7 @@ interface BudgetTableRowProps {
   onEdit: (budget: any) => void;
   onDelete: (budget: any) => void;
 }
+
 const isBudgetOld = (createdAt: string, warningDays: number | undefined | null): boolean => {
   if (!createdAt || !warningDays) return false;
   const now = new Date();
@@ -24,6 +27,7 @@ const isBudgetOld = (createdAt: string, warningDays: number | undefined | null):
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   return diffDays > warningDays;
 };
+
 export const BudgetTableRow = ({
   budget,
   profile,
@@ -36,18 +40,24 @@ export const BudgetTableRow = ({
   onEdit,
   onDelete
 }: BudgetTableRowProps) => {
-  // Verificar se o budget é válido antes de renderizar
   if (!budget || !budget.id) {
     console.warn('BudgetTableRow: budget inválido:', budget);
     return null;
   }
+
   return <>
       <TableCell className="w-12">
-        <Checkbox checked={isSelected} onCheckedChange={checked => onSelect(budget.id, !!checked)} className="w-4 h-4" />
+        <Checkbox 
+          checked={isSelected} 
+          onCheckedChange={checked => onSelect(budget.id, !!checked)} 
+          className="w-4 h-4 transition-all duration-200 hover:scale-110" 
+        />
       </TableCell>
       <TableCell>
         <div className="space-y-1">
-          <p className="font-medium text-foreground">{budget.device_model || 'Dispositivo não informado'}</p>
+          <p className="font-medium text-foreground transition-colors duration-200 group-hover:text-[#fec832]">
+            {budget.device_model || 'Dispositivo não informado'}
+          </p>
           <p className="text-sm text-muted-foreground">{budget.device_type || 'Tipo não informado'}</p>
           {budget.client_name && <p className="text-sm text-muted-foreground">{budget.client_name}</p>}
         </div>
@@ -57,7 +67,7 @@ export const BudgetTableRow = ({
       </TableCell>
       <TableCell>
         <div className="space-y-1">
-          <p className="font-semibold text-foreground">
+          <p className="font-semibold text-foreground transition-colors duration-200 group-hover:text-[#fec832]">
             R$ {((budget.total_price || 0) / 100).toLocaleString('pt-BR', {
             minimumFractionDigits: 2
           })}
@@ -70,7 +80,8 @@ export const BudgetTableRow = ({
           <span className="text-sm text-muted-foreground">
             {budget.created_at ? new Date(budget.created_at).toLocaleDateString('pt-BR') : 'Data não informada'}
           </span>
-          {profile?.budget_warning_enabled && budget.created_at && isBudgetOld(budget.created_at, profile.budget_warning_days) && <TooltipProvider>
+          {profile?.budget_warning_enabled && budget.created_at && isBudgetOld(budget.created_at, profile.budget_warning_days) && 
+            <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
                   <Clock className="h-4 w-4 text-destructive animate-pulse" />
@@ -79,21 +90,45 @@ export const BudgetTableRow = ({
                   <p>Este orçamento tem mais de {profile.budget_warning_days} dias.</p>
                 </TooltipContent>
               </Tooltip>
-            </TooltipProvider>}
+            </TooltipProvider>
+          }
         </div>
       </TableCell>
       <TableCell>
         <div className="flex items-center justify-center space-x-1">
-          <Button variant="ghost" size="sm" onClick={() => onShareWhatsApp(budget)} className="h-9 w-9 p-0 text-green-600 hover:text-green-700 hover:bg-green-50 dark:hover:bg-green-950 rounded-xl">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => onShareWhatsApp(budget)} 
+            className="h-9 w-9 p-0 text-green-600 hover:text-green-700 hover:bg-green-50 dark:hover:bg-green-950 rounded-xl transition-all duration-200 hover:scale-110"
+          >
             <MessageCircle className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="sm" onClick={() => onViewPDF(budget)} disabled={isGenerating} className="h-9 w-9 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-950 rounded-xl">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => onViewPDF(budget)} 
+            disabled={isGenerating} 
+            className="h-9 w-9 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-950 rounded-xl transition-all duration-200 hover:scale-110 disabled:opacity-50"
+          >
             <Eye className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="sm" onClick={() => onEdit(budget)} className="h-9 w-9 p-0 hover:bg-muted/20 hover:text-[#fec832] rounded-xl">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => onEdit(budget)} 
+            className="h-9 w-9 p-0 hover:bg-muted/20 hover:text-[#fec832] rounded-xl transition-all duration-200 hover:scale-110"
+          >
             <Edit className="h-4 w-4" />
           </Button>
-          
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => onDelete(budget)} 
+            className="h-9 w-9 p-0 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950 rounded-xl transition-all duration-200 hover:scale-110"
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
         </div>
       </TableCell>
     </>;

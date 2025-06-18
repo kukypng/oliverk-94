@@ -38,36 +38,49 @@ export const BudgetCard = ({
   onEdit,
   onDelete
 }: BudgetCardProps) => {
-  // Verificar se o budget é válido antes de renderizar
   if (!budget || !budget.id) {
     console.warn('BudgetCard: budget inválido:', budget);
     return null;
   }
 
   return (
-    <div className="glass-card border border-white/10 rounded-2xl p-4 hover:shadow-lg transition-all duration-300 hover:scale-[1.01] animate-fade-in">
+    <div className={`
+      glass-card border border-white/10 rounded-2xl p-4 
+      transition-all duration-300 ease-out
+      hover:shadow-xl hover:scale-[1.02] hover:-translate-y-1
+      ${isSelected ? 'ring-2 ring-[#fec832] ring-opacity-50 shadow-lg' : ''}
+      animate-fade-in cursor-pointer group
+    `}>
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-start space-x-3 flex-1">
           <div className="pt-1">
             <Checkbox
               checked={isSelected}
               onCheckedChange={(checked) => onSelect(budget.id, !!checked)}
-              className="w-5 h-5"
+              className="w-5 h-5 transition-all duration-200 hover:scale-110"
             />
           </div>
           <div className="flex-1">
             <div className="flex items-center space-x-2 mb-1">
-              <h3 className="font-semibold text-base text-foreground">{budget.device_model || 'Dispositivo não informado'}</h3>
-              <Badge variant="secondary" className="text-xs bg-muted/50">
+              <h3 className="font-semibold text-base text-foreground group-hover:text-[#fec832] transition-colors duration-200">
+                {budget.device_model || 'Dispositivo não informado'}
+              </h3>
+              <Badge variant="secondary" className="text-xs bg-muted/50 transition-all duration-200 group-hover:bg-[#fec832]/10">
                 {budget.device_type || 'Tipo não informado'}
               </Badge>
             </div>
-            {budget.client_name && <p className="text-sm text-muted-foreground mb-1">{budget.client_name}</p>}
-            <p className="text-sm text-muted-foreground">{budget.issue || 'Problema não informado'}</p>
+            {budget.client_name && (
+              <p className="text-sm text-muted-foreground mb-1 transition-colors duration-200 group-hover:text-foreground/80">
+                {budget.client_name}
+              </p>
+            )}
+            <p className="text-sm text-muted-foreground transition-colors duration-200 group-hover:text-foreground/80">
+              {budget.issue || 'Problema não informado'}
+            </p>
           </div>
         </div>
         <div className="text-right">
-          <p className="font-bold text-lg text-foreground">
+          <p className="font-bold text-lg text-foreground group-hover:text-[#fec832] transition-colors duration-200">
             R$ {((budget.total_price || 0) / 100).toLocaleString('pt-BR', {
               minimumFractionDigits: 2
             })}
@@ -92,7 +105,7 @@ export const BudgetCard = ({
             variant="ghost" 
             size="sm" 
             onClick={() => onShareWhatsApp(budget)} 
-            className="h-10 w-10 p-0 text-green-600 hover:text-green-700 hover:bg-green-50 dark:hover:bg-green-950 rounded-xl"
+            className="h-10 w-10 p-0 text-green-600 hover:text-green-700 hover:bg-green-50 dark:hover:bg-green-950 rounded-xl transition-all duration-200 hover:scale-110"
           >
             <MessageCircle className="h-5 w-5" />
           </Button>
@@ -101,7 +114,7 @@ export const BudgetCard = ({
             size="sm" 
             onClick={() => onViewPDF(budget)} 
             disabled={isGenerating} 
-            className="h-10 w-10 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-950 rounded-xl"
+            className="h-10 w-10 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-950 rounded-xl transition-all duration-200 hover:scale-110 disabled:opacity-50"
           >
             <Eye className="h-5 w-5" />
           </Button>
@@ -109,7 +122,7 @@ export const BudgetCard = ({
             variant="ghost" 
             size="sm" 
             onClick={() => onEdit(budget)} 
-            className="h-10 w-10 p-0 hover:bg-muted/20 hover:text-[#fec832] rounded-xl"
+            className="h-10 w-10 p-0 hover:bg-muted/20 hover:text-[#fec832] rounded-xl transition-all duration-200 hover:scale-110"
           >
             <Edit className="h-5 w-5" />
           </Button>
@@ -117,7 +130,7 @@ export const BudgetCard = ({
             variant="ghost" 
             size="sm" 
             onClick={() => onDelete(budget)} 
-            className="h-10 w-10 p-0 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950 rounded-xl"
+            className="h-10 w-10 p-0 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950 rounded-xl transition-all duration-200 hover:scale-110"
           >
             <Trash2 className="h-5 w-5" />
           </Button>
