@@ -1,5 +1,6 @@
+
 import React from 'react';
-import { TableCell, TableRow } from '@/components/ui/table';
+import { TableCell } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { MessageCircle, Eye, Edit, Trash2, Clock } from '@/components/ui/icons';
@@ -49,20 +50,8 @@ export const BudgetTableRow = ({
     }
   };
 
-  const handleBlueDelete = () => {
-    if (budget && budget.id) {
-      console.log('BudgetTableRow: Iniciando exclusão (azul) do orçamento:', budget.id);
-      onDelete(budget);
-    } else {
-      console.error('BudgetTableRow: Tentativa de deletar (azul) budget inválido:', budget);
-    }
-  };
-
   return (
-    <TableRow 
-      className="hover:bg-muted/20 transition-colors border-white/10 animate-fade-in" 
-      style={{ animationDelay: `${index * 50}ms` }}
-    >
+    <>
       <TableCell>
         <div className="space-y-1">
           <p className="font-medium text-foreground">{budget.device_model || 'Dispositivo não informado'}</p>
@@ -136,14 +125,6 @@ export const BudgetTableRow = ({
           <Button 
             variant="ghost" 
             size="sm" 
-            onClick={handleBlueDelete} 
-            className="h-9 w-9 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-950 rounded-xl"
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="sm" 
             onClick={handleDelete} 
             className="h-9 w-9 p-0 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950 rounded-xl"
           >
@@ -151,6 +132,6 @@ export const BudgetTableRow = ({
           </Button>
         </div>
       </TableCell>
-    </TableRow>
+    </>
   );
 };
