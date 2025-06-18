@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { TableCell } from '@/components/ui/table';
+import { TableCell, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { MessageCircle, Eye, Edit, Trash2, Clock } from '@/components/ui/icons';
@@ -51,7 +51,10 @@ export const BudgetTableRow = ({
   };
 
   return (
-    <>
+    <TableRow 
+      className="hover:bg-muted/20 transition-colors border-white/10 animate-fade-in" 
+      style={{ animationDelay: `${index * 50}ms` }}
+    >
       <TableCell>
         <div className="space-y-1">
           <p className="font-medium text-foreground">{budget.device_model || 'Dispositivo não informado'}</p>
@@ -132,6 +135,6 @@ export const BudgetTableRow = ({
           </Button>
         </div>
       </TableCell>
-    </>
+    </TableRow>
   );
 };

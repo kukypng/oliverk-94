@@ -1,12 +1,13 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Table, TableBody, TableHead, TableHeader, TableRow, TableCell } from '@/components/ui/table';
+import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { MessageCircle } from '@/components/ui/icons';
 import { generateWhatsAppMessage, shareViaWhatsApp } from '@/utils/whatsappUtils';
-import { useToast } from '@/hooks/useToast';
+import { useEnhancedToast } from '@/hooks/useEnhancedToast';
 import { EditBudgetModal } from '@/components/EditBudgetModal';
 import { DeleteBudgetConfirm } from '@/components/DeleteBudgetConfirm';
 import { BudgetsSkeleton } from '@/components/ui/loading-skeleton';
@@ -17,17 +18,16 @@ import { ConfirmationDialog } from './ConfirmationDialog';
 import { BudgetCard } from './budgets/BudgetCard';
 import { BudgetTableRow } from './budgets/BudgetTableRow';
 import { BudgetSearchBar } from './budgets/BudgetSearchBar';
-import { SelectedBudgetDelete } from './budgets/SelectedBudgetDelete';
+import { MassDeleteButton } from './budgets/MassDeleteButton';
 
 export const BudgetsContent = () => {
-  const { showSuccess, showError } = useToast();
+  const { showSuccess, showError } = useEnhancedToast();
   const { user, profile } = useAuth();
   const { generateAndSharePDF, isGenerating } = usePdfGeneration();
   const [editingBudget, setEditingBudget] = useState<any>(null);
   const [deletingBudget, setDeletingBudget] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [actualSearchTerm, setActualSearchTerm] = useState('');
-  const [selectedBudgets, setSelectedBudgets] = useState<string[]>([]);
   const [confirmation, setConfirmation] = useState<{
     action: () => void;
     title: string;
@@ -68,23 +68,6 @@ export const BudgetsContent = () => {
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       handleSearch();
-    }
-  };
-
-  const handleBudgetSelect = (budgetId: string, isSelected: boolean) => {
-    if (isSelected) {
-      setSelectedBudgets(prev => [...prev, budgetId]);
-    } else {
-      setSelectedBudgets(prev => prev.filter(id => id !== budgetId));
-    }
-  };
-
-  const handleSelectAll = (isSelected: boolean) => {
-    if (isSelected) {
-      const allBudgetIds = filteredBudgets.map(budget => budget.id);
-      setSelectedBudgets(allBudgetIds);
-    } else {
-      setSelectedBudgets([]);
     }
   };
 
@@ -175,15 +158,11 @@ export const BudgetsContent = () => {
           </div>
         </div>
         
-        {/* Selected Budget Delete Button */}
+        {/* Mass Delete Button */}
         <div className="flex justify-end">
-          <SelectedBudgetDelete 
-            selectedBudgets={selectedBudgets}
-            budgets={filteredBudgets}
-            onDeleteComplete={() => {
-              setSelectedBudgets([]);
-              refetch();
-            }}
+          <MassDeleteButton 
+            budgetCount={filteredBudgets.length} 
+            disabled={isLoading}
           />
         </div>
       </div>
@@ -202,16 +181,9 @@ export const BudgetsContent = () => {
           <CardTitle className="flex items-center justify-between text-lg lg:text-xl">
             <span>Lista de Orçamentos</span>
             {filteredBudgets.length > 0 && (
-              <div className="flex items-center space-x-2">
-                <Badge variant="secondary" className="bg-[#fec832]/10 text-[#fec832] border-[#fec832]/20">
-                  {filteredBudgets.length}
-                </Badge>
-                {selectedBudgets.length > 0 && (
-                  <Badge variant="destructive" className="text-xs">
-                    {selectedBudgets.length} selecionado{selectedBudgets.length > 1 ? 's' : ''}
-                  </Badge>
-                )}
-              </div>
+              <Badge variant="secondary" className="bg-[#fec832]/10 text-[#fec832] border-[#fec832]/20">
+                {filteredBudgets.length}
+              </Badge>
             )}
           </CardTitle>
         </CardHeader>
@@ -221,25 +193,16 @@ export const BudgetsContent = () => {
               {/* Mobile Cards View */}
               <div className="block lg:hidden space-y-4">
                 {filteredBudgets.map((budget, index) => (
-                  <div key={budget.id} className="relative">
-                    <div className="absolute top-2 left-2 z-10">
-                      <input
-                        type="checkbox"
-                        checked={selectedBudgets.includes(budget.id)}
-                        onChange={(e) => handleBudgetSelect(budget.id, e.target.checked)}
-                        className="w-4 h-4 text-red-600 bg-gray-100 border-gray-300 rounded focus:ring-red-500"
-                      />
-                    </div>
-                    <BudgetCard
-                      budget={budget}
-                      profile={profile}
-                      isGenerating={isGenerating}
-                      onShareWhatsApp={handleShareWhatsApp}
-                      onViewPDF={handleViewPDF}
-                      onEdit={setEditingBudget}
-                      onDelete={setDeletingBudget}
-                    />
-                  </div>
+                  <BudgetCard
+                    key={budget.id}
+                    budget={budget}
+                    profile={profile}
+                    isGenerating={isGenerating}
+                    onShareWhatsApp={handleShareWhatsApp}
+                    onViewPDF={handleViewPDF}
+                    onEdit={setEditingBudget}
+                    onDelete={setDeletingBudget}
+                  />
                 ))}
               </div>
 
@@ -248,14 +211,6 @@ export const BudgetsContent = () => {
                 <Table>
                   <TableHeader>
                     <TableRow className="hover:bg-transparent border-white/10">
-                      <TableHead className="w-12">
-                        <input
-                          type="checkbox"
-                          checked={selectedBudgets.length === filteredBudgets.length && filteredBudgets.length > 0}
-                          onChange={(e) => handleSelectAll(e.target.checked)}
-                          className="w-4 h-4 text-red-600 bg-gray-100 border-gray-300 rounded focus:ring-red-500"
-                        />
-                      </TableHead>
                       <TableHead className="font-semibold">Dispositivo</TableHead>
                       <TableHead className="font-semibold">Problema</TableHead>
                       <TableHead className="font-semibold">Valor</TableHead>
@@ -265,26 +220,17 @@ export const BudgetsContent = () => {
                   </TableHeader>
                   <TableBody>
                     {filteredBudgets.map((budget, index) => (
-                      <TableRow key={budget.id} className="hover:bg-muted/20 transition-colors border-white/10 animate-fade-in">
-                        <TableCell>
-                          <input
-                            type="checkbox"
-                            checked={selectedBudgets.includes(budget.id)}
-                            onChange={(e) => handleBudgetSelect(budget.id, e.target.checked)}
-                            className="w-4 h-4 text-red-600 bg-gray-100 border-gray-300 rounded focus:ring-red-500"
-                          />
-                        </TableCell>
-                        <BudgetTableRow
-                          budget={budget}
-                          profile={profile}
-                          index={index}
-                          isGenerating={isGenerating}
-                          onShareWhatsApp={handleShareWhatsApp}
-                          onViewPDF={handleViewPDF}
-                          onEdit={setEditingBudget}
-                          onDelete={setDeletingBudget}
-                        />
-                      </TableRow>
+                      <BudgetTableRow
+                        key={budget.id}
+                        budget={budget}
+                        profile={profile}
+                        index={index}
+                        isGenerating={isGenerating}
+                        onShareWhatsApp={handleShareWhatsApp}
+                        onViewPDF={handleViewPDF}
+                        onEdit={setEditingBudget}
+                        onDelete={setDeletingBudget}
+                      />
                     ))}
                   </TableBody>
                 </Table>
