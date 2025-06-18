@@ -18,6 +18,7 @@ import { ConfirmationDialog } from './ConfirmationDialog';
 import { BudgetCard } from './budgets/BudgetCard';
 import { BudgetTableRow } from './budgets/BudgetTableRow';
 import { BudgetSearchBar } from './budgets/BudgetSearchBar';
+import { MassDeleteButton } from './budgets/MassDeleteButton';
 
 export const BudgetsContent = () => {
   const { showSuccess, showError } = useEnhancedToast();
@@ -155,6 +156,14 @@ export const BudgetsContent = () => {
               {filteredBudgets.length}
             </Badge>
           </div>
+        </div>
+        
+        {/* Mass Delete Button */}
+        <div className="flex justify-end">
+          <MassDeleteButton 
+            budgetCount={filteredBudgets.length} 
+            disabled={isLoading}
+          />
         </div>
       </div>
 

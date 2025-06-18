@@ -695,6 +695,10 @@ export type Database = {
           is_admin: boolean
         }[]
       }
+      delete_all_user_budgets: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
       delete_budget_with_parts: {
         Args: { p_budget_id: string }
         Returns: boolean

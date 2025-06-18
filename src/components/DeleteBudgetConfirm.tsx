@@ -13,6 +13,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { Loader2 } from '@/components/ui/icons';
 
 interface DeleteBudgetConfirmProps {
   budget: any;
@@ -34,42 +35,6 @@ export const DeleteBudgetConfirm = ({ budget, open, onOpenChange }: DeleteBudget
       console.log('Iniciando exclusão do orçamento:', budget.id);
       console.log('Dados do orçamento:', budget);
       
-      // Verificar se o usuário está autenticado
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
-      if (authError || !user) {
-        console.error('Erro de autenticação:', authError);
-        throw new Error('Usuário não autenticado');
-      }
-      
-      console.log('Usuário autenticado:', user.id);
-      
-      // Primeiro, verificar se o orçamento existe e pertence ao usuário
-      const { data: existingBudget, error: fetchError } = await supabase
-        .from('budgets')
-        .select('id, owner_id, device_model, client_name')
-        .eq('id', budget.id)
-        .single();
-      
-      if (fetchError) {
-        console.error('Erro ao buscar orçamento:', fetchError);
-        if (fetchError.code === 'PGRST116') {
-          throw new Error('Orçamento não encontrado no banco de dados');
-        }
-        throw new Error(`Erro ao verificar orçamento: ${fetchError.message}`);
-      }
-      
-      if (!existingBudget) {
-        console.error('Orçamento não encontrado:', budget.id);
-        throw new Error('Orçamento não encontrado');
-      }
-      
-      console.log('Orçamento encontrado:', existingBudget);
-      
-      if (existingBudget.owner_id !== user.id) {
-        console.error('Usuário não é o proprietário do orçamento');
-        throw new Error('Você não tem permissão para excluir este orçamento');
-      }
-      
       // Usar a função segura de exclusão
       const { data, error } = await supabase.rpc('delete_budget_with_parts', {
         p_budget_id: budget.id
@@ -83,8 +48,8 @@ export const DeleteBudgetConfirm = ({ budget, open, onOpenChange }: DeleteBudget
       }
       
       if (data === false) {
-        console.error('Função retornou false - orçamento não encontrado ou sem permissão');
-        throw new Error('Orçamento não encontrado ou você não tem permissão para excluí-lo');
+        console.error('Função retornou false - orçamento não encontrado');
+        throw new Error('Orçamento não encontrado');
       }
       
       console.log('Orçamento excluído com sucesso');
@@ -110,17 +75,16 @@ export const DeleteBudgetConfirm = ({ budget, open, onOpenChange }: DeleteBudget
       if (error.message.includes('Acesso negado') || error.message.includes('não tem permissão')) {
         errorMessage = "Você não tem permissão para excluir este orçamento.";
       } else if (error.message.includes('não encontrado')) {
-        errorMessage = "Orçamento não encontrado. Ele pode ter sido excluído por outro usuário.";
+        errorMessage = "Orçamento não encontrado. Ele pode ter sido excluído anteriormente.";
         // Force refresh para atualizar a lista
         queryClient.invalidateQueries({ queryKey: ['budgets'] });
+        queryClient.refetchQueries({ queryKey: ['budgets'] });
+        // Fechar o diálogo automaticamente
+        onOpenChange(false);
       } else if (error.message.includes('não autenticado')) {
         errorMessage = "Você precisa estar logado para excluir orçamentos.";
       } else if (error.message.includes('inválido')) {
         errorMessage = "Dados do orçamento são inválidos.";
-      } else if (error.message.includes('banco de dados')) {
-        errorMessage = "Orçamento não encontrado no banco de dados. A lista será atualizada.";
-        // Force refresh para remover itens que não existem mais
-        queryClient.invalidateQueries({ queryKey: ['budgets'] });
       } else if (error.message) {
         errorMessage = error.message;
       }
@@ -130,11 +94,6 @@ export const DeleteBudgetConfirm = ({ budget, open, onOpenChange }: DeleteBudget
         description: errorMessage,
         variant: "destructive",
       });
-      
-      // Se for erro de orçamento não encontrado, fechar o diálogo e atualizar a lista
-      if (error.message.includes('não encontrado')) {
-        onOpenChange(false);
-      }
     },
   });
 
@@ -185,7 +144,14 @@ export const DeleteBudgetConfirm = ({ budget, open, onOpenChange }: DeleteBudget
             disabled={deleteBudgetMutation.isPending}
             className="bg-destructive hover:bg-destructive/90"
           >
-            {deleteBudgetMutation.isPending ? 'Excluindo...' : 'Excluir'}
+            {deleteBudgetMutation.isPending ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                Excluindo...
+              </>
+            ) : (
+              'Excluir'
+            )}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
