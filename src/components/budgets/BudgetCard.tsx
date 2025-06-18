@@ -58,7 +58,7 @@ export const BudgetCard = ({
             <Checkbox
               checked={isSelected}
               onCheckedChange={(checked) => onSelect(budget.id, checked as boolean)}
-              className="mt-1 shrink-0 w-3 h-3"
+              className="mt-1 shrink-0 w-2 h-2"
             />
             <div className="flex-1 min-w-0">
               <div className="flex items-center space-x-2 mb-1">
