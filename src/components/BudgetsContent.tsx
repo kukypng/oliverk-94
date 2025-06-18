@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useQuery } from '@tanstack/react-query';
@@ -8,7 +9,6 @@ import { MessageCircle } from '@/components/ui/icons';
 import { generateWhatsAppMessage, shareViaWhatsApp } from '@/utils/whatsappUtils';
 import { useToast } from '@/hooks/useToast';
 import { EditBudgetModal } from '@/components/EditBudgetModal';
-import { DeleteBudgetConfirm } from '@/components/DeleteBudgetConfirm';
 import { BudgetsSkeleton } from '@/components/ui/loading-skeleton';
 import { EmptyState } from '@/components/EmptyState';
 import { useAuth } from '@/hooks/useAuth';
@@ -24,7 +24,6 @@ export const BudgetsContent = () => {
   const { user, profile } = useAuth();
   const { generateAndSharePDF, isGenerating } = usePdfGeneration();
   const [editingBudget, setEditingBudget] = useState<any>(null);
-  const [deletingBudget, setDeletingBudget] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [actualSearchTerm, setActualSearchTerm] = useState('');
   const [selectedBudgets, setSelectedBudgets] = useState<string[]>([]);
@@ -237,7 +236,6 @@ export const BudgetsContent = () => {
                       onShareWhatsApp={handleShareWhatsApp}
                       onViewPDF={handleViewPDF}
                       onEdit={setEditingBudget}
-                      onDelete={setDeletingBudget}
                     />
                   </div>
                 ))}
@@ -282,7 +280,6 @@ export const BudgetsContent = () => {
                           onShareWhatsApp={handleShareWhatsApp}
                           onViewPDF={handleViewPDF}
                           onEdit={setEditingBudget}
-                          onDelete={setDeletingBudget}
                         />
                       </TableRow>
                     ))}
@@ -319,12 +316,6 @@ export const BudgetsContent = () => {
         budget={editingBudget} 
         open={!!editingBudget} 
         onOpenChange={(open) => !open && setEditingBudget(null)} 
-      />
-
-      <DeleteBudgetConfirm 
-        budget={deletingBudget} 
-        open={!!deletingBudget} 
-        onOpenChange={(open) => !open && setDeletingBudget(null)} 
       />
 
       <ConfirmationDialog 

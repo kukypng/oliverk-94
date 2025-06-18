@@ -3,7 +3,7 @@ import React from 'react';
 import { TableCell } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { MessageCircle, Eye, Edit, Trash2, Clock } from '@/components/ui/icons';
+import { MessageCircle, Eye, Edit, Clock } from '@/components/ui/icons';
 
 interface BudgetTableRowProps {
   budget: any;
@@ -13,7 +13,6 @@ interface BudgetTableRowProps {
   onShareWhatsApp: (budget: any) => void;
   onViewPDF: (budget: any) => void;
   onEdit: (budget: any) => void;
-  onDelete: (budget: any) => void;
 }
 
 const isBudgetOld = (createdAt: string, warningDays: number | undefined | null): boolean => {
@@ -32,23 +31,13 @@ export const BudgetTableRow = ({
   isGenerating,
   onShareWhatsApp,
   onViewPDF,
-  onEdit,
-  onDelete
+  onEdit
 }: BudgetTableRowProps) => {
   // Verificar se o budget é válido antes de renderizar
   if (!budget || !budget.id) {
     console.warn('BudgetTableRow: budget inválido:', budget);
     return null;
   }
-
-  const handleDelete = () => {
-    if (budget && budget.id) {
-      console.log('BudgetTableRow: Iniciando exclusão do orçamento:', budget.id);
-      onDelete(budget);
-    } else {
-      console.error('BudgetTableRow: Tentativa de deletar budget inválido:', budget);
-    }
-  };
 
   return (
     <>
@@ -121,14 +110,6 @@ export const BudgetTableRow = ({
             className="h-9 w-9 p-0 hover:bg-muted/20 hover:text-[#fec832] rounded-xl"
           >
             <Edit className="h-4 w-4" />
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={handleDelete} 
-            className="h-9 w-9 p-0 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950 rounded-xl"
-          >
-            <Trash2 className="h-4 w-4" />
           </Button>
         </div>
       </TableCell>

@@ -3,7 +3,7 @@ import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { MessageCircle, Eye, Edit, Trash2, Clock } from '@/components/ui/icons';
+import { MessageCircle, Eye, Edit, Clock } from '@/components/ui/icons';
 
 interface BudgetCardProps {
   budget: any;
@@ -12,7 +12,6 @@ interface BudgetCardProps {
   onShareWhatsApp: (budget: any) => void;
   onViewPDF: (budget: any) => void;
   onEdit: (budget: any) => void;
-  onDelete: (budget: any) => void;
 }
 
 const isBudgetOld = (createdAt: string, warningDays: number | undefined | null): boolean => {
@@ -30,23 +29,13 @@ export const BudgetCard = ({
   isGenerating,
   onShareWhatsApp,
   onViewPDF,
-  onEdit,
-  onDelete
+  onEdit
 }: BudgetCardProps) => {
   // Verificar se o budget é válido antes de renderizar
   if (!budget || !budget.id) {
     console.warn('BudgetCard: budget inválido:', budget);
     return null;
   }
-
-  const handleDelete = () => {
-    if (budget && budget.id) {
-      console.log('BudgetCard: Iniciando exclusão do orçamento:', budget.id);
-      onDelete(budget);
-    } else {
-      console.error('BudgetCard: Tentativa de deletar budget inválido:', budget);
-    }
-  };
 
   return (
     <div className="glass-card border border-white/10 rounded-2xl p-4 hover:shadow-lg transition-all duration-300 hover:scale-[1.01] animate-fade-in">
@@ -107,14 +96,6 @@ export const BudgetCard = ({
             className="h-10 w-10 p-0 hover:bg-muted/20 hover:text-[#fec832] rounded-xl"
           >
             <Edit className="h-5 w-5" />
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={handleDelete} 
-            className="h-10 w-10 p-0 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950 rounded-xl"
-          >
-            <Trash2 className="h-5 w-5" />
           </Button>
         </div>
       </div>
