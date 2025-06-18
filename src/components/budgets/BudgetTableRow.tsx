@@ -50,12 +50,12 @@ export const BudgetTableRow = ({
         <Checkbox 
           checked={isSelected} 
           onCheckedChange={checked => onSelect(budget.id, !!checked)} 
-          className="w-4 h-4 transition-all duration-200 hover:scale-110" 
+          className="w-4 h-4 transition-transform duration-150" 
         />
       </TableCell>
       <TableCell>
         <div className="space-y-1">
-          <p className="font-medium text-foreground transition-colors duration-200 group-hover:text-[#fec832]">
+          <p className="font-medium text-foreground transition-colors duration-150 group-hover:text-[#fec832]">
             {budget.device_model || 'Dispositivo não informado'}
           </p>
           <p className="text-sm text-muted-foreground">{budget.device_type || 'Tipo não informado'}</p>
@@ -67,7 +67,7 @@ export const BudgetTableRow = ({
       </TableCell>
       <TableCell>
         <div className="space-y-1">
-          <p className="font-semibold text-foreground transition-colors duration-200 group-hover:text-[#fec832]">
+          <p className="font-semibold text-foreground transition-colors duration-150 group-hover:text-[#fec832]">
             R$ {((budget.total_price || 0) / 100).toLocaleString('pt-BR', {
             minimumFractionDigits: 2
           })}
@@ -84,7 +84,7 @@ export const BudgetTableRow = ({
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
-                  <Clock className="h-4 w-4 text-destructive animate-pulse" />
+                  <Clock className="h-4 w-4 text-destructive" />
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>Este orçamento tem mais de {profile.budget_warning_days} dias.</p>
@@ -100,7 +100,7 @@ export const BudgetTableRow = ({
             variant="ghost" 
             size="sm" 
             onClick={() => onShareWhatsApp(budget)} 
-            className="h-9 w-9 p-0 text-green-600 hover:text-green-700 hover:bg-green-50 dark:hover:bg-green-950 rounded-xl transition-all duration-200 hover:scale-110"
+            className="h-9 w-9 p-0 text-green-600 hover:text-green-700 hover:bg-green-50 dark:hover:bg-green-950 rounded-xl transition-all duration-150"
           >
             <MessageCircle className="h-4 w-4" />
           </Button>
@@ -109,7 +109,7 @@ export const BudgetTableRow = ({
             size="sm" 
             onClick={() => onViewPDF(budget)} 
             disabled={isGenerating} 
-            className="h-9 w-9 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-950 rounded-xl transition-all duration-200 hover:scale-110 disabled:opacity-50"
+            className="h-9 w-9 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-950 rounded-xl transition-all duration-150 disabled:opacity-50"
           >
             <Eye className="h-4 w-4" />
           </Button>
@@ -117,7 +117,7 @@ export const BudgetTableRow = ({
             variant="ghost" 
             size="sm" 
             onClick={() => onEdit(budget)} 
-            className="h-9 w-9 p-0 hover:bg-muted/20 hover:text-[#fec832] rounded-xl transition-all duration-200 hover:scale-110"
+            className="h-9 w-9 p-0 hover:bg-muted/20 hover:text-[#fec832] rounded-xl transition-all duration-150"
           >
             <Edit className="h-4 w-4" />
           </Button>
@@ -125,7 +125,7 @@ export const BudgetTableRow = ({
             variant="ghost" 
             size="sm" 
             onClick={() => onDelete(budget)} 
-            className="h-9 w-9 p-0 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950 rounded-xl transition-all duration-200 hover:scale-110"
+            className="h-9 w-9 p-0 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950 rounded-xl transition-all duration-150"
           >
             <Trash2 className="h-4 w-4" />
           </Button>

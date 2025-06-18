@@ -3,11 +3,13 @@ import { useCallback, useMemo } from 'react';
 
 export const useBudgetAnimations = (filteredBudgets: any[] = []) => {
   const getStaggerDelay = useCallback((index: number) => {
-    return `${index * 50}ms`;
+    // Reduzir delay para animações mais rápidas
+    return Math.min(index * 30, 300); // Max 300ms delay
   }, []);
 
   const getCardAnimationClass = useCallback((index: number) => {
-    return `animate-fade-in hover:animate-scale-in`;
+    // Simplificar animações para melhor performance
+    return 'animate-fade-in';
   }, []);
 
   const getListAnimationClass = useCallback(() => {
@@ -15,7 +17,7 @@ export const useBudgetAnimations = (filteredBudgets: any[] = []) => {
   }, []);
 
   const getDeleteAnimationClass = useCallback(() => {
-    return 'animate-fade-out animate-scale-out';
+    return 'animate-scale-out';
   }, []);
 
   const getLoadingAnimationClass = useCallback(() => {
@@ -23,38 +25,38 @@ export const useBudgetAnimations = (filteredBudgets: any[] = []) => {
   }, []);
 
   const animationConfig = useMemo(() => ({
-    staggerChildren: 50,
-    duration: 300,
+    staggerChildren: 30, // Reduzido de 50ms para 30ms
+    duration: 200, // Reduzido de 300ms para 200ms
     easing: 'ease-out',
-    reducedMotion: false // Can be configured based on user preference
+    reducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches
   }), []);
 
   const cardVariants = useMemo(() => ({
     hidden: {
       opacity: 0,
-      y: 20,
-      scale: 0.95
+      y: 10, // Reduzido de 20px para 10px
+      scale: 0.98 // Reduzido de 0.95 para 0.98
     },
     visible: (index: number) => ({
       opacity: 1,
       y: 0,
       scale: 1,
       transition: {
-        delay: index * 0.05,
-        duration: 0.3,
+        delay: Math.min(index * 0.03, 0.3), // Reduzido delay máximo
+        duration: 0.2, // Reduzido de 0.3s para 0.2s
         ease: 'easeOut'
       }
     }),
     hover: {
-      scale: 1.02,
-      y: -4,
+      scale: 1.01, // Reduzido de 1.02 para 1.01
+      y: -2, // Reduzido de -4px para -2px
       transition: {
-        duration: 0.2,
+        duration: 0.15, // Reduzido de 0.2s para 0.15s
         ease: 'easeOut'
       }
     },
     tap: {
-      scale: 0.98
+      scale: 0.99 // Reduzido de 0.98 para 0.99
     }
   }), []);
 

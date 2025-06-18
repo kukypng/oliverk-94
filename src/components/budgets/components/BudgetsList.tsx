@@ -35,17 +35,17 @@ export const BudgetsList = ({
   onDelete
 }: BudgetsListProps) => {
   return (
-    <Card className="glass-card border-0 shadow-lg animate-slide-up bg-white/50 dark:bg-black/50 backdrop-blur-xl">
+    <Card className="glass-card border-0 shadow-lg animate-fade-in bg-white/50 dark:bg-black/50 backdrop-blur-xl">
       <CardHeader className="p-4 lg:p-6">
         <CardTitle className="flex items-center justify-between text-lg lg:text-xl">
           <span>Lista de Orçamentos</span>
           {budgets.length > 0 && (
             <div className="flex items-center space-x-2">
-              <Badge variant="secondary" className="bg-[#fec832]/10 text-[#fec832] border-[#fec832]/20 animate-fade-in">
+              <Badge variant="secondary" className="bg-[#fec832]/10 text-[#fec832] border-[#fec832]/20">
                 {budgets.length}
               </Badge>
               {selectedBudgets.length > 0 && (
-                <Badge variant="destructive" className="text-xs animate-pulse">
+                <Badge variant="destructive" className="text-xs">
                   {selectedBudgets.length} selecionado{selectedBudgets.length > 1 ? 's' : ''}
                 </Badge>
               )}
@@ -60,9 +60,10 @@ export const BudgetsList = ({
             {budgets.map((budget, index) => (
               <div
                 key={budget.id}
-                className="animate-fade-in hover:animate-scale-in"
+                className="will-change-transform"
                 style={{
-                  animationDelay: `${index * 50}ms`
+                  animationDelay: `${Math.min(index * 30, 300)}ms`,
+                  transform: 'translateZ(0)' // Force hardware acceleration
                 }}
               >
                 <BudgetCard
@@ -89,7 +90,7 @@ export const BudgetsList = ({
                     <Checkbox
                       checked={isAllSelected}
                       onCheckedChange={onSelectAll}
-                      className="w-4 h-4 transition-all duration-200 hover:scale-110"
+                      className="w-4 h-4 transition-transform duration-150"
                     />
                   </TableHead>
                   <TableHead className="font-semibold">Dispositivo</TableHead>
@@ -103,9 +104,10 @@ export const BudgetsList = ({
                 {budgets.map((budget, index) => (
                   <TableRow 
                     key={budget.id} 
-                    className="hover:bg-muted/20 transition-all duration-300 border-white/10 animate-fade-in hover:scale-[1.01]"
+                    className="hover:bg-muted/20 transition-colors duration-200 border-white/10 will-change-transform"
                     style={{
-                      animationDelay: `${index * 30}ms`
+                      animationDelay: `${Math.min(index * 20, 200)}ms`,
+                      transform: 'translateZ(0)' // Force hardware acceleration
                     }}
                   >
                     <BudgetTableRow
