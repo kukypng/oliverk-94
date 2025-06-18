@@ -3,15 +3,19 @@ import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { MessageCircle, Eye, Edit, Clock } from '@/components/ui/icons';
+import { MessageCircle, Eye, Edit, Clock, Trash2 } from '@/components/ui/icons';
+import { Checkbox } from '@/components/ui/checkbox';
 
 interface BudgetCardProps {
   budget: any;
   profile: any;
   isGenerating: boolean;
+  isSelected: boolean;
+  onSelect: (budgetId: string, isSelected: boolean) => void;
   onShareWhatsApp: (budget: any) => void;
   onViewPDF: (budget: any) => void;
   onEdit: (budget: any) => void;
+  onDelete: (budget: any) => void;
 }
 
 const isBudgetOld = (createdAt: string, warningDays: number | undefined | null): boolean => {
@@ -27,9 +31,12 @@ export const BudgetCard = ({
   budget,
   profile,
   isGenerating,
+  isSelected,
+  onSelect,
   onShareWhatsApp,
   onViewPDF,
-  onEdit
+  onEdit,
+  onDelete
 }: BudgetCardProps) => {
   // Verificar se o budget é válido antes de renderizar
   if (!budget || !budget.id) {
@@ -40,15 +47,24 @@ export const BudgetCard = ({
   return (
     <div className="glass-card border border-white/10 rounded-2xl p-4 hover:shadow-lg transition-all duration-300 hover:scale-[1.01] animate-fade-in">
       <div className="flex items-start justify-between mb-3">
-        <div className="flex-1">
-          <div className="flex items-center space-x-2 mb-1">
-            <h3 className="font-semibold text-base text-foreground">{budget.device_model || 'Dispositivo não informado'}</h3>
-            <Badge variant="secondary" className="text-xs bg-muted/50">
-              {budget.device_type || 'Tipo não informado'}
-            </Badge>
+        <div className="flex items-start space-x-3 flex-1">
+          <div className="pt-1">
+            <Checkbox
+              checked={isSelected}
+              onCheckedChange={(checked) => onSelect(budget.id, !!checked)}
+              className="w-5 h-5"
+            />
           </div>
-          {budget.client_name && <p className="text-sm text-muted-foreground mb-1">{budget.client_name}</p>}
-          <p className="text-sm text-muted-foreground">{budget.issue || 'Problema não informado'}</p>
+          <div className="flex-1">
+            <div className="flex items-center space-x-2 mb-1">
+              <h3 className="font-semibold text-base text-foreground">{budget.device_model || 'Dispositivo não informado'}</h3>
+              <Badge variant="secondary" className="text-xs bg-muted/50">
+                {budget.device_type || 'Tipo não informado'}
+              </Badge>
+            </div>
+            {budget.client_name && <p className="text-sm text-muted-foreground mb-1">{budget.client_name}</p>}
+            <p className="text-sm text-muted-foreground">{budget.issue || 'Problema não informado'}</p>
+          </div>
         </div>
         <div className="text-right">
           <p className="font-bold text-lg text-foreground">
@@ -56,7 +72,7 @@ export const BudgetCard = ({
               minimumFractionDigits: 2
             })}
           </p>
-          <div className="flex items-center">
+          <div className="flex items-center justify-end">
             <p className="text-xs text-muted-foreground">
               {budget.created_at ? new Date(budget.created_at).toLocaleDateString('pt-BR') : 'Data não informada'}
             </p>
@@ -96,6 +112,14 @@ export const BudgetCard = ({
             className="h-10 w-10 p-0 hover:bg-muted/20 hover:text-[#fec832] rounded-xl"
           >
             <Edit className="h-5 w-5" />
+          </Button>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => onDelete(budget)} 
+            className="h-10 w-10 p-0 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950 rounded-xl"
+          >
+            <Trash2 className="h-5 w-5" />
           </Button>
         </div>
       </div>

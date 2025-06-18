@@ -3,16 +3,20 @@ import React from 'react';
 import { TableCell } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { MessageCircle, Eye, Edit, Clock } from '@/components/ui/icons';
+import { MessageCircle, Eye, Edit, Clock, Trash2 } from '@/components/ui/icons';
+import { Checkbox } from '@/components/ui/checkbox';
 
 interface BudgetTableRowProps {
   budget: any;
   profile: any;
   index: number;
   isGenerating: boolean;
+  isSelected: boolean;
+  onSelect: (budgetId: string, isSelected: boolean) => void;
   onShareWhatsApp: (budget: any) => void;
   onViewPDF: (budget: any) => void;
   onEdit: (budget: any) => void;
+  onDelete: (budget: any) => void;
 }
 
 const isBudgetOld = (createdAt: string, warningDays: number | undefined | null): boolean => {
@@ -29,9 +33,12 @@ export const BudgetTableRow = ({
   profile,
   index,
   isGenerating,
+  isSelected,
+  onSelect,
   onShareWhatsApp,
   onViewPDF,
-  onEdit
+  onEdit,
+  onDelete
 }: BudgetTableRowProps) => {
   // Verificar se o budget é válido antes de renderizar
   if (!budget || !budget.id) {
@@ -41,6 +48,13 @@ export const BudgetTableRow = ({
 
   return (
     <>
+      <TableCell className="w-12">
+        <Checkbox
+          checked={isSelected}
+          onCheckedChange={(checked) => onSelect(budget.id, !!checked)}
+          className="w-4 h-4"
+        />
+      </TableCell>
       <TableCell>
         <div className="space-y-1">
           <p className="font-medium text-foreground">{budget.device_model || 'Dispositivo não informado'}</p>
@@ -110,6 +124,14 @@ export const BudgetTableRow = ({
             className="h-9 w-9 p-0 hover:bg-muted/20 hover:text-[#fec832] rounded-xl"
           >
             <Edit className="h-4 w-4" />
+          </Button>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => onDelete(budget)} 
+            className="h-9 w-9 p-0 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950 rounded-xl"
+          >
+            <Trash2 className="h-4 w-4" />
           </Button>
         </div>
       </TableCell>

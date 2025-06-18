@@ -18,6 +18,8 @@ import { BudgetCard } from './budgets/BudgetCard';
 import { BudgetTableRow } from './budgets/BudgetTableRow';
 import { BudgetSearchBar } from './budgets/BudgetSearchBar';
 import { SelectedBudgetDelete } from './budgets/SelectedBudgetDelete';
+import { DeleteBudgetDialog } from './budgets/DeleteBudgetDialog';
+import { Checkbox } from '@/components/ui/checkbox';
 
 export const BudgetsContent = () => {
   const { showSuccess, showError } = useToast();
@@ -27,6 +29,7 @@ export const BudgetsContent = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [actualSearchTerm, setActualSearchTerm] = useState('');
   const [selectedBudgets, setSelectedBudgets] = useState<string[]>([]);
+  const [deletingBudget, setDeletingBudget] = useState<any>(null);
   const [confirmation, setConfirmation] = useState<{
     action: () => void;
     title: string;
@@ -85,6 +88,10 @@ export const BudgetsContent = () => {
     } else {
       setSelectedBudgets([]);
     }
+  };
+
+  const handleDeleteSingle = (budget: any) => {
+    setDeletingBudget(budget);
   };
 
   const handleShareWhatsApp = (budget: any) => {
@@ -220,24 +227,18 @@ export const BudgetsContent = () => {
               {/* Mobile Cards View */}
               <div className="block lg:hidden space-y-4">
                 {filteredBudgets.map((budget, index) => (
-                  <div key={budget.id} className="relative">
-                    <div className="absolute top-2 left-2 z-10">
-                      <input
-                        type="checkbox"
-                        checked={selectedBudgets.includes(budget.id)}
-                        onChange={(e) => handleBudgetSelect(budget.id, e.target.checked)}
-                        className="w-4 h-4 text-red-600 bg-gray-100 border-gray-300 rounded focus:ring-red-500"
-                      />
-                    </div>
-                    <BudgetCard
-                      budget={budget}
-                      profile={profile}
-                      isGenerating={isGenerating}
-                      onShareWhatsApp={handleShareWhatsApp}
-                      onViewPDF={handleViewPDF}
-                      onEdit={setEditingBudget}
-                    />
-                  </div>
+                  <BudgetCard
+                    key={budget.id}
+                    budget={budget}
+                    profile={profile}
+                    isGenerating={isGenerating}
+                    isSelected={selectedBudgets.includes(budget.id)}
+                    onSelect={handleBudgetSelect}
+                    onShareWhatsApp={handleShareWhatsApp}
+                    onViewPDF={handleViewPDF}
+                    onEdit={setEditingBudget}
+                    onDelete={handleDeleteSingle}
+                  />
                 ))}
               </div>
 
@@ -247,11 +248,10 @@ export const BudgetsContent = () => {
                   <TableHeader>
                     <TableRow className="hover:bg-transparent border-white/10">
                       <TableHead className="w-12">
-                        <input
-                          type="checkbox"
+                        <Checkbox
                           checked={selectedBudgets.length === filteredBudgets.length && filteredBudgets.length > 0}
-                          onChange={(e) => handleSelectAll(e.target.checked)}
-                          className="w-4 h-4 text-red-600 bg-gray-100 border-gray-300 rounded focus:ring-red-500"
+                          onCheckedChange={(checked) => handleSelectAll(!!checked)}
+                          className="w-4 h-4"
                         />
                       </TableHead>
                       <TableHead className="font-semibold">Dispositivo</TableHead>
@@ -264,22 +264,17 @@ export const BudgetsContent = () => {
                   <TableBody>
                     {filteredBudgets.map((budget, index) => (
                       <TableRow key={budget.id} className="hover:bg-muted/20 transition-colors border-white/10 animate-fade-in">
-                        <TableCell>
-                          <input
-                            type="checkbox"
-                            checked={selectedBudgets.includes(budget.id)}
-                            onChange={(e) => handleBudgetSelect(budget.id, e.target.checked)}
-                            className="w-4 h-4 text-red-600 bg-gray-100 border-gray-300 rounded focus:ring-red-500"
-                          />
-                        </TableCell>
                         <BudgetTableRow
                           budget={budget}
                           profile={profile}
                           index={index}
                           isGenerating={isGenerating}
+                          isSelected={selectedBudgets.includes(budget.id)}
+                          onSelect={handleBudgetSelect}
                           onShareWhatsApp={handleShareWhatsApp}
                           onViewPDF={handleViewPDF}
                           onEdit={setEditingBudget}
+                          onDelete={handleDeleteSingle}
                         />
                       </TableRow>
                     ))}
@@ -316,6 +311,12 @@ export const BudgetsContent = () => {
         budget={editingBudget} 
         open={!!editingBudget} 
         onOpenChange={(open) => !open && setEditingBudget(null)} 
+      />
+
+      <DeleteBudgetDialog
+        budget={deletingBudget}
+        open={!!deletingBudget}
+        onOpenChange={(open) => !open && setDeletingBudget(null)}
       />
 
       <ConfirmationDialog 
