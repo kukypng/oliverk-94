@@ -50,7 +50,7 @@ export const BudgetCard = ({
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-start space-x-3 flex-1">
           <div className="pt-1">
-            <Checkbox checked={isSelected} onCheckedChange={checked => onSelect(budget.id, !!checked)} className="w-5 h-5 transition-transform duration-150" />
+            <Checkbox checked={isSelected} onCheckedChange={checked => onSelect(budget.id, !!checked)} className="w-4 h-4 transition-transform duration-150" />
           </div>
           <div className="flex-1">
             <div className="flex items-center space-x-2 mb-1">
