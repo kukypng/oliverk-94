@@ -17,7 +17,7 @@ export const HelpAndSupport = () => {
             <LifeBuoy className="mr-2" />
             Ajuda & Dicas
           </Button>
-          <Button variant="outline" onClick={() => window.open('https://wa.me/556496028022', '_blank')} className="w-full sm:w-auto text-green-600 border-green-600 hover:bg-green-50 hover:text-green-700 my-[24px] py-0 mx-0 px-[8px]">
+          <Button variant="outline" onClick={() => window.open('https://wa.me/556496028022', '_blank')} className="w-full sm:w-auto text-green-600 border-green-600 hover:bg-green-50 hover:text-green-700 py-0 mx-0 px-[6px] my-[30px]">
             <MessageCircle className="mr-2" />
             Suporte WhatsApp
           </Button>
