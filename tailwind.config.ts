@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -70,12 +71,12 @@ export default {
 					ring: 'hsl(var(--sidebar-ring))'
 				},
 				success: {
-					DEFAULT: 'hsl(var(--success))',
-					foreground: 'hsl(var(--success-foreground))'
+					DEFAULT: '#8ce2aa',
+					foreground: '#252425'
 				},
 				warning: {
-					DEFAULT: 'hsl(var(--warning))',
-					foreground: 'hsl(var(--warning-foreground))'
+					DEFAULT: '#e0e0e0',
+					foreground: '#252425'
 				}
 			},
 			borderRadius: {

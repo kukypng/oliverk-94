@@ -1,122 +1,119 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Design System baseado na imagem enviada */
-
 @layer base {
   :root {
-    /* Light theme - Paleta baseada na imagem */
-    --background: 45 41 38; /* Marrom escuro da imagem */
-    --foreground: 255 235 59; /* Amarelo dos textos */
+    /* Paleta baseada nas imagens fornecidas */
+    --background: 37 36 37; /* #252425 - Fundo escuro */
+    --foreground: 224 224 224; /* #e0e0e0 - Texto claro */
 
-    --card: 139 119 101; /* Tom de marrom médio para cards */
-    --card-foreground: 255 235 59; /* Amarelo para texto dos cards */
+    --card: 50 50 50; /* Tom mais claro para cards */
+    --card-foreground: 224 224 224; /* #e0e0e0 - Texto dos cards */
 
-    --popover: 139 119 101;
-    --popover-foreground: 255 235 59;
+    --popover: 50 50 50;
+    --popover-foreground: 224 224 224;
 
-    /* Cor primária: Amarelo da imagem */
-    --primary: 255 235 59; /* Amarelo principal */
-    --primary-foreground: 45 41 38; /* Marrom escuro para contraste */
+    /* Cor primária: Verde da imagem */
+    --primary: 140 226 170; /* #8ce2aa - Verde principal */
+    --primary-foreground: 37 36 37; /* #252425 - Texto escuro sobre verde */
 
     /* Cores secundárias */
-    --secondary: 139 119 101; /* Marrom médio */
-    --secondary-foreground: 255 235 59;
+    --secondary: 70 70 70; /* Tom médio para elementos secundários */
+    --secondary-foreground: 224 224 224;
 
-    --muted: 107 92 80; /* Marrom mais escuro */
-    --muted-foreground: 200 200 200; /* Cinza claro */
+    --muted: 60 60 60; /* Tom escuro para elementos silenciados */
+    --muted-foreground: 180 180 180; /* Cinza médio */
 
-    --accent: 255 193 7; /* Amarelo mais vibrante */
-    --accent-foreground: 45 41 38;
+    --accent: 140 226 170; /* Usar o mesmo verde como accent */
+    --accent-foreground: 37 36 37;
 
     --destructive: 244 67 54; /* Vermelho */
     --destructive-foreground: 255 255 255;
 
     /* Cores de sucesso e aviso */
-    --success: 76 175 80; /* Verde */
-    --success-foreground: 255 255 255;
+    --success: 140 226 170; /* #8ce2aa - Verde */
+    --success-foreground: 37 36 37;
     
-    --warning: 255 152 0; /* Laranja */
-    --warning-foreground: 45 41 38;
+    --warning: 224 224 224; /* #e0e0e0 - Cinza claro */
+    --warning-foreground: 37 36 37;
 
-    --border: 107 92 80; /* Marrom escuro para bordas */
-    --input: 139 119 101; /* Marrom médio para inputs */
-    --ring: 255 235 59; /* Amarelo para rings */
+    --border: 80 80 80; /* Bordas em tom médio */
+    --input: 60 60 60; /* Inputs em tom escuro */
+    --ring: 140 226 170; /* Verde para rings */
 
     --radius: 0.75rem;
 
     /* Sidebar vars */
-    --sidebar-background: 45 41 38;
-    --sidebar-foreground: 255 235 59;
-    --sidebar-primary: 255 235 59;
-    --sidebar-primary-foreground: 45 41 38;
-    --sidebar-accent: 139 119 101;
-    --sidebar-accent-foreground: 255 235 59;
-    --sidebar-border: 107 92 80;
-    --sidebar-ring: 255 235 59;
+    --sidebar-background: 37 36 37;
+    --sidebar-foreground: 224 224 224;
+    --sidebar-primary: 140 226 170;
+    --sidebar-primary-foreground: 37 36 37;
+    --sidebar-accent: 70 70 70;
+    --sidebar-accent-foreground: 224 224 224;
+    --sidebar-border: 80 80 80;
+    --sidebar-ring: 140 226 170;
 
     /* Sistema de sombras */
-    --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.15);
-    --shadow-soft: 0 2px 4px -1px rgba(0, 0, 0, 0.2), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
-    --shadow-medium: 0 4px 6px -1px rgba(0, 0, 0, 0.25), 0 2px 4px -2px rgba(0, 0, 0, 0.15);
-    --shadow-strong: 0 8px 16px -4px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
-    --shadow-xl: 0 16px 32px -8px rgba(0, 0, 0, 0.35), 0 8px 16px -4px rgba(0, 0, 0, 0.25);
-    --shadow-glow: 0 0 0 1px rgba(255, 235, 59, 0.15), 0 4px 16px -2px rgba(255, 235, 59, 0.12);
+    --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+    --shadow-soft: 0 2px 4px -1px rgba(0, 0, 0, 0.4), 0 1px 2px -1px rgba(0, 0, 0, 0.2);
+    --shadow-medium: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
+    --shadow-strong: 0 8px 16px -4px rgba(0, 0, 0, 0.6), 0 4px 6px -2px rgba(0, 0, 0, 0.4);
+    --shadow-xl: 0 16px 32px -8px rgba(0, 0, 0, 0.7), 0 8px 16px -4px rgba(0, 0, 0, 0.5);
+    --shadow-glow: 0 0 0 1px rgba(140, 226, 170, 0.15), 0 4px 16px -2px rgba(140, 226, 170, 0.12);
   }
 
   .dark {
     /* Dark theme - Igual ao light theme para manter consistência */
-    --background: 45 41 38;
-    --foreground: 255 235 59;
+    --background: 37 36 37;
+    --foreground: 224 224 224;
 
-    --card: 139 119 101;
-    --card-foreground: 255 235 59;
+    --card: 50 50 50;
+    --card-foreground: 224 224 224;
 
-    --popover: 139 119 101;
-    --popover-foreground: 255 235 59;
+    --popover: 50 50 50;
+    --popover-foreground: 224 224 224;
 
-    --primary: 255 235 59;
-    --primary-foreground: 45 41 38;
+    --primary: 140 226 170;
+    --primary-foreground: 37 36 37;
 
-    --secondary: 139 119 101;
-    --secondary-foreground: 255 235 59;
+    --secondary: 70 70 70;
+    --secondary-foreground: 224 224 224;
 
-    --muted: 107 92 80;
-    --muted-foreground: 200 200 200;
+    --muted: 60 60 60;
+    --muted-foreground: 180 180 180;
 
-    --accent: 255 193 7;
-    --accent-foreground: 45 41 38;
+    --accent: 140 226 170;
+    --accent-foreground: 37 36 37;
 
     --destructive: 244 67 54;
     --destructive-foreground: 255 255 255;
 
-    --success: 76 175 80;
-    --success-foreground: 255 255 255;
+    --success: 140 226 170;
+    --success-foreground: 37 36 37;
     
-    --warning: 255 152 0;
-    --warning-foreground: 45 41 38;
+    --warning: 224 224 224;
+    --warning-foreground: 37 36 37;
 
-    --border: 107 92 80;
-    --input: 139 119 101;
-    --ring: 255 235 59;
+    --border: 80 80 80;
+    --input: 60 60 60;
+    --ring: 140 226 170;
 
-    --sidebar-background: 45 41 38;
-    --sidebar-foreground: 255 235 59;
-    --sidebar-primary: 255 235 59;
-    --sidebar-primary-foreground: 45 41 38;
-    --sidebar-accent: 139 119 101;
-    --sidebar-accent-foreground: 255 235 59;
-    --sidebar-border: 107 92 80;
-    --sidebar-ring: 255 235 59;
+    --sidebar-background: 37 36 37;
+    --sidebar-foreground: 224 224 224;
+    --sidebar-primary: 140 226 170;
+    --sidebar-primary-foreground: 37 36 37;
+    --sidebar-accent: 70 70 70;
+    --sidebar-accent-foreground: 224 224 224;
+    --sidebar-border: 80 80 80;
+    --sidebar-ring: 140 226 170;
 
-    --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
-    --shadow-soft: 0 2px 4px -1px rgba(0, 0, 0, 0.5), 0 1px 2px -1px rgba(0, 0, 0, 0.4);
-    --shadow-medium: 0 4px 6px -1px rgba(0, 0, 0, 0.6), 0 2px 4px -2px rgba(0, 0, 0, 0.5);
-    --shadow-strong: 0 8px 16px -4px rgba(0, 0, 0, 0.7), 0 4px 6px -2px rgba(0, 0, 0, 0.6);
-    --shadow-xl: 0 16px 32px -8px rgba(0, 0, 0, 0.8), 0 8px 16px -4px rgba(0, 0, 0, 0.7);
-    --shadow-glow: 0 0 0 1px rgba(255, 235, 59, 0.2), 0 4px 16px -2px rgba(255, 235, 59, 0.15);
+    --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
+    --shadow-soft: 0 2px 4px -1px rgba(0, 0, 0, 0.6), 0 1px 2px -1px rgba(0, 0, 0, 0.4);
+    --shadow-medium: 0 4px 6px -1px rgba(0, 0, 0, 0.7), 0 2px 4px -2px rgba(0, 0, 0, 0.5);
+    --shadow-strong: 0 8px 16px -4px rgba(0, 0, 0, 0.8), 0 4px 6px -2px rgba(0, 0, 0, 0.6);
+    --shadow-xl: 0 16px 32px -8px rgba(0, 0, 0, 0.9), 0 8px 16px -4px rgba(0, 0, 0, 0.7);
+    --shadow-glow: 0 0 0 1px rgba(140, 226, 170, 0.2), 0 4px 16px -2px rgba(140, 226, 170, 0.15);
   }
 }
 
@@ -135,7 +132,6 @@
     overscroll-behavior: none;
   }
 
-  /* ... keep existing code (scrollbars, typography, mobile optimizations) */
   ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
@@ -207,7 +203,6 @@
   }
 }
 
-/* ... keep existing code (components layer with glassmorphism, buttons, cards, etc.) */
 @layer components {
   .glass {
     @apply backdrop-blur-xl;
@@ -397,7 +392,6 @@
   }
 }
 
-/* ... keep existing code (animations, responsive media queries) */
 @keyframes shimmer {
   0% {
     background-position: -200px 0;
