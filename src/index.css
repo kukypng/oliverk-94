@@ -3,133 +3,120 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Design System Premium - Baseado na paleta da imagem enviada */
+/* Design System baseado na imagem enviada */
 
 @layer base {
   :root {
-    /* Light theme - Nova paleta baseada na imagem */
-    --background: 224 224 224; /* #e0e0e0 - Cinza claro da imagem */
-    --foreground: 37 36 37; /* #252425 - Preto fosco da imagem */
+    /* Light theme - Paleta baseada na imagem */
+    --background: 45 41 38; /* Marrom escuro da imagem */
+    --foreground: 255 235 59; /* Amarelo dos textos */
 
-    --card: 255 255 255; /* Branco para cards */
-    --card-foreground: 37 36 37;
+    --card: 139 119 101; /* Tom de marrom médio para cards */
+    --card-foreground: 255 235 59; /* Amarelo para texto dos cards */
 
-    --popover: 255 255 255;
-    --popover-foreground: 37 36 37;
+    --popover: 139 119 101;
+    --popover-foreground: 255 235 59;
 
-    /* Cor primária: Verde da imagem */
-    --primary: 140 226 170; /* #8ce2aa - Verde principal da imagem */
-    --primary-foreground: 37 36 37; /* Texto escuro no verde */
+    /* Cor primária: Amarelo da imagem */
+    --primary: 255 235 59; /* Amarelo principal */
+    --primary-foreground: 45 41 38; /* Marrom escuro para contraste */
 
-    /* Cores secundárias baseadas na paleta */
-    --secondary: 240 240 240; /* Cinza muito claro */
-    --secondary-foreground: 37 36 37;
+    /* Cores secundárias */
+    --secondary: 139 119 101; /* Marrom médio */
+    --secondary-foreground: 255 235 59;
 
-    --muted: 245 245 245; /* Cinza claro para elementos muted */
-    --muted-foreground: 100 100 100; /* Cinza médio */
+    --muted: 107 92 80; /* Marrom mais escuro */
+    --muted-foreground: 200 200 200; /* Cinza claro */
 
-    --accent: 140 226 170; /* Verde da imagem para accent */
-    --accent-foreground: 37 36 37;
+    --accent: 255 193 7; /* Amarelo mais vibrante */
+    --accent-foreground: 45 41 38;
 
-    --destructive: 239 68 68; /* Vermelho para ações destrutivas */
+    --destructive: 244 67 54; /* Vermelho */
     --destructive-foreground: 255 255 255;
 
     /* Cores de sucesso e aviso */
-    --success: 140 226 170; /* Verde da imagem */
-    --success-foreground: 37 36 37;
+    --success: 76 175 80; /* Verde */
+    --success-foreground: 255 255 255;
     
-    --warning: 251 191 36; /* Amarelo/laranja */
-    --warning-foreground: 37 36 37;
+    --warning: 255 152 0; /* Laranja */
+    --warning-foreground: 45 41 38;
 
-    --border: 200 200 200; /* Borda cinza clara */
-    --input: 250 250 250; /* Fundo de input claro */
-    --ring: 140 226 170; /* Ring verde da imagem */
+    --border: 107 92 80; /* Marrom escuro para bordas */
+    --input: 139 119 101; /* Marrom médio para inputs */
+    --ring: 255 235 59; /* Amarelo para rings */
 
-    --radius: 0.75rem; /* 12px */
+    --radius: 0.75rem;
 
     /* Sidebar vars */
-    --sidebar-background: 245 245 245;
-    --sidebar-foreground: 37 36 37;
-    --sidebar-primary: 140 226 170;
-    --sidebar-primary-foreground: 37 36 37;
-    --sidebar-accent: 240 240 240;
-    --sidebar-accent-foreground: 37 36 37;
-    --sidebar-border: 200 200 200;
-    --sidebar-ring: 140 226 170;
+    --sidebar-background: 45 41 38;
+    --sidebar-foreground: 255 235 59;
+    --sidebar-primary: 255 235 59;
+    --sidebar-primary-foreground: 45 41 38;
+    --sidebar-accent: 139 119 101;
+    --sidebar-accent-foreground: 255 235 59;
+    --sidebar-border: 107 92 80;
+    --sidebar-ring: 255 235 59;
 
     /* Sistema de sombras */
-    --shadow-xs: 0 1px 2px 0 rgba(37, 36, 37, 0.08);
-    --shadow-soft: 0 2px 4px -1px rgba(37, 36, 37, 0.12), 0 1px 2px -1px rgba(37, 36, 37, 0.06);
-    --shadow-medium: 0 4px 6px -1px rgba(37, 36, 37, 0.16), 0 2px 4px -2px rgba(37, 36, 37, 0.08);
-    --shadow-strong: 0 8px 16px -4px rgba(37, 36, 37, 0.20), 0 4px 6px -2px rgba(37, 36, 37, 0.10);
-    --shadow-xl: 0 16px 32px -8px rgba(37, 36, 37, 0.25), 0 8px 16px -4px rgba(37, 36, 37, 0.15);
-    --shadow-glow: 0 0 0 1px rgba(140, 226, 170, 0.15), 0 4px 16px -2px rgba(140, 226, 170, 0.12);
-
-    /* Gradientes baseados na paleta */
-    --gradient-primary: linear-gradient(135deg, rgb(140 226 170) 0%, rgb(120 206 150) 100%);
-    --gradient-secondary: linear-gradient(135deg, rgb(240 240 240) 0%, rgb(250 250 250) 100%);
-    --gradient-success: linear-gradient(135deg, rgb(140 226 170) 0%, rgb(120 206 150) 100%);
-    --gradient-warning: linear-gradient(135deg, rgb(251 191 36) 0%, rgb(252 211 77) 100%);
+    --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.15);
+    --shadow-soft: 0 2px 4px -1px rgba(0, 0, 0, 0.2), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+    --shadow-medium: 0 4px 6px -1px rgba(0, 0, 0, 0.25), 0 2px 4px -2px rgba(0, 0, 0, 0.15);
+    --shadow-strong: 0 8px 16px -4px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+    --shadow-xl: 0 16px 32px -8px rgba(0, 0, 0, 0.35), 0 8px 16px -4px rgba(0, 0, 0, 0.25);
+    --shadow-glow: 0 0 0 1px rgba(255, 235, 59, 0.15), 0 4px 16px -2px rgba(255, 235, 59, 0.12);
   }
 
   .dark {
-    /* Dark theme - Preto fosco como solicitado */
-    --background: 37 36 37; /* #252425 - Preto fosco da imagem */
-    --foreground: 224 224 224; /* #e0e0e0 - Cinza claro da imagem */
+    /* Dark theme - Igual ao light theme para manter consistência */
+    --background: 45 41 38;
+    --foreground: 255 235 59;
 
-    --card: 45 44 45; /* Um pouco mais claro que o fundo */
-    --card-foreground: 224 224 224;
+    --card: 139 119 101;
+    --card-foreground: 255 235 59;
 
-    --popover: 45 44 45;
-    --popover-foreground: 224 224 224;
+    --popover: 139 119 101;
+    --popover-foreground: 255 235 59;
 
-    --primary: 140 226 170; /* Verde da imagem mantido */
-    --primary-foreground: 37 36 37;
+    --primary: 255 235 59;
+    --primary-foreground: 45 41 38;
 
-    --secondary: 60 60 60; /* Cinza escuro */
-    --secondary-foreground: 200 200 200;
+    --secondary: 139 119 101;
+    --secondary-foreground: 255 235 59;
 
-    --muted: 50 50 50; /* Cinza mais escuro */
-    --muted-foreground: 160 160 160;
+    --muted: 107 92 80;
+    --muted-foreground: 200 200 200;
 
-    --accent: 140 226 170; /* Verde da imagem */
-    --accent-foreground: 37 36 37;
+    --accent: 255 193 7;
+    --accent-foreground: 45 41 38;
 
-    --destructive: 248 113 113; /* Vermelho mais suave para dark */
-    --destructive-foreground: 224 224 224;
+    --destructive: 244 67 54;
+    --destructive-foreground: 255 255 255;
 
-    --success: 140 226 170; /* Verde da imagem */
-    --success-foreground: 37 36 37;
+    --success: 76 175 80;
+    --success-foreground: 255 255 255;
     
-    --warning: 251 191 36; /* Amarelo mantido */
-    --warning-foreground: 37 36 37;
+    --warning: 255 152 0;
+    --warning-foreground: 45 41 38;
 
-    --border: 80 80 80; /* Borda escura */
-    --input: 50 50 50;
-    --ring: 140 226 170;
+    --border: 107 92 80;
+    --input: 139 119 101;
+    --ring: 255 235 59;
 
-    --sidebar-background: 37 36 37;
-    --sidebar-foreground: 224 224 224;
-    --sidebar-primary: 140 226 170;
-    --sidebar-primary-foreground: 37 36 37;
-    --sidebar-accent: 60 60 60;
-    --sidebar-accent-foreground: 200 200 200;
-    --sidebar-border: 80 80 80;
-    --sidebar-ring: 140 226 170;
+    --sidebar-background: 45 41 38;
+    --sidebar-foreground: 255 235 59;
+    --sidebar-primary: 255 235 59;
+    --sidebar-primary-foreground: 45 41 38;
+    --sidebar-accent: 139 119 101;
+    --sidebar-accent-foreground: 255 235 59;
+    --sidebar-border: 107 92 80;
+    --sidebar-ring: 255 235 59;
 
-    /* Sombras mais intensas para dark mode */
     --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
     --shadow-soft: 0 2px 4px -1px rgba(0, 0, 0, 0.5), 0 1px 2px -1px rgba(0, 0, 0, 0.4);
     --shadow-medium: 0 4px 6px -1px rgba(0, 0, 0, 0.6), 0 2px 4px -2px rgba(0, 0, 0, 0.5);
     --shadow-strong: 0 8px 16px -4px rgba(0, 0, 0, 0.7), 0 4px 6px -2px rgba(0, 0, 0, 0.6);
     --shadow-xl: 0 16px 32px -8px rgba(0, 0, 0, 0.8), 0 8px 16px -4px rgba(0, 0, 0, 0.7);
-    --shadow-glow: 0 0 0 1px rgba(140, 226, 170, 0.2), 0 4px 16px -2px rgba(140, 226, 170, 0.15);
-
-    /* Gradientes para dark mode */
-    --gradient-primary: linear-gradient(135deg, rgb(140 226 170) 0%, rgb(120 206 150) 100%);
-    --gradient-secondary: linear-gradient(135deg, rgb(60 60 60) 0%, rgb(80 80 80) 100%);
-    --gradient-success: linear-gradient(135deg, rgb(140 226 170) 0%, rgb(120 206 150) 100%);
-    --gradient-warning: linear-gradient(135deg, rgb(251 191 36) 0%, rgb(252 211 77) 100%);
+    --shadow-glow: 0 0 0 1px rgba(255, 235, 59, 0.2), 0 4px 16px -2px rgba(255, 235, 59, 0.15);
   }
 }
 
@@ -146,11 +133,9 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overscroll-behavior: none;
-    /* Fundo com gradiente sutil baseado no preto fosco */
-    background: radial-gradient(ellipse at top, hsl(var(--accent) / 0.05) 0%, hsl(var(--background)) 60%);
   }
 
-  /* Scrollbars modernos */
+  /* ... keep existing code (scrollbars, typography, mobile optimizations) */
   ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
@@ -170,7 +155,6 @@
     @apply bg-primary/50;
   }
 
-  /* Otimizações mobile */
   html {
     height: 100vh;
     height: -webkit-fill-available;
@@ -184,7 +168,6 @@
     overscroll-behavior: none;
   }
 
-  /* Tipografia */
   h1, h2, h3, h4, h5, h6 {
     @apply font-semibold tracking-tight;
   }
@@ -198,7 +181,6 @@
     @apply leading-relaxed text-muted-foreground;
   }
 
-  /* Prevenir zoom no iOS */
   input, select, textarea {
     font-size: 16px;
     @apply text-base;
@@ -214,7 +196,6 @@
     }
   }
 
-  /* Suporte a safe area */
   @supports (padding: env(safe-area-inset-bottom)) {
     .pb-safe {
       padding-bottom: env(safe-area-inset-bottom);
@@ -226,8 +207,8 @@
   }
 }
 
+/* ... keep existing code (components layer with glassmorphism, buttons, cards, etc.) */
 @layer components {
-  /* Glassmorphism moderno */
   .glass {
     @apply backdrop-blur-xl;
     background: linear-gradient(135deg, 
@@ -253,14 +234,13 @@
     border-color: hsl(var(--primary) / 0.3);
   }
 
-  /* Botões modernos com cores da paleta */
   .btn-modern {
     @apply relative overflow-hidden rounded-xl px-6 py-3 font-semibold text-sm;
     @apply transform transition-all duration-300 ease-out;
     @apply hover:scale-[1.02] active:scale-[0.98];
     @apply shadow-medium hover:shadow-strong;
     @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-2;
-    background: var(--gradient-primary);
+    background: hsl(var(--primary));
     color: hsl(var(--primary-foreground));
   }
 
@@ -280,7 +260,6 @@
     @apply opacity-100;
   }
 
-  /* Cards premium com cores da paleta */
   .card-modern {
     @apply bg-card rounded-2xl shadow-soft border border-border/50;
     @apply transition-all duration-300 ease-out;
@@ -297,7 +276,6 @@
       hsl(var(--accent) / 0.03) 100%);
   }
 
-  /* Estados de destaque */
   .card-featured {
     @apply card-modern;
     border: 2px solid hsl(var(--primary) / 0.3);
@@ -307,20 +285,18 @@
     box-shadow: var(--shadow-glow);
   }
 
-  /* Elementos interativos */
   .interactive-modern {
     @apply transition-all duration-200 ease-out;
     @apply hover:scale-[1.02] active:scale-[0.99];
   }
 
-  /* FAB moderno */
   .fab-modern {
     @apply fixed bottom-20 right-4 z-40 lg:bottom-6 lg:right-6;
     @apply w-14 h-14 rounded-2xl lg:w-16 lg:h-16;
     @apply flex items-center justify-center shadow-xl;
     @apply transform transition-all duration-300 ease-out;
     @apply hover:scale-110 active:scale-95;
-    background: var(--gradient-primary);
+    background: hsl(var(--primary));
     color: hsl(var(--primary-foreground));
     box-shadow: var(--shadow-glow);
   }
@@ -329,7 +305,6 @@
     box-shadow: 0 16px 40px -8px hsl(var(--primary) / 0.4), var(--shadow-glow);
   }
 
-  /* Inputs modernos */
   .input-modern {
     @apply flex h-11 w-full rounded-xl px-4 py-3;
     @apply text-sm ring-offset-background file:border-0 file:bg-transparent;
@@ -350,7 +325,6 @@
     background: hsl(var(--background));
   }
 
-  /* Badges modernos com cores da paleta */
   .badge-modern {
     @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium;
     @apply transition-all duration-200 ease-out;
@@ -358,26 +332,25 @@
   }
 
   .badge-modern.primary {
-    background: var(--gradient-primary);
+    background: hsl(var(--primary));
     @apply text-primary-foreground border-primary/20;
   }
 
   .badge-modern.success {
-    background: var(--gradient-success);
-    @apply text-primary-foreground border-success/20;
+    background: hsl(var(--success));
+    @apply text-success-foreground border-success/20;
   }
 
   .badge-modern.warning {
-    background: var(--gradient-warning);
+    background: hsl(var(--warning));
     @apply text-warning-foreground border-warning/20;
   }
 
   .badge-modern.secondary {
-    background: var(--gradient-secondary);
+    background: hsl(var(--secondary));
     @apply text-secondary-foreground border-border/20;
   }
 
-  /* Loading states */
   .loading-shimmer-modern {
     background: linear-gradient(90deg, 
       hsla(var(--muted)) 25%, 
@@ -387,7 +360,6 @@
     animation: shimmer 2s infinite;
   }
 
-  /* Grid responsivo */
   .grid-responsive {
     @apply grid gap-4 lg:gap-6;
     @apply grid-cols-1 md:grid-cols-2 lg:grid-cols-3;
@@ -398,7 +370,6 @@
     @apply grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4;
   }
 
-  /* Estatísticas modernas */
   .stat-card {
     @apply card-modern p-6;
     background: linear-gradient(135deg, 
@@ -410,7 +381,6 @@
     @apply card-featured;
   }
 
-  /* Otimizações mobile */
   .mobile-safe {
     @apply pb-safe-bottom;
   }
@@ -427,7 +397,7 @@
   }
 }
 
-/* Animações */
+/* ... keep existing code (animations, responsive media queries) */
 @keyframes shimmer {
   0% {
     background-position: -200px 0;
@@ -455,7 +425,6 @@
   }
 }
 
-/* Melhorias responsivas */
 @media (max-width: 768px) {
   .container {
     @apply px-4;
@@ -484,12 +453,10 @@
   }
 }
 
-/* Transições dark mode */
 .dark-mode-transition {
   @apply transition-all duration-300 ease-in-out;
 }
 
-/* Performance */
 .will-change-transform {
   will-change: transform;
 }
