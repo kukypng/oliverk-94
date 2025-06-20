@@ -35,17 +35,17 @@ export const BudgetsList = ({
   onDelete
 }: BudgetsListProps) => {
   return (
-    <Card className="glass-card border-0 shadow-lg animate-fade-in bg-card/90 backdrop-blur-xl">
-      <CardHeader className="p-4 lg:p-5">
+    <Card className="glass-card border-0 shadow-lg animate-fade-in bg-white/50 dark:bg-black/50 backdrop-blur-xl">
+      <CardHeader className="p-4 lg:p-6">
         <CardTitle className="flex items-center justify-between text-lg lg:text-xl">
           <span>Lista de Orçamentos</span>
           {budgets.length > 0 && (
             <div className="flex items-center space-x-2">
-              <Badge variant="secondary" className="bg-primary/8 text-primary border-primary/15 text-xs font-medium">
+              <Badge variant="secondary" className="bg-[#fec832]/10 text-[#fec832] border-[#fec832]/20">
                 {budgets.length}
               </Badge>
               {selectedBudgets.length > 0 && (
-                <Badge variant="destructive" className="text-xs animate-scale-in">
+                <Badge variant="destructive" className="text-xs">
                   {selectedBudgets.length} selecionado{selectedBudgets.length > 1 ? 's' : ''}
                 </Badge>
               )}
@@ -53,16 +53,17 @@ export const BudgetsList = ({
           )}
         </CardTitle>
       </CardHeader>
-      <CardContent className="p-0 lg:p-5 lg:pt-0">
-        <div className="space-y-3 lg:space-y-0 p-3 lg:p-0">
+      <CardContent className="p-0 lg:p-6 lg:pt-0">
+        <div className="space-y-3 lg:space-y-0 p-4 lg:p-0">
           {/* Mobile Cards View */}
-          <div className="block lg:hidden space-y-3">
+          <div className="block lg:hidden space-y-4">
             {budgets.map((budget, index) => (
               <div
                 key={budget.id}
-                className="will-change-transform gpu-accelerated"
+                className="will-change-transform"
                 style={{
-                  animationDelay: `${Math.min(index * 30, 300)}ms`
+                  animationDelay: `${Math.min(index * 30, 300)}ms`,
+                  transform: 'translateZ(0)' // Force hardware acceleration
                 }}
               >
                 <BudgetCard
@@ -84,28 +85,29 @@ export const BudgetsList = ({
           <div className="hidden lg:block overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow className="hover:bg-transparent border-primary/8">
+                <TableRow className="hover:bg-transparent border-white/10">
                   <TableHead className="w-12">
                     <Checkbox
                       checked={isAllSelected}
                       onCheckedChange={onSelectAll}
-                      className="checkbox-modern"
+                      className="w-4 h-4 transition-transform duration-150"
                     />
                   </TableHead>
-                  <TableHead className="font-semibold text-muted-foreground">Dispositivo</TableHead>
-                  <TableHead className="font-semibold text-muted-foreground">Problema</TableHead>
-                  <TableHead className="font-semibold text-muted-foreground">Valor</TableHead>
-                  <TableHead className="font-semibold text-muted-foreground">Data</TableHead>
-                  <TableHead className="font-semibold text-center text-muted-foreground">Ações</TableHead>
+                  <TableHead className="font-semibold">Dispositivo</TableHead>
+                  <TableHead className="font-semibold">Problema</TableHead>
+                  <TableHead className="font-semibold">Valor</TableHead>
+                  <TableHead className="font-semibold">Data</TableHead>
+                  <TableHead className="font-semibold text-center">Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {budgets.map((budget, index) => (
                   <TableRow 
                     key={budget.id} 
-                    className="hover:bg-primary/3 transition-colors duration-200 border-primary/8 will-change-transform gpu-accelerated"
+                    className="hover:bg-muted/20 transition-colors duration-200 border-white/10 will-change-transform"
                     style={{
-                      animationDelay: `${Math.min(index * 20, 200)}ms`
+                      animationDelay: `${Math.min(index * 20, 200)}ms`,
+                      transform: 'translateZ(0)' // Force hardware acceleration
                     }}
                   >
                     <BudgetTableRow

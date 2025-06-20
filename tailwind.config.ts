@@ -23,8 +23,6 @@ export default {
         soft: 'var(--shadow-soft)',
         medium: 'var(--shadow-medium)',
         strong: 'var(--shadow-strong)',
-        glow: 'var(--shadow-glow)',
-        xl: 'var(--shadow-xl)',
       },
 			colors: {
 				border: 'hsl(var(--border))',
@@ -69,14 +67,6 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
-				},
-				success: {
-					DEFAULT: '#8ce2aa',
-					foreground: '#252425'
-				},
-				warning: {
-					DEFAULT: '#e0e0e0',
-					foreground: '#252425'
 				}
 			},
 			borderRadius: {
