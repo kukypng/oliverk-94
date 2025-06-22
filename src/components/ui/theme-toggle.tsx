@@ -13,11 +13,11 @@ export function ThemeToggle() {
       {/* Background slider */}
       <div className={`absolute top-1 bottom-1 w-10 bg-primary rounded-lg transition-all duration-300 ease-out shadow-soft ${theme === 'light' ? 'left-1' : 'left-11'}`} />
       
-      <div className="relative grid grid-cols-2 gap-1">
+      <div className="relative grid grid-cols-2 gap-1 bg-gray-900">
         <Button variant="ghost" size="sm" onClick={() => setTheme("light")} className={`h-10 w-10 rounded-lg transition-all duration-300 ease-out hover:scale-105 active:scale-95 ${theme === 'light' ? 'text-primary-foreground shadow-none z-10' : 'text-muted-foreground hover:text-foreground'}`}>
           <Sun className={`h-4 w-4 transition-all duration-500 ease-out ${theme === 'light' ? 'rotate-0 scale-110' : 'rotate-90 scale-100'}`} />
         </Button>
-        <Button variant="ghost" size="sm" onClick={() => setTheme("dark")} className="mx-0 my-0 py-0 px-[8px]">
+        <Button variant="ghost" size="sm" onClick={() => setTheme("dark")} className="py-0 my-0 mx-0 px-0">
           <Moon className={`h-4 w-4 transition-all duration-500 ease-out ${theme === 'dark' ? 'rotate-0 scale-110' : '-rotate-90 scale-100'}`} />
         </Button>
       </div>
