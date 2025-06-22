@@ -3,7 +3,7 @@ import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { MessageCircle, Eye, Edit, Clock, Trash2 } from '@/components/ui/icons';
+import { MessageCircle, Eye, Edit, Clock } from '@/components/ui/icons';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useLayout } from '@/contexts/LayoutContext';
 import { cn } from '@/lib/utils';
@@ -73,23 +73,6 @@ export const BudgetCard = ({
     }}>
       <div className={cn("flex items-start justify-between", isCompact ? "mb-3" : "mb-4")}>
         <div className="flex items-start space-x-3 flex-1 min-w-0">
-          <div className={cn(
-            "pt-0.5 opacity-60 hover:opacity-100 transition-all duration-200 flex-shrink-0 rounded-md",
-            getCheckboxContainer(),
-            isMobile && "hover:bg-muted/20"
-          )}>
-            <Checkbox 
-              checked={isSelected} 
-              onCheckedChange={checked => onSelect(budget.id, !!checked)} 
-              className={cn(
-                "transition-all duration-200 hover:scale-110 border-2",
-                getCheckboxSize(),
-                isMobile && "border-muted-foreground/60 data-[state=checked]:border-primary",
-                isTablet && "border-muted-foreground/50 data-[state=checked]:border-primary/80",
-                !isMobile && !isTablet && "border-muted-foreground/40 data-[state=checked]:border-primary/60"
-              )} 
-            />
-          </div>
           <div className="flex-1 min-w-0">
             <div className={cn("flex items-center space-x-2", isCompact ? "mb-2" : "mb-3")}>
               <h3 className="font-bold text-lg text-foreground group-hover:text-primary transition-colors duration-200 truncate">
@@ -131,6 +114,23 @@ export const BudgetCard = ({
       
       <div className={cn("flex items-center justify-between border-t border-border/20", isCompact ? "pt-3" : "pt-4")}>
         <div className="flex items-center space-x-1 w-full justify-center">
+          <div className={cn(
+            "opacity-60 hover:opacity-100 transition-all duration-200 flex-shrink-0 rounded-md",
+            getCheckboxContainer(),
+            isMobile && "hover:bg-muted/20"
+          )}>
+            <Checkbox 
+              checked={isSelected} 
+              onCheckedChange={checked => onSelect(budget.id, !!checked)} 
+              className={cn(
+                "transition-all duration-200 hover:scale-110 border-2",
+                getCheckboxSize(),
+                isMobile && "border-muted-foreground/60 data-[state=checked]:border-primary",
+                isTablet && "border-muted-foreground/50 data-[state=checked]:border-primary/80",
+                !isMobile && !isTablet && "border-muted-foreground/40 data-[state=checked]:border-primary/60"
+              )} 
+            />
+          </div>
           <Button 
             variant="ghost" 
             size="sm" 
@@ -164,17 +164,6 @@ export const BudgetCard = ({
             )}
           >
             <Edit className={isCompact ? "h-3.5 w-3.5" : "h-4 w-4"} />
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => onDelete(budget)} 
-            className={cn(
-              "text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-xl transition-all duration-200 hover:scale-110",
-              isCompact ? "h-8 w-8 p-0" : "h-9 w-9 p-0"
-            )}
-          >
-            <Trash2 className={isCompact ? "h-3.5 w-3.5" : "h-4 w-4"} />
           </Button>
         </div>
       </div>
