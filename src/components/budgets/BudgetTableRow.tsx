@@ -46,38 +46,40 @@ export const BudgetTableRow = ({
   }
 
   return <>
-      <TableCell className="w-12">
-        <Checkbox 
-          checked={isSelected} 
-          onCheckedChange={checked => onSelect(budget.id, !!checked)} 
-          className="w-4 h-4 transition-transform duration-150" 
-        />
-      </TableCell>
-      <TableCell>
-        <div className="space-y-1">
-          <p className="font-medium text-foreground transition-colors duration-150 group-hover:text-[#fec832]">
-            {budget.device_model || 'Dispositivo não informado'}
-          </p>
-          <p className="text-sm text-muted-foreground">{budget.device_type || 'Tipo não informado'}</p>
-          {budget.client_name && <p className="text-sm text-muted-foreground">{budget.client_name}</p>}
+      <TableCell className="w-8">
+        <div className="opacity-60 hover:opacity-100 transition-opacity">
+          <Checkbox 
+            checked={isSelected} 
+            onCheckedChange={checked => onSelect(budget.id, !!checked)} 
+            className="w-3.5 h-3.5 transition-all duration-200 hover:scale-110 border-muted-foreground/40 data-[state=checked]:border-primary/60" 
+          />
         </div>
       </TableCell>
       <TableCell>
-        <span className="text-sm">{budget.issue || 'Problema não informado'}</span>
+        <div className="space-y-2">
+          <p className="font-bold text-base text-foreground transition-colors duration-150 group-hover:text-[#fec832]">
+            {budget.device_model || 'Dispositivo não informado'}
+          </p>
+          <p className="text-sm text-muted-foreground font-medium">{budget.device_type || 'Tipo não informado'}</p>
+          {budget.client_name && <p className="text-sm text-primary/80 font-semibold">{budget.client_name}</p>}
+        </div>
+      </TableCell>
+      <TableCell>
+        <span className="text-sm leading-relaxed">{budget.issue || 'Problema não informado'}</span>
       </TableCell>
       <TableCell>
         <div className="space-y-1">
-          <p className="font-semibold text-foreground transition-colors duration-150 group-hover:text-[#fec832]">
+          <p className="font-bold text-lg text-foreground transition-colors duration-150 group-hover:text-[#fec832]">
             R$ {((budget.total_price || 0) / 100).toLocaleString('pt-BR', {
             minimumFractionDigits: 2
           })}
           </p>
-          {budget.installments > 1 && <p className="text-xs text-muted-foreground">{budget.installments}x</p>}
+          {budget.installments > 1 && <p className="text-xs text-muted-foreground font-medium">{budget.installments}x</p>}
         </div>
       </TableCell>
       <TableCell>
         <div className="flex items-center space-x-2">
-          <span className="text-sm text-muted-foreground">
+          <span className="text-sm text-muted-foreground font-medium">
             {budget.created_at ? new Date(budget.created_at).toLocaleDateString('pt-BR') : 'Data não informada'}
           </span>
           {profile?.budget_warning_enabled && budget.created_at && isBudgetOld(budget.created_at, profile.budget_warning_days) && 
