@@ -6,6 +6,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { BudgetCard } from '../BudgetCard';
 import { BudgetTableRow } from '../BudgetTableRow';
+import { useLayout } from '@/contexts/LayoutContext';
+import { cn } from '@/lib/utils';
 
 interface BudgetsListProps {
   budgets: any[];
@@ -34,9 +36,11 @@ export const BudgetsList = ({
   onEdit,
   onDelete
 }: BudgetsListProps) => {
+  const { isMobile, isTablet, contentPadding, spacing } = useLayout();
+
   return (
-    <Card className="glass-card border-0 shadow-lg animate-fade-in bg-white/50 dark:bg-black/50 backdrop-blur-xl">
-      <CardHeader className="p-4 lg:p-6">
+    <Card className="glass-card border-0 shadow-lg animate-fade-in bg-white/50 dark:bg-black/50 backdrop-blur-xl w-full">
+      <CardHeader className={cn("p-3 lg:p-6", isMobile && "p-3")}>
         <CardTitle className="flex items-center justify-between text-lg lg:text-xl">
           <span>Lista de Orçamentos</span>
           {budgets.length > 0 && (
@@ -53,17 +57,17 @@ export const BudgetsList = ({
           )}
         </CardTitle>
       </CardHeader>
-      <CardContent className="p-0 lg:p-6 lg:pt-0">
-        <div className="space-y-3 lg:space-y-0 p-4 lg:p-0">
-          {/* Mobile Cards View */}
-          <div className="block lg:hidden space-y-4">
+      <CardContent className={cn("p-0 lg:p-6 lg:pt-0", isMobile && "p-0")}>
+        <div className={cn(spacing.sm, isMobile ? "p-3" : isTablet ? "p-4" : "p-0")}>
+          {/* Mobile Cards View - Otimizado */}
+          <div className={cn("block lg:hidden", spacing.xs)}>
             {budgets.map((budget, index) => (
               <div
                 key={budget.id}
-                className="will-change-transform"
+                className="will-change-transform w-full"
                 style={{
                   animationDelay: `${Math.min(index * 30, 300)}ms`,
-                  transform: 'translateZ(0)' // Force hardware acceleration
+                  transform: 'translateZ(0)'
                 }}
               >
                 <BudgetCard
@@ -82,8 +86,8 @@ export const BudgetsList = ({
           </div>
 
           {/* Desktop Table View */}
-          <div className="hidden lg:block overflow-x-auto">
-            <Table>
+          <div className="hidden lg:block overflow-x-auto w-full">
+            <Table className="w-full">
               <TableHeader>
                 <TableRow className="hover:bg-transparent border-white/10">
                   <TableHead className="w-8">
@@ -109,7 +113,7 @@ export const BudgetsList = ({
                     className="hover:bg-muted/10 transition-colors duration-200 border-white/5 will-change-transform"
                     style={{
                       animationDelay: `${Math.min(index * 20, 200)}ms`,
-                      transform: 'translateZ(0)' // Force hardware acceleration
+                      transform: 'translateZ(0)'
                     }}
                   >
                     <BudgetTableRow

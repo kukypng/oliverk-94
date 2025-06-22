@@ -15,17 +15,28 @@ interface AdaptiveLayoutProps {
 }
 
 export const AdaptiveLayout = ({ children, activeTab, onTabChange }: AdaptiveLayoutProps) => {
-  const { isMobile, isTablet, isDesktop, showSidebar, showBottomNav } = useLayout();
+  const { 
+    isMobile, 
+    isTablet, 
+    isDesktop, 
+    navHeight, 
+    containerMaxWidth,
+    safeArea,
+    orientation
+  } = useLayout();
   const { hasPermission } = useAuth();
 
   if (isDesktop) {
     return (
       <SidebarProvider defaultOpen={true}>
-        <div className="min-h-screen flex w-full bg-background">
+        <div className={cn("min-h-screen flex w-full bg-background", containerMaxWidth, "mx-auto")}>
           <AppSidebar activeTab={activeTab} onTabChange={onTabChange} />
           
-          <SidebarInset className="flex-1 flex flex-col">
-            <header className="flex h-20 shrink-0 items-center gap-4 border-b bg-background/95 backdrop-blur-sm px-6 sticky top-0 z-30">
+          <SidebarInset className="flex-1 flex flex-col min-w-0">
+            <header className={cn(
+              "flex shrink-0 items-center gap-4 border-b bg-background/95 backdrop-blur-sm px-6 sticky top-0 z-30",
+              navHeight
+            )}>
               <div className="flex items-center gap-3">
                 <img src="/icone.png" alt="Oliver Logo" className="h-9 w-9" />
                 <h1 className="text-2xl font-bold text-foreground">Oliver</h1>
@@ -33,7 +44,9 @@ export const AdaptiveLayout = ({ children, activeTab, onTabChange }: AdaptiveLay
             </header>
             
             <main className="flex-1 overflow-y-auto">
-              {children}
+              <div className="w-full h-full">
+                {children}
+              </div>
             </main>
           </SidebarInset>
         </div>
@@ -43,24 +56,38 @@ export const AdaptiveLayout = ({ children, activeTab, onTabChange }: AdaptiveLay
 
   if (isTablet) {
     return (
-      <div className="min-h-screen flex flex-col bg-background">
+      <div className="min-h-screen flex flex-col bg-background w-full">
         <TabletHeaderNav 
           activeTab={activeTab} 
           onTabChange={onTabChange}
         />
         
-        <main className="flex-1 overflow-y-auto">
-          {children}
+        <main className={cn(
+          "flex-1 overflow-y-auto w-full",
+          orientation === 'landscape' ? "pb-2" : "pb-4"
+        )}>
+          <div className={cn("w-full h-full", containerMaxWidth, "mx-auto")}>
+            {children}
+          </div>
         </main>
       </div>
     );
   }
 
-  // Mobile layout
+  // Mobile layout - otimizado para ocupar 100% da tela
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <main className="flex-1 overflow-y-auto pb-20">
-        {children}
+    <div 
+      className="min-h-screen flex flex-col bg-background w-full overflow-hidden"
+      style={{
+        paddingTop: `${safeArea.top}px`,
+        paddingLeft: `${safeArea.left}px`,
+        paddingRight: `${safeArea.right}px`,
+      }}
+    >
+      <main className="flex-1 overflow-y-auto w-full" style={{ paddingBottom: `calc(4rem + ${safeArea.bottom}px)` }}>
+        <div className="w-full min-h-full">
+          {children}
+        </div>
       </main>
       
       <MobileBottomNav 

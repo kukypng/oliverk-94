@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { PlusCircle, List, Settings, Shield } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useLayout } from '@/contexts/LayoutContext';
 
 interface MobileQuickAccessProps {
   onTabChange: (tab: string) => void;
@@ -14,6 +15,8 @@ export const MobileQuickAccess = ({
   onTabChange,
   hasPermission
 }: MobileQuickAccessProps) => {
+  const { density } = useLayout();
+  
   const quickActions = [
     {
       id: 'new-budget',
@@ -49,12 +52,14 @@ export const MobileQuickAccess = ({
     !action.permission || hasPermission(action.permission)
   );
 
+  const isCompact = density === 'compact';
+
   return (
-    <Card className="glass-card shadow-strong">
-      <CardContent className="p-6">
-        <h3 className="text-lg font-semibold mb-4">Ações Rápidas</h3>
+    <Card className="glass-card shadow-strong w-full">
+      <CardContent className={cn("w-full", isCompact ? "p-4" : "p-6")}>
+        <h3 className={cn("font-semibold mb-3", isCompact ? "text-base" : "text-lg")}>Ações Rápidas</h3>
         
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-3 w-full">
           {visibleActions.map(action => {
             const Icon = action.icon;
             return (
@@ -62,12 +67,15 @@ export const MobileQuickAccess = ({
                 key={action.id}
                 variant="outline"
                 onClick={() => onTabChange(action.id)}
-                className="h-24 flex-col gap-2 bg-background/50 hover:bg-primary hover:text-primary-foreground border border-border/50 group transition-all duration-200 hover:scale-105"
+                className={cn(
+                  "flex-col gap-2 bg-background/50 hover:bg-primary hover:text-primary-foreground border border-border/50 group transition-all duration-200 hover:scale-105 w-full",
+                  isCompact ? "h-20" : "h-24"
+                )}
               >
                 <div className="p-2 rounded-lg bg-background/10 group-hover:bg-white/20">
-                  <Icon className={cn("h-5 w-5", action.color, "group-hover:text-white")} />
+                  <Icon className={cn(action.color, "group-hover:text-white", isCompact ? "h-4 w-4" : "h-5 w-5")} />
                 </div>
-                <span className="text-xs font-medium text-center leading-tight whitespace-pre-line">
+                <span className={cn("font-medium text-center leading-tight whitespace-pre-line", isCompact ? "text-[10px]" : "text-xs")}>
                   {action.label}
                 </span>
               </Button>
