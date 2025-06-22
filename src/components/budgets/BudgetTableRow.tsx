@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { TableCell } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
@@ -7,7 +6,6 @@ import { MessageCircle, Eye, Edit, Clock, Trash2 } from '@/components/ui/icons';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useLayout } from '@/contexts/LayoutContext';
 import { cn } from '@/lib/utils';
-
 interface BudgetTableRowProps {
   budget: any;
   profile: any;
@@ -20,7 +18,6 @@ interface BudgetTableRowProps {
   onEdit: (budget: any) => void;
   onDelete: (budget: any) => void;
 }
-
 const isBudgetOld = (createdAt: string, warningDays: number | undefined | null): boolean => {
   if (!createdAt || !warningDays) return false;
   const now = new Date();
@@ -29,7 +26,6 @@ const isBudgetOld = (createdAt: string, warningDays: number | undefined | null):
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   return diffDays > warningDays;
 };
-
 export const BudgetTableRow = ({
   budget,
   profile,
@@ -42,8 +38,10 @@ export const BudgetTableRow = ({
   onEdit,
   onDelete
 }: BudgetTableRowProps) => {
-  const { isMobile, isTablet } = useLayout();
-
+  const {
+    isMobile,
+    isTablet
+  } = useLayout();
   if (!budget || !budget.id) {
     console.warn('BudgetTableRow: budget inválido:', budget);
     return null;
@@ -62,25 +60,10 @@ export const BudgetTableRow = ({
     if (isTablet) return 'p-1.5 -m-1.5'; // Área de toque média para tablet
     return 'p-0.5'; // Área normal para desktop
   };
-
   return <>
       <TableCell className="w-8">
-        <div className={cn(
-          "opacity-60 hover:opacity-100 transition-all duration-200 rounded-md",
-          getCheckboxContainer(),
-          (isMobile || isTablet) && "hover:bg-muted/20"
-        )}>
-          <Checkbox 
-            checked={isSelected} 
-            onCheckedChange={checked => onSelect(budget.id, !!checked)} 
-            className={cn(
-              "transition-all duration-200 hover:scale-110 border-2",
-              getCheckboxSize(),
-              isMobile && "border-muted-foreground/60 data-[state=checked]:border-primary",
-              isTablet && "border-muted-foreground/50 data-[state=checked]:border-primary/80",
-              !isMobile && !isTablet && "border-muted-foreground/40 data-[state=checked]:border-primary/60"
-            )} 
-          />
+        <div className={cn("opacity-60 hover:opacity-100 transition-all duration-200 rounded-md", getCheckboxContainer(), (isMobile || isTablet) && "hover:bg-muted/20")}>
+          <Checkbox checked={isSelected} onCheckedChange={checked => onSelect(budget.id, !!checked)} className={cn("transition-all duration-200 hover:scale-110 border-2", getCheckboxSize(), isMobile && "border-muted-foreground/60 data-[state=checked]:border-primary", isTablet && "border-muted-foreground/50 data-[state=checked]:border-primary/80", !isMobile && !isTablet && "border-muted-foreground/40 data-[state=checked]:border-primary/60")} />
         </div>
       </TableCell>
       <TableCell>
@@ -110,8 +93,7 @@ export const BudgetTableRow = ({
           <span className="text-sm text-muted-foreground font-medium">
             {budget.created_at ? new Date(budget.created_at).toLocaleDateString('pt-BR') : 'Data não informada'}
           </span>
-          {profile?.budget_warning_enabled && budget.created_at && isBudgetOld(budget.created_at, profile.budget_warning_days) && 
-            <TooltipProvider>
+          {profile?.budget_warning_enabled && budget.created_at && isBudgetOld(budget.created_at, profile.budget_warning_days) && <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
                   <Clock className="h-4 w-4 text-destructive" />
@@ -120,45 +102,21 @@ export const BudgetTableRow = ({
                   <p>Este orçamento tem mais de {profile.budget_warning_days} dias.</p>
                 </TooltipContent>
               </Tooltip>
-            </TooltipProvider>
-          }
+            </TooltipProvider>}
         </div>
       </TableCell>
       <TableCell>
         <div className="flex items-center justify-center space-x-1">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => onShareWhatsApp(budget)} 
-            className="h-9 w-9 p-0 text-green-600 hover:text-green-700 hover:bg-green-50 dark:hover:bg-green-950 rounded-xl transition-all duration-150"
-          >
+          <Button variant="ghost" size="sm" onClick={() => onShareWhatsApp(budget)} className="h-9 w-9 p-0 text-green-600 hover:text-green-700 hover:bg-green-50 dark:hover:bg-green-950 rounded-xl transition-all duration-150">
             <MessageCircle className="h-4 w-4" />
           </Button>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => onViewPDF(budget)} 
-            disabled={isGenerating} 
-            className="h-9 w-9 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-950 rounded-xl transition-all duration-150 disabled:opacity-50"
-          >
+          <Button variant="ghost" size="sm" onClick={() => onViewPDF(budget)} disabled={isGenerating} className="h-9 w-9 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-950 rounded-xl transition-all duration-150 disabled:opacity-50">
             <Eye className="h-4 w-4" />
           </Button>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => onEdit(budget)} 
-            className="h-9 w-9 p-0 hover:bg-muted/20 hover:text-[#fec832] rounded-xl transition-all duration-150"
-          >
+          <Button variant="ghost" size="sm" onClick={() => onEdit(budget)} className="h-9 w-9 p-0 hover:bg-muted/20 hover:text-[#fec832] rounded-xl transition-all duration-150">
             <Edit className="h-4 w-4" />
           </Button>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => onDelete(budget)} 
-            className="h-9 w-9 p-0 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950 rounded-xl transition-all duration-150"
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
+          
         </div>
       </TableCell>
     </>;
