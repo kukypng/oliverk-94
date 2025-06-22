@@ -40,7 +40,7 @@ export const BudgetCard = ({
   onEdit,
   onDelete
 }: BudgetCardProps) => {
-  const { isMobile, density } = useLayout();
+  const { isMobile, isTablet, density } = useLayout();
 
   if (!budget || !budget.id) {
     console.warn('BudgetCard: budget inválido:', budget);
@@ -48,6 +48,20 @@ export const BudgetCard = ({
   }
 
   const isCompact = density === 'compact';
+
+  // Definir tamanho do checkbox baseado no dispositivo
+  const getCheckboxSize = () => {
+    if (isMobile) return 'w-5 h-5'; // 20px para mobile
+    if (isTablet) return 'w-4 h-4'; // 16px para tablet
+    return 'w-3.5 h-3.5'; // 14px para desktop
+  };
+
+  // Definir área de toque expandida para mobile
+  const getCheckboxContainer = () => {
+    if (isMobile) return 'p-2 -m-2'; // Área de toque maior para mobile
+    if (isTablet) return 'p-1.5 -m-1.5'; // Área de toque média para tablet
+    return 'p-0.5'; // Área normal para desktop
+  };
 
   return (
     <div className={cn(
@@ -59,11 +73,21 @@ export const BudgetCard = ({
     }}>
       <div className={cn("flex items-start justify-between", isCompact ? "mb-3" : "mb-4")}>
         <div className="flex items-start space-x-3 flex-1 min-w-0">
-          <div className="pt-0.5 opacity-60 hover:opacity-100 transition-opacity flex-shrink-0">
+          <div className={cn(
+            "pt-0.5 opacity-60 hover:opacity-100 transition-all duration-200 flex-shrink-0 rounded-md",
+            getCheckboxContainer(),
+            isMobile && "hover:bg-muted/20"
+          )}>
             <Checkbox 
               checked={isSelected} 
               onCheckedChange={checked => onSelect(budget.id, !!checked)} 
-              className="w-3.5 h-3.5 transition-all duration-200 hover:scale-110 border-muted-foreground/40 data-[state=checked]:border-primary/60" 
+              className={cn(
+                "transition-all duration-200 hover:scale-110 border-2",
+                getCheckboxSize(),
+                isMobile && "border-muted-foreground/60 data-[state=checked]:border-primary",
+                isTablet && "border-muted-foreground/50 data-[state=checked]:border-primary/80",
+                !isMobile && !isTablet && "border-muted-foreground/40 data-[state=checked]:border-primary/60"
+              )} 
             />
           </div>
           <div className="flex-1 min-w-0">

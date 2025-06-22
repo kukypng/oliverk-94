@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { MessageCircle, Eye, Edit, Clock, Trash2 } from '@/components/ui/icons';
 import { Checkbox } from '@/components/ui/checkbox';
+import { useLayout } from '@/contexts/LayoutContext';
+import { cn } from '@/lib/utils';
 
 interface BudgetTableRowProps {
   budget: any;
@@ -40,18 +42,44 @@ export const BudgetTableRow = ({
   onEdit,
   onDelete
 }: BudgetTableRowProps) => {
+  const { isMobile, isTablet } = useLayout();
+
   if (!budget || !budget.id) {
     console.warn('BudgetTableRow: budget inválido:', budget);
     return null;
   }
 
+  // Definir tamanho do checkbox baseado no dispositivo
+  const getCheckboxSize = () => {
+    if (isMobile) return 'w-5 h-5'; // 20px para mobile
+    if (isTablet) return 'w-4 h-4'; // 16px para tablet
+    return 'w-3.5 h-3.5'; // 14px para desktop
+  };
+
+  // Definir área de toque expandida para mobile/tablet
+  const getCheckboxContainer = () => {
+    if (isMobile) return 'p-2 -m-2'; // Área de toque maior para mobile
+    if (isTablet) return 'p-1.5 -m-1.5'; // Área de toque média para tablet
+    return 'p-0.5'; // Área normal para desktop
+  };
+
   return <>
       <TableCell className="w-8">
-        <div className="opacity-60 hover:opacity-100 transition-opacity">
+        <div className={cn(
+          "opacity-60 hover:opacity-100 transition-all duration-200 rounded-md",
+          getCheckboxContainer(),
+          (isMobile || isTablet) && "hover:bg-muted/20"
+        )}>
           <Checkbox 
             checked={isSelected} 
             onCheckedChange={checked => onSelect(budget.id, !!checked)} 
-            className="w-3.5 h-3.5 transition-all duration-200 hover:scale-110 border-muted-foreground/40 data-[state=checked]:border-primary/60" 
+            className={cn(
+              "transition-all duration-200 hover:scale-110 border-2",
+              getCheckboxSize(),
+              isMobile && "border-muted-foreground/60 data-[state=checked]:border-primary",
+              isTablet && "border-muted-foreground/50 data-[state=checked]:border-primary/80",
+              !isMobile && !isTablet && "border-muted-foreground/40 data-[state=checked]:border-primary/60"
+            )} 
           />
         </div>
       </TableCell>
