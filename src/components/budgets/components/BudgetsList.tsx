@@ -53,17 +53,17 @@ export const BudgetsList = ({
   };
 
   return (
-    <Card className="glass-card border-0 shadow-lg animate-fade-in bg-white/50 dark:bg-black/50 backdrop-blur-xl w-full">
+    <Card className="glass-card border-0 shadow-lg animate-fade-in bg-glass-gradient border-brand-green/20 dark:border-brand-green/30 backdrop-blur-xl w-full">
       <CardHeader className={cn("p-3 lg:p-6", isMobile && "p-3")}>
-        <CardTitle className="flex items-center justify-between text-lg lg:text-xl">
+        <CardTitle className="flex items-center justify-between text-lg lg:text-xl text-foreground">
           <span>Lista de Orçamentos</span>
           {budgets.length > 0 && (
             <div className="flex items-center space-x-2">
-              <Badge variant="secondary" className="bg-[#fec832]/10 text-[#fec832] border-[#fec832]/20 font-semibold">
+              <Badge variant="secondary" className="bg-brand-green/10 text-brand-green border-brand-green/30 font-semibold">
                 {budgets.length}
               </Badge>
               {selectedBudgets.length > 0 && (
-                <Badge variant="destructive" className="text-xs font-medium">
+                <Badge variant="destructive" className="text-xs font-medium bg-brand-orange/10 text-brand-orange border-brand-orange/30">
                   {selectedBudgets.length} selecionado{selectedBudgets.length > 1 ? 's' : ''}
                 </Badge>
               )}
@@ -101,14 +101,14 @@ export const BudgetsList = ({
 
           {/* Desktop Table View */}
           <div className="hidden lg:block overflow-x-auto w-full">
-            <Table className="w-full">
+            <Table className="w-full table-premium">
               <TableHeader>
-                <TableRow className="hover:bg-transparent border-white/10">
+                <TableRow className="hover:bg-transparent border-brand-green/10">
                   <TableHead className="w-8">
                     <div className={cn(
                       "opacity-60 hover:opacity-100 transition-all duration-200 rounded-md",
                       getSelectAllCheckboxContainer(),
-                      (isMobile || isTablet) && "hover:bg-muted/20"
+                      (isMobile || isTablet) && "hover:bg-brand-green/10"
                     )}>
                       <Checkbox
                         checked={isAllSelected}
@@ -116,9 +116,9 @@ export const BudgetsList = ({
                         className={cn(
                           "transition-all duration-200 hover:scale-110 border-2",
                           getSelectAllCheckboxSize(),
-                          isMobile && "border-muted-foreground/60 data-[state=checked]:border-primary",
-                          isTablet && "border-muted-foreground/50 data-[state=checked]:border-primary/80",
-                          !isMobile && !isTablet && "border-muted-foreground/40 data-[state=checked]:border-primary/60"
+                          isMobile && "border-brand-green/60 data-[state=checked]:border-brand-green",
+                          isTablet && "border-brand-green/50 data-[state=checked]:border-brand-green/80",
+                          !isMobile && !isTablet && "border-brand-green/40 data-[state=checked]:border-brand-green/60"
                         )}
                       />
                     </div>
@@ -134,7 +134,7 @@ export const BudgetsList = ({
                 {budgets.map((budget, index) => (
                   <TableRow 
                     key={budget.id} 
-                    className="hover:bg-muted/10 transition-colors duration-200 border-white/5 will-change-transform"
+                    className="hover:bg-brand-green/5 transition-colors duration-200 border-brand-green/10 will-change-transform group"
                     style={{
                       animationDelay: `${Math.min(index * 20, 200)}ms`,
                       transform: 'translateZ(0)'
