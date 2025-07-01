@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -11,7 +10,7 @@
     --background: 255 251 239;  /* #fffbef - warm cream */
     --foreground: 10 18 17;     /* #0a1211 - deep dark green */
 
-    --card: 248 249 250;        /* Light warm gray for cards */
+    --card: 255 255 255;        /* Pure white for cards in light mode */
     --card-foreground: 10 18 17;
 
     --popover: 255 251 239;
@@ -20,20 +19,20 @@
     --primary: 140 226 170;     /* #8ce2aa - vibrant green */
     --primary-foreground: 10 18 17;
 
-    --secondary: 255 113 33;    /* #ff7121 - vibrant orange */
-    --secondary-foreground: 255 251 239;
+    --secondary: 240 240 240;   /* Light gray for secondary elements */
+    --secondary-foreground: 10 18 17;
 
-    --muted: 240 240 240;
+    --muted: 248 249 250;       /* Very light gray */
     --muted-foreground: 115 115 115;
 
-    --accent: 10 18 17;         /* #0a1211 - deep dark green as accent */
-    --accent-foreground: 255 251 239;
+    --accent: 140 226 170;      /* Green accent */
+    --accent-foreground: 10 18 17;
 
     --destructive: 239 68 68;
     --destructive-foreground: 255 251 239;
 
     --border: 228 228 231;
-    --input: 228 228 231;
+    --input: 248 249 250;
     --ring: 140 226 170;        /* Green ring */
 
     --radius: 0.75rem;
@@ -42,7 +41,7 @@
     --sidebar-foreground: 10 18 17;
     --sidebar-primary: 140 226 170;
     --sidebar-primary-foreground: 10 18 17;
-    --sidebar-accent: 240 240 240;
+    --sidebar-accent: 248 249 250;
     --sidebar-accent-foreground: 10 18 17;
     --sidebar-border: 228 228 231;
     --sidebar-ring: 140 226 170;
@@ -52,19 +51,6 @@
     --shadow-medium: 0 4px 6px -1px rgba(10, 18, 17, 0.1), 0 2px 4px -1px rgba(10, 18, 17, 0.06);
     --shadow-strong: 0 10px 15px -3px rgba(10, 18, 17, 0.1), 0 4px 6px -2px rgba(10, 18, 17, 0.05);
     --shadow-xl: 0 20px 25px -5px rgba(10, 18, 17, 0.1), 0 10px 10px -5px rgba(10, 18, 17, 0.04);
-
-    /* Premium spacing and effects */
-    --spacing-xs: 0.25rem;
-    --spacing-sm: 0.5rem;
-    --spacing-md: 1rem;
-    --spacing-lg: 1.5rem;
-    --spacing-xl: 2rem;
-    --spacing-2xl: 3rem;
-    --spacing-3xl: 4rem;
-
-    --blur-glass: blur(20px);
-    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-spring: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   }
 
   .dark {
@@ -81,7 +67,7 @@
     --primary: 140 226 170;     /* #8ce2aa - vibrant green */
     --primary-foreground: 10 18 17;
 
-    --secondary: 255 113 33;    /* #ff7121 - vibrant orange */
+    --secondary: 55 55 55;      /* Darker gray for secondary elements */
     --secondary-foreground: 255 251 239;
 
     --muted: 55 55 55;
@@ -124,7 +110,7 @@
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     font-feature-settings: "rlig" 1, "calt" 1;
     overscroll-behavior: none;
-    /* Enhanced background with brand gradient */
+    /* Subtle background gradient */
     background: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(var(--muted)) 100%);
   }
 
@@ -191,111 +177,71 @@
 @layer components {
   /* Modern Brand Glass Morphism */
   .glass {
-    @apply backdrop-blur-xl bg-card/80 dark:bg-card/90 border border-brand-green/10 dark:border-brand-green/20;
-    backdrop-filter: var(--blur-glass);
-    -webkit-backdrop-filter: var(--blur-glass);
+    @apply backdrop-blur-xl bg-card/95 border border-brand-green/10 dark:border-brand-green/20;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
   }
 
   .glass-card {
-    @apply glass rounded-3xl shadow-medium;
-    transition: var(--transition-smooth);
+    @apply glass rounded-2xl shadow-soft;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     background: linear-gradient(135deg, 
-      rgba(255, 251, 239, 0.1) 0%, 
-      rgba(140, 226, 170, 0.05) 100%);
+      hsl(var(--card)) 0%, 
+      rgba(140, 226, 170, 0.02) 100%);
   }
 
   .glass-card:hover {
-    @apply shadow-strong;
-    transform: translateY(-2px);
-    box-shadow: 0 0 20px rgba(140, 226, 170, 0.2);
+    @apply shadow-medium;
+    transform: translateY(-1px);
+    box-shadow: 0 0 15px rgba(140, 226, 170, 0.15);
   }
 
   /* Enhanced Brand Buttons */
   .btn-brand-primary {
-    @apply relative overflow-hidden rounded-2xl px-6 py-4 font-semibold;
+    @apply relative overflow-hidden rounded-xl px-6 py-3 font-semibold;
     @apply text-brand-dark bg-brand-green;
     @apply transform transition-all duration-300 ease-out;
     @apply hover:scale-[1.02] active:scale-[0.98];
-    @apply shadow-medium hover:shadow-brand-glow;
+    @apply shadow-soft hover:shadow-brand-glow;
     background: linear-gradient(135deg, #8ce2aa 0%, #6bc48b 100%);
   }
 
   .btn-brand-primary:hover {
     background: linear-gradient(135deg, #6bc48b 0%, #8ce2aa 100%);
-    animation: glow 2s ease-in-out infinite;
   }
 
   .btn-brand-secondary {
-    @apply relative overflow-hidden rounded-2xl px-6 py-4 font-semibold;
+    @apply relative overflow-hidden rounded-xl px-6 py-3 font-semibold;
     @apply text-brand-cream bg-brand-orange;
     @apply transform transition-all duration-300 ease-out;
     @apply hover:scale-[1.02] active:scale-[0.98];
-    @apply shadow-medium hover:shadow-orange-glow;
+    @apply shadow-soft hover:shadow-orange-glow;
     background: linear-gradient(135deg, #ff7121 0%, #e85a0f 100%);
-  }
-
-  .btn-brand-secondary:hover {
-    background: linear-gradient(135deg, #e85a0f 0%, #ff7121 100%);
   }
 
   /* Enhanced Card Styles */
   .card-premium {
-    @apply bg-card border border-brand-green/20 rounded-2xl shadow-soft;
+    @apply bg-card border border-brand-green/10 rounded-xl shadow-soft;
     @apply transition-all duration-300 ease-out;
-    @apply hover:shadow-medium hover:-translate-y-1 hover:border-brand-green/40;
+    @apply hover:shadow-medium hover:-translate-y-0.5 hover:border-brand-green/20;
     background: linear-gradient(135deg, 
       hsl(var(--card)) 0%, 
-      rgba(140, 226, 170, 0.02) 100%);
-    backdrop-filter: blur(8px);
+      rgba(140, 226, 170, 0.01) 100%);
   }
 
   .card-premium:hover {
-    box-shadow: 0 0 30px rgba(140, 226, 170, 0.15);
+    box-shadow: 0 0 20px rgba(140, 226, 170, 0.1);
   }
 
-  /* Interactive Elements with Brand Colors */
+  /* Interactive Elements */
   .interactive-scale {
     @apply transition-transform duration-200 ease-out;
-    @apply hover:scale-[1.02] active:scale-[0.98];
+    @apply hover:scale-[1.01] active:scale-[0.99];
   }
 
-  /* Enhanced FAB */
-  .fab {
-    @apply fixed bottom-24 right-6 z-40 lg:bottom-6;
-    @apply w-16 h-16 rounded-3xl;
-    @apply flex items-center justify-center shadow-xl;
-    @apply transform transition-all duration-500 ease-out;
-    @apply hover:scale-110 active:scale-95;
-    @apply text-brand-dark;
-    background: linear-gradient(135deg, #8ce2aa 0%, #6bc48b 100%);
-    box-shadow: 0 0 30px rgba(140, 226, 170, 0.4);
-  }
-
-  .fab:hover {
-    animation: glow 2s ease-in-out infinite;
-  }
-
-  /* Enhanced Input Styles */
-  .input-premium {
-    @apply flex h-12 w-full rounded-xl border border-brand-green/30 bg-input/50 px-4 py-3;
-    @apply text-base ring-offset-background file:border-0 file:bg-transparent;
-    @apply file:text-sm file:font-medium placeholder:text-muted-foreground;
-    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/40;
-    @apply focus-visible:ring-offset-2 focus-visible:border-brand-green/60;
-    @apply disabled:cursor-not-allowed disabled:opacity-50;
-    @apply transition-all duration-200 ease-out;
-    backdrop-filter: blur(8px);
-  }
-
-  .input-premium:focus {
-    @apply bg-background/80 shadow-soft;
-    transform: translateY(-1px);
-    box-shadow: 0 0 15px rgba(140, 226, 170, 0.2);
-  }
-
-  /* Enhanced Status Badges with Brand Colors */
+  /* Enhanced Status Badges */
   .status-badge {
-    @apply inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold;
+    @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium;
     @apply transition-all duration-200 ease-out;
   }
 
@@ -311,34 +257,26 @@
     @apply bg-red-500/10 text-red-600 border border-red-500/20;
   }
 
-  .status-badge.info {
-    @apply bg-blue-500/10 text-blue-600 border border-blue-500/20;
-  }
-
   /* Enhanced Table Styles */
   .table-premium {
-    @apply w-full border-separate border-spacing-0 bg-card rounded-2xl overflow-hidden shadow-soft;
+    @apply w-full border-separate border-spacing-0 bg-card rounded-xl overflow-hidden shadow-soft;
     background: linear-gradient(135deg, 
       hsl(var(--card)) 0%, 
-      rgba(140, 226, 170, 0.02) 100%);
+      rgba(140, 226, 170, 0.01) 100%);
   }
 
   .table-premium th {
-    @apply bg-brand-green/5 px-6 py-4 text-left font-semibold text-sm text-muted-foreground;
-    @apply uppercase tracking-wider border-b border-brand-green/20;
+    @apply bg-brand-green/5 px-4 py-3 text-left font-medium text-sm text-muted-foreground;
+    @apply border-b border-brand-green/10;
   }
 
   .table-premium td {
-    @apply px-6 py-4 border-b border-brand-green/10 text-foreground;
+    @apply px-4 py-3 border-b border-brand-green/5 text-foreground;
     @apply transition-colors duration-200;
   }
 
   .table-premium tr:hover td {
-    @apply bg-brand-green/5;
-  }
-
-  .table-premium tr:last-child td {
-    @apply border-b-0;
+    @apply bg-brand-green/3;
   }
 
   /* Mobile optimizations */
@@ -349,46 +287,6 @@
   .mobile-touch {
     @apply min-h-[44px] min-w-[44px];
     touch-action: manipulation;
-  }
-
-  /* Enhanced focus rings with brand colors */
-  .focus-ring {
-    @apply focus:outline-none focus:ring-2 focus:ring-brand-green/30 focus:border-brand-green/60;
-    @apply transition-all duration-200 ease-out;
-  }
-
-  /* Premium loading states with brand colors */
-  .loading-shimmer {
-    background: linear-gradient(90deg, 
-      hsla(var(--muted)) 25%, 
-      rgba(140, 226, 170, 0.1) 50%, 
-      hsla(var(--muted)) 75%);
-    background-size: 200% 100%;
-    animation: shimmer 2s infinite;
-  }
-
-  /* Enhanced animations */
-  .animate-fade-in-up {
-    animation: fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .animate-scale-in {
-    animation: scaleIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .animate-slide-up {
-    animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  /* Responsive grid with enhanced spacing */
-  .grid-responsive {
-    @apply grid gap-6;
-    @apply grid-cols-1 md:grid-cols-2 lg:grid-cols-3;
-  }
-
-  .grid-responsive-cards {
-    @apply grid gap-4;
-    @apply grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4;
   }
 
   /* Brand gradient backgrounds */
@@ -406,8 +304,8 @@
 
   .bg-glass-gradient {
     background: linear-gradient(135deg, 
-      rgba(255, 251, 239, 0.1) 0%, 
-      rgba(140, 226, 170, 0.1) 100%);
+      rgba(255, 251, 239, 0.05) 0%, 
+      rgba(140, 226, 170, 0.05) 100%);
   }
 }
 
