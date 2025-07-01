@@ -42,7 +42,7 @@ export const AdaptiveDashboard = ({
             <h2 className="font-semibold text-foreground text-sm">
               {profile?.name || 'Usuário'}
             </h2>
-            <Badge variant="secondary" className="text-[10px] px-1.5 py-0.5 bg-primary/10 text-primary border-primary/20">
+            <Badge variant="secondary" className="text-[10px] px-1.5 py-0.5">
               {profile?.role.toUpperCase() || 'USER'}
             </Badge>
           </div>
@@ -74,7 +74,7 @@ export const AdaptiveDashboard = ({
               <h3 className="font-semibold text-foreground">
                 {profile?.name || 'Usuário'}
               </h3>
-              <Badge variant="secondary" className="text-xs mt-0.5 bg-primary/10 text-primary border-primary/20">
+              <Badge variant="secondary" className="text-xs mt-0.5">
                 {profile?.role.toUpperCase() || 'USER'}
               </Badge>
             </div>
